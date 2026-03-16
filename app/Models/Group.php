@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Group extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
@@ -40,6 +42,7 @@ class Group extends Model
     public function players(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'group_user')
+            ->withPivot('is_admin')
             ->withTimestamps();
     }
 }
