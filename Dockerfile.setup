@@ -1,0 +1,4 @@
+# Sprint 0 — Imagem para setup (PHP 8.2 + Composer + Node)
+FROM docker.io/library/composer:2.8 AS setup
+RUN apk add --no-cache nodejs npm
+WORKDIR /app
