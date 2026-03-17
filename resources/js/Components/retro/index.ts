@@ -25,3 +25,10 @@ export { RetroNumberStepper } from './RetroNumberStepper';
 export { RetroFileInput } from './RetroFileInput';
 export { RetroDatePicker } from './RetroDatePicker';
 export { RetroButton } from './RetroButton';
+export {
+  RetroTable,
+  RetroTableHeaderRow,
+  RetroTableHeaderCell,
+  RetroTableRow,
+  RetroTableCell,
+} from './RetroTable';
