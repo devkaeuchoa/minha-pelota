@@ -47,6 +47,25 @@ class GroupController extends Controller
         return redirect()->route('groups.index');
     }
 
+    public function destroyMany(Request $request): RedirectResponse
+    {
+        $ids = $request->input('ids', []);
+
+        if (! is_array($ids) || $ids === []) {
+            return redirect()->route('groups.index');
+        }
+
+        $query = Group::query()->whereIn('id', $ids);
+
+        if (! app()->environment('local')) {
+            $query->where('owner_id', $request->user()->id);
+        }
+
+        $query->delete();
+
+        return redirect()->route('groups.index');
+    }
+
     private function authorizeOwner(Request $request, Group $group): void
     {
         if (app()->environment('local')) {

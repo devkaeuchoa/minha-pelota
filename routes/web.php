@@ -59,6 +59,7 @@ if (app()->environment('local')) {
         Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
         Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
         Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
+        Route::delete('/groups', [GroupController::class, 'destroyMany'])->name('groups.destroyMany');
     });
 } else {
     Route::middleware('auth')->group(function () {
@@ -109,6 +110,7 @@ if (app()->environment('local')) {
         Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
         Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
         Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
+        Route::delete('/groups', [GroupController::class, 'destroyMany'])->name('groups.destroyMany');
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
