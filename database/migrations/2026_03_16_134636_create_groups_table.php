@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->string('name', 120);
             $table->string('slug', 150)->unique();
-            $table->string('weekday', 10);
+            $table->unsignedTinyInteger('weekday');
             $table->time('time');
             $table->string('location_name', 150);
             $table->string('status', 20)->default('active');

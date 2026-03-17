@@ -30,7 +30,7 @@ CREATE_GROUP_RESPONSE=$(curl -sS -X POST "${API_BASE}/groups" \
   -d '{
     "name": "Smoke Test Group",
     "slug": "smoke-test-group",
-    "weekday": "monday",
+    "weekday": 1,
     "time": "20:00",
     "location_name": "Smoke Arena"
   }')
