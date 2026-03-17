@@ -19,7 +19,7 @@ export function GroupsHeader({
   total,
   selectedCount,
 }: GroupsHeaderProps) {
-  const statusLabel = 'BATCH';
+  const statusLabel = 'SELEÇÃO';
   const status = hasSelection ? 'on' : 'off';
   const totalLabel = total.toString();
   const selectedLabel = selectedCount.toString();
@@ -30,12 +30,12 @@ export function GroupsHeader({
         <RetroStatusPill status={status} label={statusLabel} />
 
         <div className="flex flex-wrap gap-3">
-          <RetroValueDisplay label="GROUPS" value={totalLabel} />
-          <RetroValueDisplay label="SELECTED" value={selectedLabel} />
+          <RetroValueDisplay label="GRUPOS" value={totalLabel} />
+          <RetroValueDisplay label="SELECIONADOS" value={selectedLabel} />
         </div>
       </div>
 
-      <RetroInlineInfo message="MANAGE YOUR GROUPS AND MATCHES." />
+      <RetroInlineInfo message="GERENCIE SEUS GRUPOS E PARTIDAS." />
 
       <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-1 justify-end gap-3">
@@ -44,11 +44,11 @@ export function GroupsHeader({
             variant="danger"
             disabled={!hasSelection || processing}
           >
-            REMOVE SELECTED
+            REMOVER SELECIONADOS
           </RetroButton>
           <Link href="/groups/create" className="flex-1">
             <RetroButton type="button" variant="success">
-              NEW GROUP
+              NOVO GRUPO
             </RetroButton>
           </Link>
         </div>

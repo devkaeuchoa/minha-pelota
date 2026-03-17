@@ -1,4 +1,3 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { Group, Player, PageProps } from '@/types';
 import { useGroupShowController } from '@/features/groups/useGroupShowController';
@@ -7,6 +6,7 @@ import { GroupInviteSection } from '@/features/groups/components/GroupInviteSect
 import { PlayersTable } from '@/features/groups/components/PlayersTable';
 import { PlayerForm } from '@/features/groups/components/PlayerForm';
 import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
+import { RetroLayout, RetroSectionHeader, RetroPanel } from '@/Components/retro';
 
 interface ShowProps extends PageProps {
   group: Group;
@@ -17,40 +17,52 @@ export default function Show({ group, players }: ShowProps) {
   const { addForm, invite, playersSection, settings } = useGroupShowController(group, players);
 
   return (
-    <AuthenticatedLayout header={<h2>Grupo: {group.name}</h2>}>
+    <RetroLayout>
       <Head title={group.name} />
 
-      <GroupDetailsSection group={group} />
+      <RetroSectionHeader title="2. DETALHES DO GRUPO" />
+      <RetroPanel>
+        <GroupDetailsSection group={group} />
+      </RetroPanel>
 
-      <GroupInviteSection
-        inviteUrl={invite.inviteUrl}
-        processing={invite.processing}
-        onGenerateInvite={invite.onGenerate}
-        onCopyInvite={invite.onCopy}
-      />
+      <RetroSectionHeader title="3. CONVITE" />
+      <RetroPanel>
+        <GroupInviteSection
+          inviteUrl={invite.inviteUrl}
+          processing={invite.processing}
+          onGenerateInvite={invite.onGenerate}
+          onCopyInvite={invite.onCopy}
+        />
+      </RetroPanel>
 
-      <section className="section section--tight">
-        <h3>Jogadores ({playersSection.players.length})</h3>
+      <RetroSectionHeader title={`4. JOGADORES (${playersSection.players.length})`} />
+      <RetroPanel>
         <PlayersTable
           players={playersSection.players}
           onRemovePlayer={playersSection.onRemovePlayer}
           removeProcessingId={playersSection.removeProcessingId}
         />
-      </section>
+      </RetroPanel>
 
-      <PlayerForm
-        values={addForm.values}
-        errors={addForm.errors}
-        processing={addForm.processing}
-        onChange={addForm.onChange}
-        onSubmit={addForm.onSubmit}
-      />
+      <RetroSectionHeader title="5. ADICIONAR JOGADOR" />
+      <RetroPanel>
+        <PlayerForm
+          values={addForm.values}
+          errors={addForm.errors}
+          processing={addForm.processing}
+          onChange={addForm.onChange}
+          onSubmit={addForm.onSubmit}
+        />
+      </RetroPanel>
 
-      <GroupSettingsSection
-        groupId={settings.groupId}
-        deleteProcessing={settings.deleteProcessing}
-        onDeleteGroup={settings.onDeleteGroup}
-      />
-    </AuthenticatedLayout>
+      <RetroSectionHeader title="6. CONFIGURAÇÕES DO GRUPO" />
+      <RetroPanel>
+        <GroupSettingsSection
+          groupId={settings.groupId}
+          deleteProcessing={settings.deleteProcessing}
+          onDeleteGroup={settings.onDeleteGroup}
+        />
+      </RetroPanel>
+    </RetroLayout>
   );
 }
