@@ -1,3 +1,5 @@
+import { RetroBannerAlert, RetroButton, RetroFormField, RetroTextInput } from '@/Components/retro';
+
 interface GroupInviteSectionProps {
   inviteUrl: string | null;
   processing: boolean;
@@ -11,25 +13,43 @@ export function GroupInviteSection({
   onGenerateInvite,
   onCopyInvite,
 }: GroupInviteSectionProps) {
+  if (inviteUrl) {
+    return (
+      <div className="flex flex-col gap-3">
+        <RetroBannerAlert message="LINK DE CONVITE ATIVO" />
+        <RetroFormField label="LINK DO CONVITE" htmlFor="group_invite_url">
+          <RetroTextInput
+            id="group_invite_url"
+            readOnly
+            value={inviteUrl}
+            onClick={onCopyInvite}
+          />
+        </RetroFormField>
+        <div className="flex gap-3">
+          <RetroButton type="button" variant="success" onClick={onCopyInvite}>
+            COPIAR LINK
+          </RetroButton>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <section className="section section--tight">
-      <h3>Convite do grupo</h3>
-      {inviteUrl ? (
-        <>
-          <p>Compartilhe este link para jogadores se cadastrarem no grupo:</p>
-          <input type="text" value={inviteUrl} readOnly />
-          <button type="button" onClick={onCopyInvite}>
-            Copiar link
-          </button>
-        </>
-      ) : (
-        <>
-          <p>Este grupo ainda não possui um link de convite ativo.</p>
-          <button type="button" disabled={processing} onClick={onGenerateInvite}>
-            Gerar link de convite
-          </button>
-        </>
-      )}
-    </section>
+    <div className="flex flex-col gap-3">
+      <RetroBannerAlert message="NENHUM LINK DE CONVITE ATIVO" />
+      <p className="retro-text-shadow text-sm text-[#a0b0ff]">
+        GERE UM LINK PARA QUE NOVOS JOGADORES ENTREM NO GRUPO.
+      </p>
+      <div className="flex gap-3">
+        <RetroButton
+          type="button"
+          variant="success"
+          disabled={processing}
+          onClick={onGenerateInvite}
+        >
+          GERAR LINK DE CONVITE
+        </RetroButton>
+      </div>
+    </div>
   );
 }

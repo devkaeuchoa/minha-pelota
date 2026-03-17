@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { RetroButton } from '@/Components/retro';
 
 interface GroupSettingsSectionProps {
   groupId: number;
@@ -12,12 +13,25 @@ export function GroupSettingsSection({
   onDeleteGroup,
 }: GroupSettingsSectionProps) {
   return (
-    <section className="section section--tight">
-      <h3>Configurações do grupo</h3>
-      <Link href={`/groups/${groupId}/edit`}>Editar grupo</Link>
-      <button type="button" disabled={deleteProcessing} onClick={onDeleteGroup}>
-        Remover grupo
-      </button>
-    </section>
+    <div className="flex flex-col gap-3">
+      <p className="retro-text-shadow text-sm text-[#a0b0ff]">
+        EDITE OU REMOVA AS CONFIGURAÇÕES DO GRUPO.
+      </p>
+      <div className="flex gap-3">
+        <Link href={`/groups/${groupId}/edit`} className="flex-1">
+          <RetroButton type="button" variant="success">
+            EDITAR GRUPO
+          </RetroButton>
+        </Link>
+        <RetroButton
+          type="button"
+          variant="danger"
+          disabled={deleteProcessing}
+          onClick={onDeleteGroup}
+        >
+          REMOVER GRUPO
+        </RetroButton>
+      </div>
+    </div>
   );
 }

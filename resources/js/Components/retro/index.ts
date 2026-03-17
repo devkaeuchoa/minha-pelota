@@ -32,3 +32,4 @@ export {
   RetroTableRow,
   RetroTableCell,
 } from './RetroTable';
+export { RetroInfoCard } from './RetroInfoCard';

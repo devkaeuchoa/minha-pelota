@@ -6,7 +6,7 @@ import { GroupInviteSection } from '@/features/groups/components/GroupInviteSect
 import { PlayersTable } from '@/features/groups/components/PlayersTable';
 import { PlayerForm } from '@/features/groups/components/PlayerForm';
 import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
-import { RetroLayout, RetroSectionHeader, RetroPanel } from '@/Components/retro';
+import { RetroInfoCard, RetroLayout, RetroPanel, RetroSectionHeader } from '@/Components/retro';
 
 interface ShowProps extends PageProps {
   group: Group;
@@ -21,9 +21,7 @@ export default function Show({ group, players }: ShowProps) {
       <Head title={group.name} />
 
       <RetroSectionHeader title="2. DETALHES DO GRUPO" />
-      <RetroPanel>
-        <GroupDetailsSection group={group} />
-      </RetroPanel>
+      <GroupDetailsSection group={group} />
 
       <RetroSectionHeader title="3. CONVITE" />
       <RetroPanel>
