@@ -13,4 +13,3 @@ export function slugifyKebab(input: string): string {
     .replace(/\s+/g, '-') // espaços -> hífen
     .replace(/-+/g, '-'); // hífens duplicados
 }
-

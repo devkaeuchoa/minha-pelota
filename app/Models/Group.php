@@ -7,11 +7,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 
 class Group extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (Group $group): void {
+            if (empty($group->invite_code)) {
+                $group->invite_code = Str::random(12);
+            }
+        });
+    }
 
     protected $fillable = [
         'owner_id',
@@ -41,8 +51,7 @@ class Group extends Model
 
     public function players(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'group_user')
-            ->withPivot('is_admin')
+        return $this->belongsToMany(Player::class, 'group_player')
             ->withTimestamps();
     }
 }

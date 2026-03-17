@@ -32,12 +32,13 @@ export interface Group {
   deleted_at: string | null;
 }
 
-export interface GroupPlayer {
+export interface Player {
   id: number;
   name: string;
-  email: string;
-  physical_condition: string;
-  is_admin: boolean;
+  nick: string;
+  phone: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PageProps {

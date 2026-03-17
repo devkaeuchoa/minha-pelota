@@ -65,12 +65,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
 
         <div className="form__group">
           <label htmlFor="slug">Slug</label>
-          <input
-            id="slug"
-            type="text"
-            value={data.slug}
-            readOnly
-          />
+          <input id="slug" type="text" value={data.slug} readOnly />
           {errors.slug && <p>{errors.slug}</p>}
         </div>
 

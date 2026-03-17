@@ -9,26 +9,26 @@ if (app()->environment('local')) {
         ->names('api.groups');
 
     Route::get('groups/{group}/players', [GroupPlayerController::class, 'index'])
-        ->name('groups.players.index');
+        ->name('api.groups.players.index');
     Route::post('groups/{group}/players', [GroupPlayerController::class, 'store'])
-        ->name('groups.players.store');
+        ->name('api.groups.players.store');
     Route::patch('groups/{group}/players/{user}', [GroupPlayerController::class, 'update'])
-        ->name('groups.players.update');
+        ->name('api.groups.players.update');
     Route::delete('groups/{group}/players/{user}', [GroupPlayerController::class, 'destroy'])
-        ->name('groups.players.destroy');
+        ->name('api.groups.players.destroy');
 } else {
     Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('groups', GroupController::class)
             ->names('api.groups');
 
         Route::get('groups/{group}/players', [GroupPlayerController::class, 'index'])
-            ->name('groups.players.index');
+            ->name('api.groups.players.index');
         Route::post('groups/{group}/players', [GroupPlayerController::class, 'store'])
-            ->name('groups.players.store');
+            ->name('api.groups.players.store');
         Route::patch('groups/{group}/players/{user}', [GroupPlayerController::class, 'update'])
-            ->name('groups.players.update');
+            ->name('api.groups.players.update');
         Route::delete('groups/{group}/players/{user}', [GroupPlayerController::class, 'destroy'])
-            ->name('groups.players.destroy');
+            ->name('api.groups.players.destroy');
     });
 }
 

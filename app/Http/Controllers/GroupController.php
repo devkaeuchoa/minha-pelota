@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class GroupController extends Controller
 {
@@ -64,6 +65,16 @@ class GroupController extends Controller
         $query->delete();
 
         return redirect()->route('groups.index');
+    }
+
+    public function regenerateInvite(Request $request, Group $group): RedirectResponse
+    {
+        $this->authorizeOwner($request, $group);
+
+        $group->invite_code = Str::random(12);
+        $group->save();
+
+        return redirect()->route('groups.show', $group);
     }
 
     private function authorizeOwner(Request $request, Group $group): void

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\InviteController;
+use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Group;
 use Illuminate\Foundation\Application;
@@ -32,17 +34,7 @@ if (app()->environment('local')) {
         })->name('groups.create');
 
         Route::get('/groups/{group}', function (Group $group) {
-            $players = $group->players()
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'physical_condition' => $user->physical_condition,
-                        'is_admin' => (bool) $user->pivot->is_admin,
-                    ];
-                });
+            $players = $group->players()->get();
 
             return Inertia::render('Groups/Show', [
                 'group' => $group,
@@ -60,6 +52,12 @@ if (app()->environment('local')) {
         Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
         Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
         Route::delete('/groups', [GroupController::class, 'destroyMany'])->name('groups.destroyMany');
+
+        Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
+
+        Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
+        Route::put('/groups/{group}/players/{player}', [PlayerController::class, 'update'])->name('groups.players.update');
+        Route::delete('/groups/{group}/players/{player}', [PlayerController::class, 'destroy'])->name('groups.players.destroy');
     });
 } else {
     Route::middleware('auth')->group(function () {
@@ -81,17 +79,7 @@ if (app()->environment('local')) {
         Route::get('/groups/{group}', function (Group $group) {
             abort_unless($group->owner_id === auth()->id(), 403);
 
-            $players = $group->players()
-                ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'physical_condition' => $user->physical_condition,
-                        'is_admin' => (bool) $user->pivot->is_admin,
-                    ];
-                });
+            $players = $group->players()->get();
 
             return Inertia::render('Groups/Show', [
                 'group' => $group,
@@ -112,10 +100,20 @@ if (app()->environment('local')) {
         Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
         Route::delete('/groups', [GroupController::class, 'destroyMany'])->name('groups.destroyMany');
 
+        Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
+
+        Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
+        Route::put('/groups/{group}/players/{player}', [PlayerController::class, 'update'])->name('groups.players.update');
+        Route::delete('/groups/{group}/players/{player}', [PlayerController::class, 'destroy'])->name('groups.players.destroy');
+
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 }
+
+Route::get('/invite/{inviteCode}', [InviteController::class, 'show'])->name('invite.show');
+Route::post('/invite/{inviteCode}', [InviteController::class, 'store'])->name('invite.store');
+Route::get('/invite/{inviteCode}/success', [InviteController::class, 'success'])->name('invite.success');
 
 require __DIR__.'/auth.php';
