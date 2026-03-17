@@ -1,11 +1,17 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Group, Player, PageProps } from '@/types';
 import { useGroupShowController } from '@/features/groups/useGroupShowController';
 import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
 import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
 import { PlayersTable } from '@/features/groups/components/PlayersTable';
 import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
-import { RetroInfoCard, RetroLayout, RetroPanel, RetroSectionHeader } from '@/Components/retro';
+import {
+  RetroButton,
+  RetroInfoCard,
+  RetroLayout,
+  RetroPanel,
+  RetroSectionHeader,
+} from '@/Components/retro';
 
 interface ShowProps extends PageProps {
   group: Group;
@@ -22,12 +28,20 @@ export default function Show({ group, players }: ShowProps) {
       <RetroSectionHeader title="2. DETALHES DO GRUPO" />
       <RetroInfoCard>
         <GroupDetailsSection group={group} />
-        <div className="mt-3">
+        <div className="mt-3 flex flex-col gap-3">
           <GroupSettingsSection
             groupId={settings.groupId}
             deleteProcessing={settings.deleteProcessing}
             onDeleteGroup={settings.onDeleteGroup}
           />
+          <RetroButton
+            type="button"
+            variant="success"
+            size="md"
+            onClick={() => router.visit(route('groups.players', group.id))}
+          >
+            GERENCIAR JOGADORES
+          </RetroButton>
         </div>
       </RetroInfoCard>
 

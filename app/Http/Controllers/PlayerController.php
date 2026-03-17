@@ -8,6 +8,8 @@ use App\Models\Group;
 use App\Models\Player;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class PlayerController extends Controller
 {
@@ -27,6 +29,25 @@ class PlayerController extends Controller
         }
 
         return redirect()->route('groups.show', $group);
+    }
+
+    public function attachExisting(Request $request, Group $group): RedirectResponse|Response
+    {
+        $this->authorizeOwner($request, $group);
+
+        $data = $request->validate([
+            'player_id' => ['required', 'integer', 'exists:players,id'],
+        ]);
+
+        if (! $group->players()->where('player_id', $data['player_id'])->exists()) {
+            $group->players()->attach($data['player_id']);
+        }
+
+        if ($request->wantsJson()) {
+            return Inertia::location(route('groups.players', $group));
+        }
+
+        return redirect()->route('groups.players', $group);
     }
 
     public function update(UpdatePlayerRequest $request, Group $group, Player $player): RedirectResponse

@@ -57,7 +57,6 @@ export default function Index({ groups }: IndexProps) {
         </RetroPanel>
         <RetroControlHintBar
           hints={[
-            { key: 'A', label: 'ALTERNAR SELEÇÃO', color: '#39ff14' },
             { key: 'B', label: 'REMOVER SELECIONADOS', color: '#ff0055' },
           ]}
         />

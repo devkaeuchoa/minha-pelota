@@ -33,3 +33,4 @@ export {
   RetroTableCell,
 } from './RetroTable';
 export { RetroInfoCard } from './RetroInfoCard';
+export { RetroPlayerList } from './RetroPlayerList';

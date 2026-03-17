@@ -48,6 +48,20 @@ if (app()->environment('local')) {
             ]);
         })->name('groups.edit');
 
+        Route::get('/groups/{group}/players', function (Group $group) {
+            $groupPlayers = $group->players()->get();
+            $availablePlayers = \App\Models\Player::query()
+                ->whereNotIn('id', $groupPlayers->pluck('id'))
+                ->orderBy('name')
+                ->get();
+
+            return Inertia::render('Groups/Players', [
+                'group' => $group,
+                'groupPlayers' => $groupPlayers,
+                'availablePlayers' => $availablePlayers,
+            ]);
+        })->name('groups.players');
+
         Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
         Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
         Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
@@ -56,6 +70,7 @@ if (app()->environment('local')) {
         Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
 
         Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
+        Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');
         Route::put('/groups/{group}/players/{player}', [PlayerController::class, 'update'])->name('groups.players.update');
         Route::delete('/groups/{group}/players/{player}', [PlayerController::class, 'destroy'])->name('groups.players.destroy');
     });
@@ -95,6 +110,23 @@ if (app()->environment('local')) {
             ]);
         })->name('groups.edit');
 
+        Route::get('/groups/{group}/players', function (Group $group) {
+            abort_unless($group->owner_id === auth()->id(), 403);
+
+            $groupPlayers = $group->players()->get();
+            $availablePlayers = \App\Models\Player::query()
+                ->where('owner_id', auth()->id())
+                ->whereNotIn('id', $groupPlayers->pluck('id'))
+                ->orderBy('name')
+                ->get();
+
+            return Inertia::render('Groups/Players', [
+                'group' => $group,
+                'groupPlayers' => $groupPlayers,
+                'availablePlayers' => $availablePlayers,
+            ]);
+        })->name('groups.players');
+
         Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
         Route::put('/groups/{group}', [GroupController::class, 'update'])->name('groups.update');
         Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
@@ -103,6 +135,7 @@ if (app()->environment('local')) {
         Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
 
         Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
+        Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');
         Route::put('/groups/{group}/players/{player}', [PlayerController::class, 'update'])->name('groups.players.update');
         Route::delete('/groups/{group}/players/{player}', [PlayerController::class, 'destroy'])->name('groups.players.destroy');
 
