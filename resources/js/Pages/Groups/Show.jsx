@@ -8,6 +8,8 @@ export default function Show({ auth, group, players }) {
         is_admin: false,
     });
 
+    const deleteForm = useForm();
+
     const handleAdd = (e) => {
         e.preventDefault();
         addForm.post(`/api/groups/${group.id}/players`);
@@ -103,6 +105,23 @@ export default function Show({ auth, group, players }) {
                         </div>
                     </div>
                 </form>
+            </section>
+
+            <section className="section section--tight">
+                <h3>Configurações do grupo</h3>
+                <button
+                    type="button"
+                    disabled={deleteForm.processing}
+                    onClick={() => {
+                        if (!confirm('Tem certeza que deseja remover este grupo? Essa ação não pode ser desfeita.')) {
+                            return;
+                        }
+
+                        deleteForm.delete(route('groups.destroy', group));
+                    }}
+                >
+                    Remover grupo
+                </button>
             </section>
         </AuthenticatedLayout>
     );

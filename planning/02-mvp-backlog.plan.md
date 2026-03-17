@@ -34,7 +34,8 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 ## Tasks (Sprint 1 — Core: Grupo + Jogadores)
 
 - [ ] Modelar entidades: Grupo, Jogador, Partida
-- [ ] Implementar CRUD de grupos (admin)
+- [ ] Implementar CRUD de grupos (admin: create/read/update/delete com UI Inertia/React)
+- [ ] Implementar fluxo de remoção de grupos com confirmação e redirect para lista
 - [ ] Implementar cadastro de jogadores (convite por link)
 - [ ] Tela de login/autenticação básica
 - [ ] Layout base (admin vs jogador)

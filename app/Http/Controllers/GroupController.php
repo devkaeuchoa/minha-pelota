@@ -38,6 +38,15 @@ class GroupController extends Controller
         return redirect()->route('groups.show', $group);
     }
 
+    public function destroy(Request $request, Group $group): RedirectResponse
+    {
+        $this->authorizeOwner($request, $group);
+
+        $group->delete();
+
+        return redirect()->route('groups.index');
+    }
+
     private function authorizeOwner(Request $request, Group $group): void
     {
         if (app()->environment('local')) {
