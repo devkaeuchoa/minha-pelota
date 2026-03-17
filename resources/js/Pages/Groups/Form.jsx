@@ -2,6 +2,16 @@ import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
+const weekdayOptions = [
+  { value: '0', label: 'Domingo' },
+  { value: '1', label: 'Segunda-feira' },
+  { value: '2', label: 'Terça-feira' },
+  { value: '3', label: 'Quarta-feira' },
+  { value: '4', label: 'Quinta-feira' },
+  { value: '5', label: 'Sexta-feira' },
+  { value: '6', label: 'Sábado' },
+];
+
 export default function Form({ auth, group, submitUrl, method, title }) {
   const { data, setData, post, put, processing, errors } = useForm({
     name: group?.name || '',
@@ -49,13 +59,21 @@ export default function Form({ auth, group, submitUrl, method, title }) {
         </div>
 
         <div className="form__group">
-          <label htmlFor="weekday">Dia da semana</label>
-          <input
-            id="weekday"
-            type="text"
-            value={data.weekday}
-            onChange={(e) => setData('weekday', e.target.value)}
-          />
+          <span>Dia da semana</span>
+          <div>
+            {weekdayOptions.map((option) => (
+              <label key={option.value}>
+                <input
+                  type="checkbox"
+                  checked={data.weekday === option.value}
+                  onChange={() =>
+                    setData('weekday', data.weekday === option.value ? '' : option.value)
+                  }
+                />{' '}
+                {option.label}
+              </label>
+            ))}
+          </div>
           {errors.weekday && <p>{errors.weekday}</p>}
         </div>
 

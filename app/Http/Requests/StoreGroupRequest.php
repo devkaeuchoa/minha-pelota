@@ -20,7 +20,7 @@ class StoreGroupRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120'],
             'slug' => ['required', 'string', 'max:150', 'unique:groups,slug'],
-            'weekday' => ['required', 'string', 'max:10'],
+            'weekday' => ['required', 'integer', 'min:0', 'max:6'],
             'time' => ['required', 'date_format:H:i'],
             'location_name' => ['required', 'string', 'max:150'],
             'status' => ['sometimes', 'string', 'max:20'],

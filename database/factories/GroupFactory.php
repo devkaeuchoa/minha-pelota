@@ -21,7 +21,7 @@ class GroupFactory extends Factory
             'owner_id' => UserFactory::new(),
             'name' => $this->faker->unique()->words(3, true),
             'slug' => $this->faker->unique()->slug(),
-            'weekday' => $this->faker->randomElement(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']),
+            'weekday' => $this->faker->numberBetween(0, 6),
             'time' => $this->faker->time('H:i'),
             'location_name' => $this->faker->city(),
             'status' => 'active',
