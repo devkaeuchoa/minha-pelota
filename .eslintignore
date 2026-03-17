@@ -1,0 +1,9 @@
+node_modules
+vendor
+public
+storage
+bootstrap
+config
+resources/css
+resources/views
+
