@@ -1,7 +1,7 @@
-import React from 'react';
 import Form from './Form';
+import { PageProps } from '@/types';
 
-export default function Create(props) {
+export default function Create(props: PageProps) {
   return (
     <Form
       {...props}

@@ -1,22 +1,28 @@
-import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { FormEvent } from 'react';
+import { Group, GroupPlayer, PageProps } from '@/types';
 
-export default function Show({ auth, group, players }) {
+interface ShowProps extends PageProps {
+  group: Group;
+  players: GroupPlayer[];
+}
+
+export default function Show({ group, players }: ShowProps) {
   const addForm = useForm({
     user_id: '',
     is_admin: false,
   });
 
-  const deleteForm = useForm();
+  const deleteForm = useForm({});
 
-  const handleAdd = (e) => {
+  const handleAdd = (e: FormEvent) => {
     e.preventDefault();
     addForm.post(`/api/groups/${group.id}/players`);
   };
 
   return (
-    <AuthenticatedLayout user={auth.user} header={<h2>Grupo: {group.name}</h2>}>
+    <AuthenticatedLayout header={<h2>Grupo: {group.name}</h2>}>
       <Head title={group.name} />
 
       <section className="section section--tight">

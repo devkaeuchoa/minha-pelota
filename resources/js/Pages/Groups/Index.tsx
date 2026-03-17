@@ -1,23 +1,36 @@
-import React, { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { Group, PageProps } from '@/types';
 
-export default function Index({ auth, groups }) {
+interface IndexProps extends PageProps {
+  groups: Group[];
+}
+
+export default function Index({ groups }: IndexProps) {
   const {
     data,
     setData,
     delete: destroy,
     processing,
-  } = useForm({
+  } = useForm<{ ids: number[] }>({
     ids: [],
   });
-  const [selectedIds, setSelectedIds] = useState(new Set());
-  const toggleSelected = (id) => {
-    setSelectedIds((current) => (current.has(id) ? current.delete(id) : current.add(id)));
-    setData('ids', Array.from(selectedIds));
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const toggleSelected = (id: number) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      setData('ids', Array.from(next));
+      return next;
+    });
   };
 
-  const handleBatchDelete = (event) => {
+  const handleBatchDelete = (event: FormEvent) => {
     event.preventDefault();
 
     if (!data.ids.length) {
@@ -32,14 +45,12 @@ export default function Index({ auth, groups }) {
       return;
     }
 
-    destroy(route('groups.destroyMany'), {
-      data,
-    });
+    destroy(route('groups.destroyMany'));
   };
 
   if (!groups.length) {
     return (
-      <AuthenticatedLayout user={auth.user} header={<h2>Meus grupos</h2>}>
+      <AuthenticatedLayout header={<h2>Meus grupos</h2>}>
         <Head title="Meus grupos" />
         <section className="section">
           <HeaderActions processing={false} />
@@ -50,7 +61,7 @@ export default function Index({ auth, groups }) {
   }
 
   return (
-    <AuthenticatedLayout user={auth.user} header={<h2>Meus grupos</h2>}>
+    <AuthenticatedLayout header={<h2>Meus grupos</h2>}>
       <Head title="Meus grupos" />
       <section className="section">
         <BatchDeleteForm
@@ -65,7 +76,7 @@ export default function Index({ auth, groups }) {
   );
 }
 
-function HeaderActions({ processing }) {
+function HeaderActions({ processing }: { processing: boolean }) {
   return (
     <div className="flex items-center justify-between">
       <p>Gerencie aqui os grupos que você criou.</p>
@@ -83,7 +94,21 @@ function EmptyState() {
   return <p>Você ainda não possui grupos.</p>;
 }
 
-function BatchDeleteForm({ processing, onSubmit, groups, selectedIds, onToggleSelected }) {
+interface BatchDeleteFormProps {
+  processing: boolean;
+  onSubmit: (e: FormEvent) => void;
+  groups: Group[];
+  selectedIds: Set<number>;
+  onToggleSelected: (id: number) => void;
+}
+
+function BatchDeleteForm({
+  processing,
+  onSubmit,
+  groups,
+  selectedIds,
+  onToggleSelected,
+}: BatchDeleteFormProps) {
   return (
     <form onSubmit={onSubmit}>
       <HeaderActions processing={processing} />
@@ -92,7 +117,13 @@ function BatchDeleteForm({ processing, onSubmit, groups, selectedIds, onToggleSe
   );
 }
 
-function GroupsTable({ groups, selectedIds, onToggleSelected }) {
+interface GroupsTableProps {
+  groups: Group[];
+  selectedIds: Set<number>;
+  onToggleSelected: (id: number) => void;
+}
+
+function GroupsTable({ groups, selectedIds, onToggleSelected }: GroupsTableProps) {
   return (
     <div className="table">
       <table>

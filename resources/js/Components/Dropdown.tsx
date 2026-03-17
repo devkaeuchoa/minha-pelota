@@ -1,10 +1,20 @@
 import { Transition } from '@headlessui/react';
 import { Link } from '@inertiajs/react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, PropsWithChildren, ComponentProps } from 'react';
 
-const DropDownContext = createContext();
+interface DropdownContextType {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  toggleOpen: () => void;
+}
 
-const Dropdown = ({ children }) => {
+const DropDownContext = createContext<DropdownContextType>({
+  open: false,
+  setOpen: () => {},
+  toggleOpen: () => {},
+});
+
+const Dropdown = ({ children }: PropsWithChildren) => {
   const [open, setOpen] = useState(false);
 
   const toggleOpen = () => {
@@ -18,7 +28,7 @@ const Dropdown = ({ children }) => {
   );
 };
 
-const Trigger = ({ children }) => {
+const Trigger = ({ children }: PropsWithChildren) => {
   const { open, setOpen, toggleOpen } = useContext(DropDownContext);
 
   return (
@@ -30,7 +40,18 @@ const Trigger = ({ children }) => {
   );
 };
 
-const Content = ({ align = 'right', width = '48', contentClasses = 'py-1 bg-white', children }) => {
+interface ContentProps extends PropsWithChildren {
+  align?: 'left' | 'right';
+  width?: '48';
+  contentClasses?: string;
+}
+
+const Content = ({
+  align = 'right',
+  width = '48',
+  contentClasses = 'py-1 bg-white',
+  children,
+}: ContentProps) => {
   const { open, setOpen } = useContext(DropDownContext);
 
   let alignmentClasses = 'origin-top';
@@ -71,7 +92,11 @@ const Content = ({ align = 'right', width = '48', contentClasses = 'py-1 bg-whit
   );
 };
 
-const DropdownLink = ({ className = '', children, ...props }) => {
+type DropdownLinkProps = ComponentProps<typeof Link> & {
+  className?: string;
+};
+
+const DropdownLink = ({ className = '', children, ...props }: DropdownLinkProps) => {
   return (
     <Link
       {...props}
@@ -85,8 +110,8 @@ const DropdownLink = ({ className = '', children, ...props }) => {
   );
 };
 
-Dropdown.Trigger = Trigger;
-Dropdown.Content = Content;
-Dropdown.Link = DropdownLink;
-
-export default Dropdown;
+export default Object.assign(Dropdown, {
+  Trigger,
+  Content,
+  Link: DropdownLink,
+});

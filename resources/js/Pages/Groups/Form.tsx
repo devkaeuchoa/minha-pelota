@@ -1,6 +1,7 @@
-import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { FormEvent } from 'react';
+import { Group, PageProps } from '@/types';
 
 const weekdayOptions = [
   { value: '0', label: 'Domingo' },
@@ -12,16 +13,23 @@ const weekdayOptions = [
   { value: '6', label: 'Sábado' },
 ];
 
-export default function Form({ auth, group, submitUrl, method, title }) {
+interface FormProps extends PageProps {
+  group: Group | null;
+  submitUrl: string;
+  method: 'post' | 'put';
+  title: string;
+}
+
+export default function Form({ group, submitUrl, method, title }: FormProps) {
   const { data, setData, post, put, processing, errors } = useForm({
-    name: group?.name || '',
-    slug: group?.slug || '',
-    weekday: group?.weekday || '',
-    time: group?.time || '',
-    location_name: group?.location_name || '',
+    name: group?.name ?? '',
+    slug: group?.slug ?? '',
+    weekday: group?.weekday?.toString() ?? '',
+    time: group?.time ?? '',
+    location_name: group?.location_name ?? '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     if (method === 'post') {
@@ -32,7 +40,7 @@ export default function Form({ auth, group, submitUrl, method, title }) {
   };
 
   return (
-    <AuthenticatedLayout user={auth.user} header={<h2>{title}</h2>}>
+    <AuthenticatedLayout header={<h2>{title}</h2>}>
       <Head title={title} />
 
       <form onSubmit={handleSubmit} className="form">

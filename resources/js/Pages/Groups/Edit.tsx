@@ -1,9 +1,11 @@
-import React from 'react';
 import Form from './Form';
+import { Group, PageProps } from '@/types';
 
-export default function Edit(props) {
-  const { group } = props;
+interface EditProps extends PageProps {
+  group: Group;
+}
 
+export default function Edit({ group, ...props }: EditProps) {
   return (
     <Form
       {...props}
