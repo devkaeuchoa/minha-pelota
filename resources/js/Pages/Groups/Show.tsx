@@ -4,7 +4,6 @@ import { useGroupShowController } from '@/features/groups/useGroupShowController
 import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
 import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
 import { PlayersTable } from '@/features/groups/components/PlayersTable';
-import { PlayerForm } from '@/features/groups/components/PlayerForm';
 import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
 import { RetroInfoCard, RetroLayout, RetroPanel, RetroSectionHeader } from '@/Components/retro';
 
@@ -21,7 +20,16 @@ export default function Show({ group, players }: ShowProps) {
       <Head title={group.name} />
 
       <RetroSectionHeader title="2. DETALHES DO GRUPO" />
-      <GroupDetailsSection group={group} />
+      <RetroInfoCard>
+        <GroupDetailsSection group={group} />
+        <div className="mt-3">
+          <GroupSettingsSection
+            groupId={settings.groupId}
+            deleteProcessing={settings.deleteProcessing}
+            onDeleteGroup={settings.onDeleteGroup}
+          />
+        </div>
+      </RetroInfoCard>
 
       <RetroSectionHeader title="3. CONVITE" />
       <RetroPanel>
@@ -42,25 +50,7 @@ export default function Show({ group, players }: ShowProps) {
         />
       </RetroPanel>
 
-      <RetroSectionHeader title="5. ADICIONAR JOGADOR" />
-      <RetroPanel>
-        <PlayerForm
-          values={addForm.values}
-          errors={addForm.errors}
-          processing={addForm.processing}
-          onChange={addForm.onChange}
-          onSubmit={addForm.onSubmit}
-        />
-      </RetroPanel>
-
-      <RetroSectionHeader title="6. CONFIGURAÇÕES DO GRUPO" />
-      <RetroPanel>
-        <GroupSettingsSection
-          groupId={settings.groupId}
-          deleteProcessing={settings.deleteProcessing}
-          onDeleteGroup={settings.onDeleteGroup}
-        />
-      </RetroPanel>
+      {/* Formulário de adicionar jogador será movido para uma tela específica futuramente */}
     </RetroLayout>
   );
 }

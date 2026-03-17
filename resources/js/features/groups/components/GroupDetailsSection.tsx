@@ -1,5 +1,4 @@
 import { Group } from '@/types';
-import { RetroInfoCard } from '@/Components/retro';
 
 interface GroupDetailsSectionProps {
   group: Group;
@@ -7,7 +6,7 @@ interface GroupDetailsSectionProps {
 
 export function GroupDetailsSection({ group }: GroupDetailsSectionProps) {
   return (
-    <RetroInfoCard>
+    <>
       <div className="flex items-center justify-between border-b-2 border-[#4060c0] pb-1">
         <span className="retro-text-shadow text-xl tracking-widest text-white">
           {group.name}
@@ -19,7 +18,7 @@ export function GroupDetailsSection({ group }: GroupDetailsSectionProps) {
         <Row label="HORÁRIO" value={group.time} />
         <Row label="LOCAL" value={group.location_name} />
       </div>
-    </RetroInfoCard>
+    </>
   );
 }
 

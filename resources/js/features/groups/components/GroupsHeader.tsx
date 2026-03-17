@@ -40,6 +40,8 @@ export function GroupsHeader({
       <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-1 justify-end gap-3">
           <RetroButton
+            size="sm"
+            className="flex-1"
             type="submit"
             variant="danger"
             disabled={!hasSelection || processing}
@@ -47,7 +49,7 @@ export function GroupsHeader({
             REMOVER SELECIONADOS
           </RetroButton>
           <Link href="/groups/create" className="flex-1">
-            <RetroButton type="button" variant="success">
+            <RetroButton size="sm" type="button" variant="success">
               NOVO GRUPO
             </RetroButton>
           </Link>

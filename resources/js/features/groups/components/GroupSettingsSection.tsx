@@ -19,11 +19,13 @@ export function GroupSettingsSection({
       </p>
       <div className="flex gap-3">
         <Link href={`/groups/${groupId}/edit`} className="flex-1">
-          <RetroButton type="button" variant="success">
+          <RetroButton size="md" type="button" variant="success">
             EDITAR GRUPO
           </RetroButton>
         </Link>
         <RetroButton
+          size="md"
+          className="flex-1"
           type="button"
           variant="danger"
           disabled={deleteProcessing}
