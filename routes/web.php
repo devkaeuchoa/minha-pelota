@@ -112,6 +112,10 @@ if (app()->environment('local')) {
     });
 }
 
+Route::get('/retro/ui-kit', function () {
+    return Inertia::render('Retro/UiKit');
+})->name('retro.ui-kit');
+
 Route::get('/invite/{inviteCode}', [InviteController::class, 'show'])->name('invite.show');
 Route::post('/invite/{inviteCode}', [InviteController::class, 'store'])->name('invite.store');
 Route::get('/invite/{inviteCode}/success', [InviteController::class, 'success'])->name('invite.success');
