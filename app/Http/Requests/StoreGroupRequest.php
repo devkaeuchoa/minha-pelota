@@ -8,6 +8,10 @@ class StoreGroupRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        if (app()->environment('local')) {
+            return true;
+        }
+
         return $this->user() !== null;
     }
 
