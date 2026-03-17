@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import { Group, PageProps } from '@/types';
+import { slugifyKebab } from '@/utils/slug';
 
 const weekdayOptions = [
   { value: '0', label: 'Domingo' },
@@ -50,7 +51,14 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
             id="name"
             type="text"
             value={data.name}
-            onChange={(e) => setData('name', e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setData((current) => ({
+                ...current,
+                name: value,
+                slug: slugifyKebab(value),
+              }));
+            }}
           />
           {errors.name && <p>{errors.name}</p>}
         </div>
@@ -61,7 +69,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
             id="slug"
             type="text"
             value={data.slug}
-            onChange={(e) => setData('slug', e.target.value)}
+            readOnly
           />
           {errors.slug && <p>{errors.slug}</p>}
         </div>
