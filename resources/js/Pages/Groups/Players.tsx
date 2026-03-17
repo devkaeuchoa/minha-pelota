@@ -1,6 +1,12 @@
 import { Head } from '@inertiajs/react';
 import { Group, Player, PageProps } from '@/types';
-import { RetroButton, RetroLayout, RetroPlayerList, RetroSectionHeader } from '@/Components/retro';
+import {
+  RetroButton,
+  RetroLayout,
+  RetroPlayerList,
+  RetroSearchInput,
+  RetroSectionHeader,
+} from '@/Components/retro';
 import { useGroupPlayersController } from '@/features/groups/useGroupPlayersController';
 
 interface PlayersPageProps extends PageProps {
@@ -30,13 +36,20 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <RetroPlayerList
-          title="DISPONÍVEIS"
-          players={controller.available}
-          selectedId={controller.selectedAvailableId}
-          onSelect={controller.handleSelectAvailable}
-          variant="available"
-        />
+        <div className="flex flex-col gap-2">
+          <RetroSearchInput
+            value={controller.searchTerm}
+            onChange={controller.setSearchTerm}
+            placeholder="BUSCAR JOGADOR"
+          />
+          <RetroPlayerList
+            title="DISPONÍVEIS"
+            players={controller.filteredAvailable}
+            selectedIds={Array.from(controller.selectedAvailableIds)}
+            onToggle={controller.handleToggleAvailable}
+            variant="available"
+          />
+        </div>
         <RetroPlayerList
           title="NO GRUPO"
           players={controller.inGroup}
@@ -51,7 +64,7 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
           type="button"
           variant="success"
           size="lg"
-          disabled={!controller.selectedAvailableId || controller.processingAdd}
+          disabled={controller.selectedAvailableIds.size === 0 || controller.processingAdd}
           onClick={controller.handleAddToGroup}
         >
           ADICIONAR AO GRUPO

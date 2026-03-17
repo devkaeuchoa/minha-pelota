@@ -36,11 +36,14 @@ class PlayerController extends Controller
         $this->authorizeOwner($request, $group);
 
         $data = $request->validate([
-            'player_id' => ['required', 'integer', 'exists:players,id'],
+            'player_ids' => ['required', 'array'],
+            'player_ids.*' => ['integer', 'exists:players,id'],
         ]);
 
-        if (! $group->players()->where('player_id', $data['player_id'])->exists()) {
-            $group->players()->attach($data['player_id']);
+        foreach ($data['player_ids'] as $playerId) {
+            if (! $group->players()->where('player_id', $playerId)->exists()) {
+                $group->players()->attach($playerId);
+            }
         }
 
         if ($request->wantsJson()) {
@@ -65,7 +68,14 @@ class PlayerController extends Controller
 
         $group->players()->detach($player->id);
 
-        return redirect()->route('groups.show', $group);
+        $previous = url()->previous();
+        $playersPath = '/groups/'.$group->id.'/players';
+
+        $targetRoute = str_contains($previous, $playersPath)
+            ? 'groups.players'
+            : 'groups.show';
+
+        return redirect()->route($targetRoute, $group);
     }
 
     private function authorizeOwner(Request $request, Group $group): void

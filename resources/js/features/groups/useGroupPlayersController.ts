@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Player } from '@/types';
 
 interface UseGroupPlayersControllerArgs {
@@ -15,36 +15,59 @@ export function useGroupPlayersController({
 }: UseGroupPlayersControllerArgs) {
   const [available, setAvailable] = useState(availablePlayers);
   const [inGroup, setInGroup] = useState(groupPlayers);
-  const [selectedAvailableId, setSelectedAvailableId] = useState<number | null>(null);
+  const [selectedAvailableIds, setSelectedAvailableIds] = useState<Set<number>>(
+    new Set(),
+  );
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [processingAdd, setProcessingAdd] = useState(false);
   const [processingRemove, setProcessingRemove] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSelectAvailable = (id: number) => {
-    setSelectedAvailableId(id);
+  const handleToggleAvailable = (id: number) => {
+    setSelectedAvailableIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
     setSelectedGroupId(null);
   };
 
   const handleSelectGroup = (id: number) => {
     setSelectedGroupId(id);
-    setSelectedAvailableId(null);
+    setSelectedAvailableIds(new Set());
   };
 
+  const filteredAvailable = useMemo(() => {
+    if (!searchTerm.trim()) return available;
+    const term = searchTerm.toLowerCase();
+    return available.filter((player) => {
+      const base = `${player.name} ${player.nick ?? ''}`.toLowerCase();
+      return base.includes(term);
+    });
+  }, [available, searchTerm]);
+
   const handleAddToGroup = () => {
-    if (!selectedAvailableId || processingAdd) return;
+    if (selectedAvailableIds.size === 0 || processingAdd) return;
     setProcessingAdd(true);
+
+    const ids = Array.from(selectedAvailableIds);
 
     router.post(
       route('groups.players.attach', groupId),
-      { player_id: selectedAvailableId },
+      { player_ids: ids },
       {
         onFinish: () => setProcessingAdd(false),
         onSuccess: () => {
-          const player = available.find((p) => p.id === selectedAvailableId);
-          if (!player) return;
-          setAvailable((list) => list.filter((p) => p.id !== selectedAvailableId));
-          setInGroup((list) => [...list, player]);
-          setSelectedAvailableId(null);
+          setAvailable((list) => list.filter((p) => !selectedAvailableIds.has(p.id)));
+          setInGroup((list) => [
+            ...list,
+            ...available.filter((p) => selectedAvailableIds.has(p.id)),
+          ]);
+          setSelectedAvailableIds(new Set());
         },
       },
     );
@@ -69,11 +92,14 @@ export function useGroupPlayersController({
   return {
     available,
     inGroup,
-    selectedAvailableId,
+    filteredAvailable,
+    selectedAvailableIds,
     selectedGroupId,
     processingAdd,
     processingRemove,
-    handleSelectAvailable,
+    searchTerm,
+    setSearchTerm,
+    handleToggleAvailable,
     handleSelectGroup,
     handleAddToGroup,
     handleRemoveFromGroup,

@@ -5,8 +5,10 @@ type PlayerVariant = 'available' | 'group';
 interface RetroPlayerListProps {
   title: string;
   players: { id: number; name: string; nick?: string | null }[];
-  selectedId: number | null;
+  selectedId?: number | null;
+  selectedIds?: number[];
   onSelect?: (id: number) => void;
+  onToggle?: (id: number) => void;
   variant?: PlayerVariant;
 }
 
@@ -14,7 +16,9 @@ export function RetroPlayerList({
   title,
   players,
   selectedId,
+  selectedIds,
   onSelect,
+  onToggle,
   variant = 'available',
 }: RetroPlayerListProps) {
   return (
@@ -25,9 +29,17 @@ export function RetroPlayerList({
             key={player.id}
             name={player.name}
             nick={player.nick}
-            active={player.id === selectedId}
+            active={
+              selectedIds ? selectedIds.includes(player.id) : player.id === selectedId
+            }
             variant={variant}
-            onClick={() => onSelect?.(player.id)}
+            onClick={() => {
+              if (onToggle) {
+                onToggle(player.id);
+              } else {
+                onSelect?.(player.id);
+              }
+            }}
           />
         ))}
         {players.length === 0 && (
