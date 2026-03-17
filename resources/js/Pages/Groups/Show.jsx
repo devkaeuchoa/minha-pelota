@@ -22,7 +22,7 @@ export default function Show({ auth, group, players }) {
         >
             <Head title={group.name} />
 
-            <section className="space-y-4">
+            <section className="section section--tight">
                 <div>
                     <p>Dia: {group.weekday}</p>
                     <p>Horário: {group.time}</p>
@@ -30,13 +30,13 @@ export default function Show({ auth, group, players }) {
                 </div>
             </section>
 
-            <section className="space-y-4">
+            <section className="section section--tight">
                 <h3>Jogadores</h3>
 
                 {players.length === 0 ? (
                     <p>Nenhum jogador neste grupo.</p>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div className="table">
                         <table>
                             <thead>
                                 <tr>
@@ -61,11 +61,10 @@ export default function Show({ auth, group, players }) {
                 )}
             </section>
 
-            <section className="space-y-4">
+            <section className="section section--tight">
                 <h3>Adicionar jogador</h3>
-                <form onSubmit={handleAdd}>
-                    <div className="space-y-4">
-                        <div>
+                <form onSubmit={handleAdd} className="form">
+                    <div className="form__group">
                             <label htmlFor="user_id">ID do usuário</label>
                             <input
                                 id="user_id"
@@ -76,7 +75,7 @@ export default function Show({ auth, group, players }) {
                             {addForm.errors.user_id && <p>{addForm.errors.user_id}</p>}
                         </div>
 
-                        <div>
+                        <div className="form__group">
                             <label htmlFor="is_admin">
                                 <input
                                     id="is_admin"
@@ -90,11 +89,17 @@ export default function Show({ auth, group, players }) {
                             </label>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <button type="submit" disabled={addForm.processing}>
+                        <div className="form__actions">
+                            <button
+                                type="submit"
+                                disabled={addForm.processing}
+                                className="btn--primary"
+                            >
                                 Adicionar
                             </button>
-                            <Link href="/groups">Voltar para lista</Link>
+                            <Link href="/groups" className="btn--secondary">
+                                Voltar para lista
+                            </Link>
                         </div>
                     </div>
                 </form>

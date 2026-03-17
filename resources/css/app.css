@@ -1,3 +1,57 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Page layout (BEM) */
+    .page {
+        @apply mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8;
+    }
+
+    .page__header {
+        @apply mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8;
+    }
+
+    .page__main {
+        @apply space-y-8;
+    }
+
+    /* Sections (BEM) */
+    .section {
+        @apply space-y-6;
+    }
+
+    .section--tight {
+        @apply space-y-4;
+    }
+
+    .table {
+        @apply overflow-x-auto;
+    }
+
+    /* Forms (BEM) */
+    .form {
+        @apply space-y-6;
+    }
+
+    .form__group {
+        @apply space-y-1;
+    }
+
+    .form__actions {
+        @apply flex items-center gap-4;
+    }
+
+    /* Buttons (BEM) */
+    .btn {
+        @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium;
+    }
+
+    .btn--primary {
+        @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+    }
+
+    .btn--secondary {
+        @apply btn bg-gray-100 text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50;
+    }
+}

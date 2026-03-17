@@ -12,8 +12,8 @@ export default function Index({ auth, groups }) {
         >
             <Head title="Meus grupos" />
 
-            <section className="space-y-6">
-                <div className="flex justify-between items-center">
+            <section className="section">
+                <div className="flex items-center justify-between">
                     <p>Gerencie aqui os grupos que você criou.</p>
                     <Link href="/groups/create">Criar novo grupo</Link>
                 </div>
@@ -21,7 +21,7 @@ export default function Index({ auth, groups }) {
                 {groups.length === 0 ? (
                     <p>Você ainda não possui grupos.</p>
                 ) : (
-                    <div className="overflow-x-auto">
+                    <div className="table">
                         <table>
                             <thead>
                                 <tr>

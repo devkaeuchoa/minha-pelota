@@ -30,9 +30,8 @@ export default function Form({ auth, group, submitUrl, method, title }) {
         >
             <Head title={title} />
 
-            <form onSubmit={handleSubmit}>
-                <div className="space-y-6">
-                    <div>
+            <form onSubmit={handleSubmit} className="form">
+                <div className="form__group">
                     <label htmlFor="name">Nome</label>
                     <input
                         id="name"
@@ -41,9 +40,9 @@ export default function Form({ auth, group, submitUrl, method, title }) {
                         onChange={(e) => setData('name', e.target.value)}
                     />
                     {errors.name && <p>{errors.name}</p>}
-                    </div>
+                </div>
 
-                    <div>
+                <div className="form__group">
                     <label htmlFor="slug">Slug</label>
                     <input
                         id="slug"
@@ -52,9 +51,9 @@ export default function Form({ auth, group, submitUrl, method, title }) {
                         onChange={(e) => setData('slug', e.target.value)}
                     />
                     {errors.slug && <p>{errors.slug}</p>}
-                    </div>
+                </div>
 
-                    <div>
+                <div className="form__group">
                     <label htmlFor="weekday">Dia da semana</label>
                     <input
                         id="weekday"
@@ -63,9 +62,9 @@ export default function Form({ auth, group, submitUrl, method, title }) {
                         onChange={(e) => setData('weekday', e.target.value)}
                     />
                     {errors.weekday && <p>{errors.weekday}</p>}
-                    </div>
+                </div>
 
-                    <div>
+                <div className="form__group">
                     <label htmlFor="time">Horário</label>
                     <input
                         id="time"
@@ -74,9 +73,9 @@ export default function Form({ auth, group, submitUrl, method, title }) {
                         onChange={(e) => setData('time', e.target.value)}
                     />
                     {errors.time && <p>{errors.time}</p>}
-                    </div>
+                </div>
 
-                    <div>
+                <div className="form__group">
                     <label htmlFor="location_name">Local</label>
                     <input
                         id="location_name"
@@ -85,14 +84,15 @@ export default function Form({ auth, group, submitUrl, method, title }) {
                         onChange={(e) => setData('location_name', e.target.value)}
                     />
                     {errors.location_name && <p>{errors.location_name}</p>}
-                    </div>
+                </div>
 
-                    <div className="flex items-center gap-4">
-                    <button type="submit" disabled={processing}>
+                <div className="form__actions">
+                    <button type="submit" disabled={processing} className="btn--primary">
                         Salvar
                     </button>
-                    <Link href="/groups">Cancelar</Link>
-                    </div>
+                    <Link href="/groups" className="btn--secondary">
+                        Cancelar
+                    </Link>
                 </div>
             </form>
         </AuthenticatedLayout>

@@ -170,14 +170,12 @@ export default function AuthenticatedLayout({ header, children }) {
 
             {header && (
                 <header className="bg-white shadow">
-                    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
-                    </div>
+                    <div className="page__header">{header}</div>
                 </header>
             )}
 
-            <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-                <div className="space-y-8">{children}</div>
+            <main className="page">
+                <div className="page__main">{children}</div>
             </main>
         </div>
     );
