@@ -6,7 +6,9 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    const page = usePage();
+    const auth = page.props.auth || {};
+    const user = auth.user || null;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -25,8 +27,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                                    href={'#'}
+                                    active={false}
                                 >
                                     Dashboard
                                 </NavLink>
@@ -42,7 +44,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
-                                                {user.name}
+                                                {user ? user.name : 'Guest'}
 
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
@@ -62,12 +64,12 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     <Dropdown.Content>
                                         <Dropdown.Link
-                                            href={route('profile.edit')}
+                                            href={'#'}
                                         >
                                             Profile
                                         </Dropdown.Link>
                                         <Dropdown.Link
-                                            href={route('logout')}
+                                            href={'#'}
                                             method="post"
                                             as="button"
                                         >
@@ -129,8 +131,8 @@ export default function AuthenticatedLayout({ header, children }) {
                 >
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            href={'#'}
+                            active={false}
                         >
                             Dashboard
                         </ResponsiveNavLink>
@@ -138,21 +140,25 @@ export default function AuthenticatedLayout({ header, children }) {
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
                         <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
+                            {user && (
+                                <>
+                                    <div className="text-base font-medium text-gray-800">
+                                        {user.name}
+                                    </div>
+                                    <div className="text-sm font-medium text-gray-500">
+                                        {user.email}
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
+                            <ResponsiveNavLink href={'#'}>
                                 Profile
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 method="post"
-                                href={route('logout')}
+                                href={'#'}
                                 as="button"
                             >
                                 Log Out
@@ -164,13 +170,15 @@ export default function AuthenticatedLayout({ header, children }) {
 
             {header && (
                 <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
                         {header}
                     </div>
                 </header>
             )}
 
-            <main>{children}</main>
+            <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+                <div className="space-y-8">{children}</div>
+            </main>
         </div>
     );
 }
