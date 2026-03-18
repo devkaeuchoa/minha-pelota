@@ -1,124 +1,62 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
-import { Group, GroupPlayer, PageProps } from '@/types';
+import { Head, router } from '@inertiajs/react';
+import { Group, Player, PageProps } from '@/types';
+import { useGroupShowController } from '@/features/groups/useGroupShowController';
+import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
+import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
+import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
+import {
+  RetroRosterGrid,
+  RetroButton,
+  RetroInfoCard,
+  RetroAccordion,
+  RetroSectionHeader,
+} from '@/Components/retro';
+import { RetroAppShell } from '@/Layouts/RetroAppShell';
 
 interface ShowProps extends PageProps {
   group: Group;
-  players: GroupPlayer[];
+  players: Player[];
 }
 
 export default function Show({ group, players }: ShowProps) {
-  const addForm = useForm({
-    user_id: '',
-    is_admin: false,
-  });
-
-  const deleteForm = useForm({});
-
-  const handleAdd = (e: FormEvent) => {
-    e.preventDefault();
-    addForm.post(`/api/groups/${group.id}/players`);
-  };
+  const { addForm, invite, playersSection, settings } = useGroupShowController(group, players);
 
   return (
-    <AuthenticatedLayout header={<h2>Grupo: {group.name}</h2>}>
+    <RetroAppShell activeId="groups">
       <Head title={group.name} />
 
-      <section className="section section--tight">
-        <div>
-          <p>Dia: {group.weekday}</p>
-          <p>Horário: {group.time}</p>
-          <p>Local: {group.location_name}</p>
+      <RetroSectionHeader title="2. DETALHES DO GRUPO" />
+      <RetroInfoCard>
+        <GroupDetailsSection group={group} />
+        <div className="mt-3 flex flex-col gap-3">
+          <GroupSettingsSection
+            groupId={settings.groupId}
+            deleteProcessing={settings.deleteProcessing}
+            onDeleteGroup={settings.onDeleteGroup}
+          />
         </div>
-      </section>
+      </RetroInfoCard>
 
-      <section className="section section--tight">
-        <h3>Jogadores</h3>
+      <RetroAccordion title="3. CONVITE" defaultOpen={false}>
+        <GroupInviteSection
+          inviteUrl={invite.inviteUrl}
+          processing={invite.processing}
+          onGenerateInvite={invite.onGenerate}
+          onCopyInvite={invite.onCopy}
+        />
+      </RetroAccordion>
 
-        {players.length === 0 ? (
-          <p>Nenhum jogador neste grupo.</p>
-        ) : (
-          <div className="table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Email</th>
-                  <th>Condição física</th>
-                  <th>Admin</th>
-                </tr>
-              </thead>
-              <tbody>
-                {players.map((player) => (
-                  <tr key={player.id}>
-                    <td>{player.name}</td>
-                    <td>{player.email}</td>
-                    <td>{player.physical_condition}</td>
-                    <td>{player.is_admin ? 'Sim' : 'Não'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="section section--tight">
-        <h3>Adicionar jogador</h3>
-        <form onSubmit={handleAdd} className="form">
-          <div className="form__group">
-            <label htmlFor="user_id">ID do usuário</label>
-            <input
-              id="user_id"
-              type="number"
-              value={addForm.data.user_id}
-              onChange={(e) => addForm.setData('user_id', e.target.value)}
-            />
-            {addForm.errors.user_id && <p>{addForm.errors.user_id}</p>}
-          </div>
-
-          <div className="form__group">
-            <label htmlFor="is_admin">
-              <input
-                id="is_admin"
-                type="checkbox"
-                checked={addForm.data.is_admin}
-                onChange={(e) => addForm.setData('is_admin', e.target.checked)}
-              />
-              Admin do grupo
-            </label>
-          </div>
-
-          <div className="form__actions">
-            <button type="submit" disabled={addForm.processing}>
-              Adicionar
-            </button>
-            <Link href="/groups">Voltar para lista</Link>
-          </div>
-        </form>
-      </section>
-
-      <section className="section section--tight">
-        <h3>Configurações do grupo</h3>
-        <button
+      <RetroAccordion title={`4. JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
+        <RetroButton
           type="button"
-          disabled={deleteForm.processing}
-          onClick={() => {
-            if (
-              !confirm(
-                'Tem certeza que deseja remover este grupo? Essa ação não pode ser desfeita.',
-              )
-            ) {
-              return;
-            }
-
-            deleteForm.delete(route('groups.destroy', group));
-          }}
+          variant="success"
+          size="md"
+          onClick={() => router.visit(route('groups.players', group.id))}
         >
-          Remover grupo
-        </button>
-      </section>
-    </AuthenticatedLayout>
+          GERENCIAR JOGADORES
+        </RetroButton>
+        <RetroRosterGrid players={playersSection.players} />
+      </RetroAccordion>
+    </RetroAppShell>
   );
 }

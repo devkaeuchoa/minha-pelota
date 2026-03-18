@@ -73,9 +73,21 @@ minha-pelota/
 │   └── Http/Controllers/
 ├── resources/
 │   └── js/
-│       ├── Components/   # React components
+│       ├── types/        # Model — interfaces de domínio (Group, Player, PageProps)
+│       ├── utils/        # Model — funções puras (slug, phone, group helpers)
+│       ├── features/     # Feature-oriented modules
+│       │   ├── groups/
+│       │   │   ├── components/   # View — componentes puros de UI
+│       │   │   ├── useGroupShowController.ts
+│       │   │   └── useGroupsIndexController.ts
+│       │   ├── invite/
+│       │   │   ├── components/
+│       │   │   └── useInviteAcceptController.ts
+│       │   └── players/
+│       │       └── components/
+│       ├── Components/   # Componentes compartilhados
 │       ├── Layouts/
-│       └── Pages/       # Inertia pages
+│       └── Pages/        # Containers Inertia (Controller fino)
 ├── public/              # document root no HostGator
 ├── database/migrations/
 ├── routes/web.php
@@ -83,6 +95,26 @@ minha-pelota/
 ├── planning/            # docs de planejamento
 └── README.md
 ```
+
+---
+
+## Arquitetura Frontend — MVC-like por Feature
+
+O frontend segue uma separação **Model / View / Controller** adaptada para React + Inertia, organizada por feature:
+
+| Camada         | Localização                                        | Responsabilidade                                                                   |
+| -------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **Model**      | `types/`, `utils/`                                 | Interfaces de domínio, funções puras de transformação/validação                    |
+| **View**       | `features/<feature>/components/`                   | Componentes React puros — recebem dados e callbacks via props                      |
+| **Controller** | `features/<feature>/use*Controller.ts`, `Pages/**` | Hooks que orquestram `useForm`, `route`, side effects; Pages como containers finos |
+
+### Convenções
+
+1. **Nenhum componente de View** acessa `useForm`, `route` ou `usePage` diretamente
+2. **Hooks de controller** ficam em `features/<feature>/` com prefixo `use` e sufixo `Controller`
+3. **Páginas Inertia** (`Pages/**`) atuam como containers: chamam o hook controller e compõem Views
+4. **Funções de domínio** (slug, phone, inviteUrl) permanecem em `utils/` — puras e testáveis
+5. **Novos domínios** devem criar sua pasta em `features/` seguindo o mesmo padrão
 
 ---
 

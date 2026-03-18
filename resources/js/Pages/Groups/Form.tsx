@@ -1,8 +1,16 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import { Group, PageProps } from '@/types';
 import { slugifyKebab } from '@/utils/slug';
+import {
+  RetroButton,
+  RetroFormField,
+  RetroPanel,
+  RetroRadio,
+  RetroSectionHeader,
+  RetroTextInput,
+} from '@/Components/retro';
+import { RetroAppShell } from '@/Layouts/RetroAppShell';
 
 const weekdayOptions = [
   { value: '0', label: 'Domingo' },
@@ -40,88 +48,92 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
     }
   };
 
+  const activeWeekdayId = data.weekday;
+
   return (
-    <AuthenticatedLayout header={<h2>{title}</h2>}>
+    <RetroAppShell activeId="groups">
       <Head title={title} />
 
-      <form onSubmit={handleSubmit} className="form">
-        <div className="form__group">
-          <label htmlFor="name">Nome</label>
-          <input
-            id="name"
-            type="text"
-            value={data.name}
-            onChange={(e) => {
-              const value = e.target.value;
-              setData((current) => ({
-                ...current,
-                name: value,
-                slug: slugifyKebab(value),
-              }));
-            }}
-          />
-          {errors.name && <p>{errors.name}</p>}
-        </div>
+      <RetroSectionHeader title="1. CONFIGURAÇÃO DO GRUPO" />
+      <RetroPanel>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <RetroFormField label="NOME" htmlFor="group_name">
+            <RetroTextInput
+              id="group_name"
+              value={data.name}
+              onChange={(e) => {
+                const value = e.target.value;
+                setData((current) => ({
+                  ...current,
+                  name: value,
+                  slug: slugifyKebab(value),
+                }));
+              }}
+            />
+            {errors.name && (
+              <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.name}</p>
+            )}
+          </RetroFormField>
 
-        <div className="form__group">
-          <label htmlFor="slug">Slug</label>
-          <input
-            id="slug"
-            type="text"
-            value={data.slug}
-            readOnly
-          />
-          {errors.slug && <p>{errors.slug}</p>}
-        </div>
+          <RetroFormField label="SLUG" htmlFor="group_slug">
+            <RetroTextInput
+              id="group_slug"
+              value={data.slug}
+              onChange={(e) => setData('slug', e.target.value)}
+            />
+            {errors.slug && (
+              <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.slug}</p>
+            )}
+          </RetroFormField>
 
-        <div className="form__group">
-          <span>Dia da semana</span>
-          <div>
-            {weekdayOptions.map((option) => (
-              <label key={option.value}>
-                <input
-                  type="checkbox"
-                  checked={data.weekday === option.value}
-                  onChange={() =>
-                    setData('weekday', data.weekday === option.value ? '' : option.value)
-                  }
-                />{' '}
-                {option.label}
-              </label>
-            ))}
+          <RetroRadio
+            label="DIA DA SEMANA"
+            options={weekdayOptions.map((option) => ({
+              id: option.value,
+              label: option.label,
+            }))}
+            activeId={activeWeekdayId}
+            onChange={(id) => setData('weekday', id === activeWeekdayId ? '' : id)}
+          />
+          {errors.weekday && (
+            <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.weekday}</p>
+          )}
+
+          <RetroFormField label="HORÁRIO" htmlFor="group_time">
+            <RetroTextInput
+              id="group_time"
+              type="time"
+              value={data.time}
+              onChange={(e) => setData('time', e.target.value)}
+            />
+            {errors.time && (
+              <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.time}</p>
+            )}
+          </RetroFormField>
+
+          <RetroFormField label="LOCAL" htmlFor="group_location">
+            <RetroTextInput
+              id="group_location"
+              value={data.location_name}
+              onChange={(e) => setData('location_name', e.target.value)}
+            />
+            {errors.location_name && (
+              <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.location_name}</p>
+            )}
+          </RetroFormField>
+
+          <div className="mt-2 flex gap-3">
+            <Link href="/groups" className="flex-1">
+              <RetroButton type="button" variant="danger">
+                CANCELAR
+              </RetroButton>
+            </Link>
+            <RetroButton type="submit" variant="success" disabled={processing} className="flex-1">
+              SALVAR
+            </RetroButton>
           </div>
-          {errors.weekday && <p>{errors.weekday}</p>}
-        </div>
-
-        <div className="form__group">
-          <label htmlFor="time">Horário</label>
-          <input
-            id="time"
-            type="time"
-            value={data.time}
-            onChange={(e) => setData('time', e.target.value)}
-          />
-          {errors.time && <p>{errors.time}</p>}
-        </div>
-
-        <div className="form__group">
-          <label htmlFor="location_name">Local</label>
-          <input
-            id="location_name"
-            type="text"
-            value={data.location_name}
-            onChange={(e) => setData('location_name', e.target.value)}
-          />
-          {errors.location_name && <p>{errors.location_name}</p>}
-        </div>
-
-        <div className="form__actions">
-          <button type="submit" disabled={processing}>
-            Salvar
-          </button>
-          <Link href="/groups">Cancelar</Link>
-        </div>
-      </form>
-    </AuthenticatedLayout>
+        </form>
+      </RetroPanel>
+    </RetroAppShell>
   );
 }
