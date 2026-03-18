@@ -9,7 +9,7 @@ import {
   RetroButton,
   RetroInfoCard,
   RetroLayout,
-  RetroPanel,
+  RetroAccordion,
   RetroSectionHeader,
 } from '@/Components/retro';
 
@@ -45,26 +45,23 @@ export default function Show({ group, players }: ShowProps) {
         </div>
       </RetroInfoCard>
 
-      <RetroSectionHeader title="3. CONVITE" />
-      <RetroPanel>
+      <RetroAccordion title="3. CONVITE" defaultOpen={false}>
         <GroupInviteSection
           inviteUrl={invite.inviteUrl}
           processing={invite.processing}
           onGenerateInvite={invite.onGenerate}
           onCopyInvite={invite.onCopy}
         />
-      </RetroPanel>
+      </RetroAccordion>
 
-      <RetroSectionHeader title={`4. JOGADORES (${playersSection.players.length})`} />
-      <RetroPanel>
+      <RetroAccordion title={`4. JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
         <PlayersTable
           players={playersSection.players}
           onRemovePlayer={playersSection.onRemovePlayer}
           removeProcessingId={playersSection.removeProcessingId}
         />
-      </RetroPanel>
+      </RetroAccordion>
 
-      {/* Formulário de adicionar jogador será movido para uma tela específica futuramente */}
     </RetroLayout>
   );
 }

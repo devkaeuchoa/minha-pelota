@@ -1,4 +1,4 @@
-import { RetroBannerAlert, RetroButton, RetroFormField, RetroTextInput } from '@/Components/retro';
+import { RetroAccordion, RetroButton, RetroFormField, RetroTextInput } from '@/Components/retro';
 
 interface GroupInviteSectionProps {
   inviteUrl: string | null;
@@ -15,8 +15,7 @@ export function GroupInviteSection({
 }: GroupInviteSectionProps) {
   if (inviteUrl) {
     return (
-      <div className="flex flex-col gap-3">
-        <RetroBannerAlert message="LINK DE CONVITE ATIVO" />
+      <>
         <RetroFormField label="LINK DO CONVITE" htmlFor="group_invite_url">
           <RetroTextInput
             id="group_invite_url"
@@ -30,13 +29,12 @@ export function GroupInviteSection({
             COPIAR LINK
           </RetroButton>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <RetroBannerAlert message="NENHUM LINK DE CONVITE ATIVO" />
+    <>
       <p className="retro-text-shadow text-sm text-[#a0b0ff]">
         GERE UM LINK PARA QUE NOVOS JOGADORES ENTREM NO GRUPO.
       </p>
@@ -50,6 +48,6 @@ export function GroupInviteSection({
           GERAR LINK DE CONVITE
         </RetroButton>
       </div>
-    </div>
+    </>
   );
 }
