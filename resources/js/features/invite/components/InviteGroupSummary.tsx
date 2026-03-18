@@ -1,12 +1,4 @@
-const weekdayLabels = [
-  'Domingo',
-  'Segunda-feira',
-  'Terça-feira',
-  'Quarta-feira',
-  'Quinta-feira',
-  'Sexta-feira',
-  'Sábado',
-];
+import { getWeekdayLabelFromIndex } from '@/utils/datetime';
 
 interface InviteGroupSummaryProps {
   name: string;
@@ -15,17 +7,12 @@ interface InviteGroupSummaryProps {
   locationName: string;
 }
 
-export function InviteGroupSummary({
-  name,
-  weekday,
-  time,
-  locationName,
-}: InviteGroupSummaryProps) {
+export function InviteGroupSummary({ name, weekday, time, locationName }: InviteGroupSummaryProps) {
   return (
     <>
       <h2>{name}</h2>
       <p>
-        {weekdayLabels[weekday]} às {time} — {locationName}
+        {getWeekdayLabelFromIndex(weekday) ?? weekday} às {time} — {locationName}
       </p>
       <hr />
     </>

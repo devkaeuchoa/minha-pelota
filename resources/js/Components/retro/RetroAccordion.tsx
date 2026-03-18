@@ -7,7 +7,6 @@ interface RetroAccordionProps extends PropsWithChildren {
 
 export function RetroAccordion({ title, defaultOpen = true, children }: RetroAccordionProps) {
   const [open, setOpen] = useState(defaultOpen);
-  console.log(open);
 
   return (
     <div data-component="retro-accordion" className="retro-border-panel bg-[#0b1340]">
@@ -24,4 +23,3 @@ export function RetroAccordion({ title, defaultOpen = true, children }: RetroAcc
     </div>
   );
 }
-

@@ -18,11 +18,6 @@ export function GroupSettingsSection({
         EDITE OU REMOVA AS CONFIGURAÇÕES DO GRUPO.
       </p>
       <div className="flex gap-3">
-        <Link href={`/groups/${groupId}/edit`} className="flex-1">
-          <RetroButton size="md" type="button" variant="success">
-            EDITAR GRUPO
-          </RetroButton>
-        </Link>
         <RetroButton
           size="md"
           className="flex-1"
@@ -33,6 +28,11 @@ export function GroupSettingsSection({
         >
           REMOVER GRUPO
         </RetroButton>
+        <Link href={`/groups/${groupId}/edit`} className="flex-1">
+          <RetroButton size="md" type="button" variant="success">
+            EDITAR GRUPO
+          </RetroButton>
+        </Link>
       </div>
     </div>
   );
