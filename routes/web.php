@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\GroupMatchGenerationController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
@@ -35,10 +36,12 @@ if (app()->environment('local')) {
 
         Route::get('/groups/{group}', function (Group $group) {
             $players = $group->players()->get();
+            $upcomingMatches = $group->matches()->upcoming()->limit(10)->get();
 
             return Inertia::render('Groups/Show', [
                 'group' => $group,
                 'players' => $players,
+                'matches' => $upcomingMatches,
             ]);
         })->name('groups.show');
 
@@ -68,6 +71,15 @@ if (app()->environment('local')) {
         Route::delete('/groups', [GroupController::class, 'destroyMany'])->name('groups.destroyMany');
 
         Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
+
+        Route::post('/groups/{group}/matches/generate/current-month', [
+            GroupMatchGenerationController::class,
+            'generateCurrentMonth',
+        ])->name('groups.matches.generate-current-month');
+        Route::post('/groups/{group}/matches/generate/months', [
+            GroupMatchGenerationController::class,
+            'generateForMonths',
+        ])->name('groups.matches.generate-months');
 
         Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
         Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');
@@ -95,10 +107,12 @@ if (app()->environment('local')) {
             abort_unless($group->owner_id === auth()->id(), 403);
 
             $players = $group->players()->get();
+            $upcomingMatches = $group->matches()->upcoming()->limit(10)->get();
 
             return Inertia::render('Groups/Show', [
                 'group' => $group,
                 'players' => $players,
+                'matches' => $upcomingMatches,
             ]);
         })->name('groups.show');
 
@@ -133,6 +147,15 @@ if (app()->environment('local')) {
         Route::delete('/groups', [GroupController::class, 'destroyMany'])->name('groups.destroyMany');
 
         Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
+
+        Route::post('/groups/{group}/matches/generate/current-month', [
+            GroupMatchGenerationController::class,
+            'generateCurrentMonth',
+        ])->name('groups.matches.generate-current-month');
+        Route::post('/groups/{group}/matches/generate/months', [
+            GroupMatchGenerationController::class,
+            'generateForMonths',
+        ])->name('groups.matches.generate-months');
 
         Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
         Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');
