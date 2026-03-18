@@ -10,9 +10,7 @@ export function RetroRosterGrid({ players }: RetroRosterGridProps) {
   }
 
   const manyPlayers = players.length > 20;
-  const nameClass = manyPlayers
-    ? 'text-base tracking-wide'
-    : 'text-xl tracking-wider';
+  const nameClass = manyPlayers ? 'text-base tracking-wide' : 'text-xl tracking-wider';
   const faceSize = manyPlayers ? 'w-4 h-4' : 'w-5 h-5';
 
   return (
@@ -29,7 +27,7 @@ export function RetroRosterGrid({ players }: RetroRosterGridProps) {
               <span className={manyPlayers ? 'text-xs' : 'text-sm'}>🙂</span>
             </div>
             <span className={`retro-text-shadow text-[#ffd700] uppercase truncate ${nameClass}`}>
-              {player.name}
+              {player.nick || player.name}
             </span>
           </div>
         ))}
@@ -37,4 +35,3 @@ export function RetroRosterGrid({ players }: RetroRosterGridProps) {
     </div>
   );
 }
-
