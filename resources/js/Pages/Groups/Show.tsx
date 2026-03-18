@@ -31,8 +31,11 @@ export default function Show({ group, players }: ShowProps) {
         <div className="mt-3 flex flex-col gap-3">
           <GroupSettingsSection
             groupId={settings.groupId}
+            recurrence={group.recurrence}
             deleteProcessing={settings.deleteProcessing}
+            generateProcessing={settings.generateProcessing}
             onDeleteGroup={settings.onDeleteGroup}
+            onGenerateMatches={settings.onGenerateMatches}
           />
         </div>
       </RetroInfoCard>

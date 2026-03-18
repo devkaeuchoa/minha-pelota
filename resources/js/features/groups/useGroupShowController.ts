@@ -8,6 +8,7 @@ export function useGroupShowController(group: Group, players: Player[]) {
   const addForm = useForm({ name: '', nick: '', phone: '' });
   const inviteForm = useForm({});
   const deleteForm = useForm({});
+  const generateMatchesForm = useForm({});
   const [removeProcessingId, setRemoveProcessingId] = useState<number | null>(null);
 
   const inviteUrl = getGroupInviteUrl(group);
@@ -52,6 +53,18 @@ export function useGroupShowController(group: Group, players: Player[]) {
     deleteForm.delete(route('groups.destroy', group));
   };
 
+  const handleGenerateMatches = () => {
+    if (
+      !confirm(
+        'Deseja gerar as partidas para o mês atual? Partidas já existentes neste período podem ser mantidas ou recriadas conforme a lógica do sistema.',
+      )
+    ) {
+      return;
+    }
+
+    generateMatchesForm.post(route('groups.matches.generate-current-month', group));
+  };
+
   return {
     addForm: {
       values: addForm.data,
@@ -75,6 +88,8 @@ export function useGroupShowController(group: Group, players: Player[]) {
       groupId: group.id,
       deleteProcessing: deleteForm.processing,
       onDeleteGroup: handleDeleteGroup,
+      generateProcessing: generateMatchesForm.processing,
+      onGenerateMatches: handleGenerateMatches,
     },
   };
 }

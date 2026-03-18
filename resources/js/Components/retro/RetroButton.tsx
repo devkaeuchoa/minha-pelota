@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes } from 'react';
 
-type ButtonVariant = 'success' | 'danger';
+type ButtonVariant = 'success' | 'danger' | 'neutral';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface RetroButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,6 +13,8 @@ const variantStyles: Record<ButtonVariant, string> = {
     'bg-[#39ff14] border-2 border-white text-white font-bold shadow-[0_0_8px_#39ff14] hover:brightness-110',
   danger:
     'bg-[#ff0055] border-2 border-white text-white font-bold shadow-[0_0_8px_#ff0055] hover:brightness-110',
+  neutral:
+    'bg-[#1f2937] border-2 border-[#4b5563] text-[#e5e7eb] font-semibold hover:bg-[#111827] hover:border-[#9ca3af]',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
