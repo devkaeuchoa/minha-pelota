@@ -120,11 +120,11 @@ O frontend segue uma separação **Model / View / Controller** adaptada para Rea
 
 ## Tasks Sprint 0 (checklist)
 
-- [ ] Criar projeto Laravel — `./scripts/setup-sprint-0.sh` (local) ou `./scripts/setup-sprint-0-docker.sh` (Docker). Ver SETUP.md
+- [x] Criar projeto Laravel — `./scripts/setup-sprint-0.sh` (local) ou `./scripts/setup-sprint-0-docker.sh` (Docker). Ver SETUP.md
 - [ ] Configurar `.env` e MySQL local
-- [ ] Instalar Laravel Breeze (Inertia + React stack)
-- [ ] Criar migrations: users, grupos, jogadores, partidas
-- [ ] Configurar Tailwind e layout base
+- [x] Instalar Laravel Breeze (Inertia + React stack)
+- [x] Criar migrations: users, grupos, jogadores, partidas
+- [x] Configurar Tailwind e layout base
 - [ ] Documentar deploy HostGator (passos no README)
 
 ---
