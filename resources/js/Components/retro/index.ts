@@ -25,6 +25,7 @@ export { RetroNumberStepper } from './RetroNumberStepper';
 export { RetroFileInput } from './RetroFileInput';
 export { RetroDatePicker } from './RetroDatePicker';
 export { RetroButton } from './RetroButton';
+export { RetroAccordion } from './RetroAccordion';
 export {
   RetroTable,
   RetroTableHeaderRow,
