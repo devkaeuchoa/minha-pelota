@@ -123,14 +123,14 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
           </RetroFormField>
 
           <div className="mt-2 flex gap-3">
-            <RetroButton type="submit" variant="success" disabled={processing} className="flex-1">
-              SALVAR
-            </RetroButton>
             <Link href="/groups" className="flex-1">
               <RetroButton type="button" variant="danger">
                 CANCELAR
               </RetroButton>
             </Link>
+            <RetroButton type="submit" variant="success" disabled={processing} className="flex-1">
+              SALVAR
+            </RetroButton>
           </div>
         </form>
       </RetroPanel>

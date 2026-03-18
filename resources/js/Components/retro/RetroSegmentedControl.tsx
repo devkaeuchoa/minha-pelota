@@ -17,7 +17,10 @@ export function RetroSegmentedControl({
   onChange,
 }: RetroSegmentedControlProps) {
   return (
-    <div className="retro-drop-shadow flex h-8 items-stretch border-2 border-[#4060c0] bg-[#1e348c]">
+    <div
+      data-component="retro-segmented-control"
+      className="retro-drop-shadow flex h-8 items-stretch border-2 border-[#4060c0] bg-[#1e348c]"
+    >
       <div className="flex items-center border-r-2 border-[#4060c0] bg-[#101c54] px-2">
         <span className="retro-text-shadow text-lg text-[#a0b0ff]">{label}</span>
       </div>

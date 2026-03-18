@@ -12,7 +12,7 @@ interface RetroSelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>,
 
 export function RetroSelect({ label, options, ...props }: RetroSelectProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div data-component="retro-select" className="flex flex-col gap-1">
       <label className="retro-text-shadow text-base text-[#a0b0ff]">{label}</label>
       <div className="relative">
         <select

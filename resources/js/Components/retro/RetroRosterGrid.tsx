@@ -14,7 +14,7 @@ export function RetroRosterGrid({ players }: RetroRosterGridProps) {
   const faceSize = manyPlayers ? 'w-4 h-4' : 'w-5 h-5';
 
   return (
-    <div className="border-panel-blue bg-[#0b1340] w-full">
+    <div data-component="retro-roster-grid" className="border-panel-blue bg-[#0b1340] w-full">
       <div className="flex max-h-[360px] flex-col flex-wrap content-start gap-y-1 gap-x-3">
         {players.map((player) => (
           <div

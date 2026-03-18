@@ -9,7 +9,7 @@ interface RetroPasswordInputProps extends Omit<
 
 export function RetroPasswordInput({ label, ...props }: RetroPasswordInputProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div data-component="retro-password-input" className="flex flex-col gap-1">
       <label className="retro-text-shadow text-base text-[#a0b0ff]">{label}</label>
       <div className="retro-inset-shadow flex items-center gap-2 border-2 border-[#4060c0] bg-[#0b1340] p-1">
         <input

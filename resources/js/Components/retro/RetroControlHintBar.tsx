@@ -10,7 +10,10 @@ interface RetroControlHintBarProps {
 
 export function RetroControlHintBar({ hints }: RetroControlHintBarProps) {
   return (
-    <div className="flex items-center justify-between border-y-2 border-[#5a7add] bg-[#1e348c] px-2 py-1">
+    <div
+      data-component="retro-control-hint-bar"
+      className="flex items-center justify-between border-y-2 border-[#5a7add] bg-[#1e348c] px-2 py-1"
+    >
       {hints.map((hint) => (
         <span
           key={hint.key}

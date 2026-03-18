@@ -36,7 +36,7 @@ export function RetroButton({
   const finalClasses = disabled ? `${baseClasses} ${disabledStyles}` : baseClasses;
 
   return (
-    <button className={finalClasses} {...props}>
+    <button data-component="retro-button" className={finalClasses} {...props}>
       {children}
     </button>
   );

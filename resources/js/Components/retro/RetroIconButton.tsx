@@ -34,7 +34,13 @@ export function RetroIconButton({
   const classes = `${base} ${metal} ${disabled ? disabledStyles : ''}`;
 
   return (
-    <button type="button" {...props} disabled={disabled} className={classes}>
+    <button
+      data-component="retro-icon-button"
+      type="button"
+      {...props}
+      disabled={disabled}
+      className={classes}
+    >
       {icon}
     </button>
   );

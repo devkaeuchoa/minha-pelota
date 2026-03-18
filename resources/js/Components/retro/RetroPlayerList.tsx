@@ -29,9 +29,7 @@ export function RetroPlayerList({
             key={player.id}
             name={player.name}
             nick={player.nick}
-            active={
-              selectedIds ? selectedIds.includes(player.id) : player.id === selectedId
-            }
+            active={selectedIds ? selectedIds.includes(player.id) : player.id === selectedId}
             variant={variant}
             onClick={() => {
               if (onToggle) {
@@ -56,7 +54,10 @@ interface RetroPlayerListShellProps extends PropsWithChildren {
 
 function RetroPlayerListShell({ title, children }: RetroPlayerListShellProps) {
   return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-[#1e348c] retro-border-panel p-2">
+    <div
+      data-component="retro-player-list"
+      className="relative flex h-full flex-col overflow-hidden bg-[#1e348c] retro-border-panel p-2"
+    >
       <div
         className="absolute inset-0 bg-[#101c54] opacity-40"
         style={{

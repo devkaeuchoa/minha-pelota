@@ -8,6 +8,7 @@ export function RetroStatusPill({ status, label }: RetroStatusPillProps) {
 
   return (
     <div
+      data-component="retro-status-pill"
       className={`retro-border-panel flex items-center gap-2 bg-[#1e348c] px-2 py-1 ${
         isOn ? '' : 'opacity-50'
       }`}

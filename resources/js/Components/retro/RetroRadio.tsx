@@ -12,7 +12,10 @@ interface RetroRadioProps {
 
 export function RetroRadio({ label, options, activeId, onChange }: RetroRadioProps) {
   return (
-    <div className="flex flex-col gap-2 border-2 border-[#4060c0] bg-[#1a2c7a] p-2">
+    <div
+      data-component="retro-radio"
+      className="flex flex-col gap-2 border-2 border-[#4060c0] bg-[#1a2c7a] p-2"
+    >
       <span className="retro-text-shadow text-base text-[#a0b0ff]">{label}</span>
       <div className="flex flex-col gap-1">
         {options.map((option) => {

@@ -14,7 +14,7 @@ interface RetroDatePickerProps {
 
 export function RetroDatePicker({ label, segments, onSegmentClick }: RetroDatePickerProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div data-component="retro-date-picker" className="flex flex-col gap-1">
       <label className="retro-text-shadow text-sm text-[#a0b0ff]">{label}</label>
       <div className="flex gap-1">
         {segments.map((seg, i) => (

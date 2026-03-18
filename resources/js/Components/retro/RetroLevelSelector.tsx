@@ -12,7 +12,10 @@ interface RetroLevelSelectorProps {
 
 export function RetroLevelSelector({ label, levels, activeId, onChange }: RetroLevelSelectorProps) {
   return (
-    <div className="retro-drop-shadow flex h-8 items-stretch border-2 border-[#4060c0] bg-[#1e348c]">
+    <div
+      data-component="retro-level-selector"
+      className="retro-drop-shadow flex h-8 items-stretch border-2 border-[#4060c0] bg-[#1e348c]"
+    >
       <div className="flex items-center border-r-2 border-[#4060c0] bg-[#101c54] px-2">
         <span className="retro-text-shadow text-lg text-[#a0b0ff]">{label}</span>
       </div>

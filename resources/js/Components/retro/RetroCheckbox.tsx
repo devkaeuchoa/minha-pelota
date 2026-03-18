@@ -6,7 +6,10 @@ interface RetroCheckboxProps {
 
 export function RetroCheckbox({ label, checked = false, onChange }: RetroCheckboxProps) {
   return (
-    <div className="flex items-center gap-3 border-2 border-[#4060c0] bg-[#1e348c] p-2">
+    <div
+      data-component="retro-checkbox"
+      className="flex items-center gap-3 border-2 border-[#4060c0] bg-[#1e348c] p-2"
+    >
       <div
         className={`retro-inset-shadow relative flex h-6 w-6 items-center justify-center border-2 bg-[#0b1340] ${
           checked ? 'border-[#39ff14]' : 'border-[#4060c0]'

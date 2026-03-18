@@ -6,7 +6,7 @@ interface RetroFileInputProps {
 
 export function RetroFileInput({ label, fileName, onBrowse }: RetroFileInputProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div data-component="retro-file-input" className="flex flex-col gap-1">
       <label className="retro-text-shadow text-sm text-[#a0b0ff]">{label}</label>
       <div
         className="flex cursor-pointer items-center gap-2 border-2 border-[#4060c0] bg-[#1e348c] p-2 hover:bg-[#2540a0]"

@@ -23,7 +23,7 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
   });
 
   return (
-    <RetroAppShell activeId="groups" title="GRUPOS">
+    <RetroAppShell activeId="groups">
       <Head title={`Jogadores — ${group.name}`} />
 
       <RetroSectionHeader title="3. JOGADORES DO GRUPO" />
@@ -82,4 +82,3 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
     </RetroAppShell>
   );
 }
-

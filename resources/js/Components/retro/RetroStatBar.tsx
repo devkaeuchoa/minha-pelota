@@ -18,7 +18,7 @@ export function RetroStatBar({ label, value, variant }: RetroStatBarProps) {
   const clamped = Math.max(0, Math.min(100, value));
 
   return (
-    <div className="flex items-center gap-2">
+    <div data-component="retro-stat-bar" className="flex items-center gap-2">
       <span className="retro-text-shadow w-6 text-lg text-white">{label}</span>
       <div className="retro-stat-bg flex h-4 flex-1">
         <div className={variantClass[variant]} style={{ width: `${clamped}%` }} />

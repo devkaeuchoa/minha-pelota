@@ -9,7 +9,10 @@ interface RetroTeamCardProps {
 
 export function RetroTeamCard({ teamName, playerLabel, formation, flag }: RetroTeamCardProps) {
   return (
-    <div className="retro-border-panel relative overflow-hidden bg-[#1e348c] p-2">
+    <div
+      data-component="retro-team-card"
+      className="retro-border-panel relative overflow-hidden bg-[#1e348c] p-2"
+    >
       <div
         className="absolute inset-0 bg-[#101c54] opacity-50"
         style={{

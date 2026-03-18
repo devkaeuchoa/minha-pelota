@@ -14,7 +14,10 @@ interface RetroModeSelectProps {
 
 export function RetroModeSelect({ title, modes, activeId, onChange }: RetroModeSelectProps) {
   return (
-    <div className="retro-border-panel flex flex-col gap-1.5 bg-[#0b1340] p-2">
+    <div
+      data-component="retro-mode-select"
+      className="retro-border-panel flex flex-col gap-1.5 bg-[#0b1340] p-2"
+    >
       {title && <ModeSelectTitle>{title}</ModeSelectTitle>}
 
       {modes.map((mode) => {

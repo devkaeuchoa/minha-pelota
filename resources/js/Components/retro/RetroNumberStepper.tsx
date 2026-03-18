@@ -22,7 +22,7 @@ export function RetroNumberStepper({
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div data-component="retro-number-stepper" className="flex flex-col gap-1">
       <label className="retro-text-shadow text-sm text-[#a0b0ff]">{label}</label>
       <div className="flex gap-2">
         <button

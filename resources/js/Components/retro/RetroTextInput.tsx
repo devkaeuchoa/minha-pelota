@@ -6,7 +6,7 @@ interface RetroTextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>
 
 export function RetroTextInput({ label, id, ...props }: RetroTextInputProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div data-component="retro-text-input" className="flex flex-col gap-1">
       {label && (
         <label htmlFor={id} className="retro-text-shadow text-base text-[#a0b0ff]">
           {label}

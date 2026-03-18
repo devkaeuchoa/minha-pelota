@@ -11,7 +11,10 @@ export function RetroSlider({ label, min = 0, max = 100, value }: RetroSliderPro
   const pct = range > 0 ? ((value - min) / range) * 100 : 0;
 
   return (
-    <div className="flex items-center gap-3 border-2 border-[#4060c0] bg-[#1e348c] p-2">
+    <div
+      data-component="retro-slider"
+      className="flex items-center gap-3 border-2 border-[#4060c0] bg-[#1e348c] p-2"
+    >
       <div className="flex flex-1 flex-col gap-1">
         <label className="retro-text-shadow text-sm text-[#a0b0ff]">{label}</label>
         <div className="flex items-center gap-2">

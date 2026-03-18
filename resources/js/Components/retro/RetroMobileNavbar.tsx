@@ -25,7 +25,7 @@ export function RetroMobileNavbar({ title, items, activeId }: RetroMobileNavbarP
   };
 
   return (
-    <>
+    <div data-component="retro-mobile-navbar">
       <header className="retro-bg-metallic retro-border-emboss relative z-20 flex shrink-0 items-center justify-between px-3 py-2 shadow-[0_4px_10px_rgba(0,0,0,0.8)]">
         <div className="flex items-center gap-2">
           <RetroIconButton
@@ -133,6 +133,6 @@ export function RetroMobileNavbar({ title, items, activeId }: RetroMobileNavbarP
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

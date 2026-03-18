@@ -18,7 +18,7 @@ export function RetroDesktopNavbar({
   activeId,
 }: RetroDesktopNavbarProps) {
   return (
-    <header className="relative z-40 w-full">
+    <header data-component="retro-desktop-navbar" className="relative z-40 w-full">
       <div className="retro-bg-metallic retro-border-emboss flex items-center justify-between px-3 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.7)]">
         <div className="flex items-center gap-4">
           <h1 className="retro-text-shadow-light m-0 text-3xl font-bold leading-none tracking-widest text-red-700 italic">

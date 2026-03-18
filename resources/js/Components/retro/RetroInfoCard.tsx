@@ -2,7 +2,10 @@ import { PropsWithChildren } from 'react';
 
 export function RetroInfoCard({ children }: PropsWithChildren) {
   return (
-    <div className="relative overflow-hidden bg-[#1e348c] retro-border-panel p-2">
+    <div
+      data-component="retro-info-card"
+      className="relative overflow-hidden bg-[#1e348c] retro-border-panel p-2"
+    >
       <div
         className="absolute inset-0 bg-[#101c54] opacity-40"
         style={{
@@ -14,4 +17,3 @@ export function RetroInfoCard({ children }: PropsWithChildren) {
     </div>
   );
 }
-
