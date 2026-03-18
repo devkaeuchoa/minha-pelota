@@ -30,8 +30,8 @@ interface RowProps {
 function Row({ label, value }: RowProps) {
   return (
     <div className="flex items-center justify-between">
-      <span className="retro-text-shadow text-xs text-[#a0b0ff]">{label}:</span>
-      <span className="retro-text-shadow text-sm text-white">{value ?? '-'}</span>
+      <span className="retro-text-shadow text-base text-[#a0b0ff]">{label}:</span>
+      <span className="retro-text-shadow text-base text-white">{value ?? '-'}</span>
     </div>
   );
 }
