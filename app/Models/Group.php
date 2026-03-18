@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
@@ -31,6 +32,7 @@ class Group extends Model
         'time',
         'location_name',
         'status',
+        'recurrence',
         'max_players',
         'max_guests',
         'allow_guests',
@@ -53,5 +55,10 @@ class Group extends Model
     {
         return $this->belongsToMany(Player::class, 'group_player')
             ->withTimestamps();
+    }
+
+    public function matches(): HasMany
+    {
+        return $this->hasMany(Game::class)->orderBy('scheduled_at');
     }
 }

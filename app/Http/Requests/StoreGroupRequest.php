@@ -24,6 +24,7 @@ class StoreGroupRequest extends FormRequest
             'time' => ['required', 'date_format:H:i'],
             'location_name' => ['required', 'string', 'max:150'],
             'status' => ['sometimes', 'string', 'max:20'],
+            'recurrence' => ['sometimes', 'string', 'in:none,weekly,biweekly,monthly'],
             'max_players' => ['nullable', 'integer', 'min:0', 'max:255'],
             'max_guests' => ['nullable', 'integer', 'min:0', 'max:255'],
             'allow_guests' => ['boolean'],

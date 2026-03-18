@@ -20,6 +20,7 @@ return new class extends Migration
             $table->time('time');
             $table->string('location_name', 150);
             $table->string('status', 20)->default('active');
+            $table->string('recurrence', 20)->default('weekly');
 
             $table->unsignedTinyInteger('max_players')->nullable();
             $table->unsignedTinyInteger('max_guests')->nullable();
