@@ -2,10 +2,8 @@ import { PropsWithChildren } from 'react';
 
 export function RetroTable({ children }: PropsWithChildren) {
   return (
-    <div className="table">
-      <table className="w-full border-collapse text-left text-sm text-white">
-        {children}
-      </table>
+    <div className="table w-full h-full">
+      <table className="w-full border-collapse text-left text-sm text-white">{children}</table>
     </div>
   );
 }
@@ -15,11 +13,7 @@ export function RetroTableHeaderRow({ children }: PropsWithChildren) {
 }
 
 export function RetroTableHeaderCell({ children }: PropsWithChildren) {
-  return (
-    <th className="border border-[#4060c0] px-3 py-2">
-      {children}
-    </th>
-  );
+  return <th className="border border-[#4060c0] px-3 py-2">{children}</th>;
 }
 
 interface RetroTableRowProps extends PropsWithChildren {
@@ -48,11 +42,12 @@ const cellVariantClasses: Record<CellVariant, string> = {
   soft: 'text-[#cbd5f5]',
 };
 
-export function RetroTableCell({ variant = 'default', children , className }: RetroTableCellProps) {
+export function RetroTableCell({ variant = 'default', children, className }: RetroTableCellProps) {
   return (
-    <td className={`h-full min-h-0 border border-[#4060c0] px-3 py-2 ${cellVariantClasses[variant]} ${className}`}>
+    <td
+      className={`h-full min-h-0 border border-[#4060c0] px-3 py-2 ${cellVariantClasses[variant]} ${className}`}
+    >
       {children}
     </td>
   );
 }
-

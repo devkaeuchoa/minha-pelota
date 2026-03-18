@@ -22,7 +22,7 @@ export default function Show({ group, players }: ShowProps) {
   const { addForm, invite, playersSection, settings } = useGroupShowController(group, players);
 
   return (
-    <RetroAppShell activeId="groups" title="GRUPOS">
+    <RetroAppShell activeId="groups">
       <Head title={group.name} />
 
       <RetroSectionHeader title="2. DETALHES DO GRUPO" />

@@ -51,7 +51,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
   const activeWeekdayId = data.weekday;
 
   return (
-    <RetroAppShell activeId="groups" title="GRUPOS">
+    <RetroAppShell activeId="groups">
       <Head title={title} />
 
       <RetroSectionHeader title="1. CONFIGURAÇÃO DO GRUPO" />
@@ -118,9 +118,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
               onChange={(e) => setData('location_name', e.target.value)}
             />
             {errors.location_name && (
-              <p className="retro-text-shadow text-sm text-[#ff0055]">
-                {errors.location_name}
-              </p>
+              <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.location_name}</p>
             )}
           </RetroFormField>
 

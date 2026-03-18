@@ -15,26 +15,19 @@ export default function Index({ groups }: IndexProps) {
 
   if (!groups.length) {
     return (
-      <RetroAppShell activeId="groups" title="GRUPOS">
+      <RetroAppShell activeId="groups">
         <Head title="Meus grupos" />
         <RetroSectionHeader title="1. GRUPOS" />
         <RetroPanel>
-          <GroupsHeader
-            processing={false}
-            hasSelection={false}
-            total={0}
-            selectedCount={0}
-          />
-          <p className="retro-text-shadow text-lg text-[#a0b0ff]">
-            VOCÊ AINDA NÃO POSSUI GRUPOS.
-          </p>
+          <GroupsHeader processing={false} hasSelection={false} total={0} selectedCount={0} />
+          <p className="retro-text-shadow text-lg text-[#a0b0ff]">VOCÊ AINDA NÃO POSSUI GRUPOS.</p>
         </RetroPanel>
       </RetroAppShell>
     );
   }
 
   return (
-    <RetroAppShell activeId="groups" title="GRUPOS">
+    <RetroAppShell activeId="groups">
       <Head title="Meus grupos" />
       <form onSubmit={controller.handleBatchDelete}>
         <RetroSectionHeader title="1. GRUPOS" />
@@ -52,9 +45,7 @@ export default function Index({ groups }: IndexProps) {
           />
         </RetroPanel>
         <RetroControlHintBar
-          hints={[
-            { key: 'B', label: 'REMOVER SELECIONADOS', color: '#ff0055' },
-          ]}
+          hints={[{ key: 'B', label: 'REMOVER SELECIONADOS', color: '#ff0055' }]}
         />
       </form>
     </RetroAppShell>
