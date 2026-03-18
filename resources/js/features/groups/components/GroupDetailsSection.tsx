@@ -1,5 +1,6 @@
 import { Group } from '@/types';
 import { getWeekdayLabel } from '@/utils/datetime';
+import { getRecurrenceLabel, RecurrenceValue } from '@/utils/groups';
 
 interface GroupDetailsSectionProps {
   group: Group;
@@ -7,6 +8,7 @@ interface GroupDetailsSectionProps {
 
 export function GroupDetailsSection({ group }: GroupDetailsSectionProps) {
   const weekdayLabel = getWeekdayLabel(group.weekday) ?? group.weekday;
+  const recurrenceLabel = getRecurrenceLabel(group.recurrence as RecurrenceValue);
 
   return (
     <>
@@ -18,6 +20,7 @@ export function GroupDetailsSection({ group }: GroupDetailsSectionProps) {
         <Row label="DIA" value={weekdayLabel} />
         <Row label="HORÁRIO" value={group.time} />
         <Row label="LOCAL" value={group.location_name} />
+        <Row label="RECORRÊNCIA" value={recurrenceLabel} />
       </div>
     </>
   );

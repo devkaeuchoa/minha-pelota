@@ -24,6 +24,7 @@ export function RetroLevelSelector({ label, levels, activeId, onChange }: RetroL
           const isActive = level.id === activeId;
           return (
             <button
+              type="button"
               key={level.id}
               onClick={() => onChange?.(level.id)}
               className={

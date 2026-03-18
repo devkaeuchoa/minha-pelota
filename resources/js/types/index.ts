@@ -15,6 +15,7 @@ export interface Group {
   weekday: number;
   time: string;
   location_name: string;
+  recurrence?: string;
   status: string;
   max_players: number | null;
   max_guests: number | null;

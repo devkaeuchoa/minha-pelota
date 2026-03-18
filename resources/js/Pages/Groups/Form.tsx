@@ -5,6 +5,7 @@ import { slugifyKebab } from '@/utils/slug';
 import {
   RetroButton,
   RetroFormField,
+  RetroLevelSelector,
   RetroPanel,
   RetroRadio,
   RetroSectionHeader,
@@ -22,6 +23,13 @@ const weekdayOptions = [
   { value: '6', label: 'Sábado' },
 ];
 
+const recurrenceLevels = [
+  { id: 'none', label: 'NENHUMA' },
+  { id: 'weekly', label: 'SEMANAL' },
+  { id: 'biweekly', label: 'QUINZENAL' },
+  { id: 'monthly', label: 'MENSAL' },
+];
+
 interface FormProps extends PageProps {
   group: Group | null;
   submitUrl: string;
@@ -34,6 +42,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
     name: group?.name ?? '',
     slug: group?.slug ?? '',
     weekday: group?.weekday?.toString() ?? '',
+    recurrence: group?.recurrence ?? 'weekly',
     time: group?.time ?? '',
     location_name: group?.location_name ?? '',
   });
@@ -97,6 +106,16 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
           />
           {errors.weekday && (
             <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.weekday}</p>
+          )}
+
+          <RetroLevelSelector
+            label="RECORRÊNCIA"
+            levels={recurrenceLevels}
+            activeId={data.recurrence}
+            onChange={(id) => setData('recurrence', id)}
+          />
+          {errors.recurrence && (
+            <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.recurrence}</p>
           )}
 
           <RetroFormField label="HORÁRIO" htmlFor="group_time">

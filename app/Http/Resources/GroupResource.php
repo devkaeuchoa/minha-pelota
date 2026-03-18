@@ -22,6 +22,7 @@ class GroupResource extends JsonResource
             'weekday' => $this->weekday,
             'time' => $this->time,
             'location_name' => $this->location_name,
+            'recurrence' => $this->recurrence,
             'status' => $this->status,
             'max_players' => $this->max_players,
             'max_guests' => $this->max_guests,
