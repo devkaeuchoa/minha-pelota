@@ -2,12 +2,12 @@ import { Head } from '@inertiajs/react';
 import { Group, Player, PageProps } from '@/types';
 import {
   RetroButton,
-  RetroLayout,
   RetroPlayerList,
   RetroSearchInput,
   RetroSectionHeader,
 } from '@/Components/retro';
 import { useGroupPlayersController } from '@/features/groups/useGroupPlayersController';
+import { RetroAppShell } from '@/Layouts/RetroAppShell';
 
 interface PlayersPageProps extends PageProps {
   group: Group;
@@ -23,7 +23,7 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
   });
 
   return (
-    <RetroLayout>
+    <RetroAppShell activeId="groups" title="GRUPOS">
       <Head title={`Jogadores — ${group.name}`} />
 
       <RetroSectionHeader title="3. JOGADORES DO GRUPO" />
@@ -79,7 +79,7 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
           REMOVER DO GRUPO
         </RetroButton>
       </div>
-    </RetroLayout>
+    </RetroAppShell>
   );
 }
 

@@ -50,7 +50,7 @@ const cellVariantClasses: Record<CellVariant, string> = {
 
 export function RetroTableCell({ variant = 'default', children , className }: RetroTableCellProps) {
   return (
-    <td className={`border border-[#4060c0] px-3 py-2 ${cellVariantClasses[variant]} ${className}`}>
+    <td className={`h-full min-h-0 border border-[#4060c0] px-3 py-2 ${cellVariantClasses[variant]} ${className}`}>
       {children}
     </td>
   );

@@ -3,15 +3,15 @@ import { Group, Player, PageProps } from '@/types';
 import { useGroupShowController } from '@/features/groups/useGroupShowController';
 import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
 import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
-import { PlayersTable } from '@/features/groups/components/PlayersTable';
 import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
 import {
+  RetroRosterGrid,
   RetroButton,
   RetroInfoCard,
-  RetroLayout,
   RetroAccordion,
   RetroSectionHeader,
 } from '@/Components/retro';
+import { RetroAppShell } from '@/Layouts/RetroAppShell';
 
 interface ShowProps extends PageProps {
   group: Group;
@@ -22,7 +22,7 @@ export default function Show({ group, players }: ShowProps) {
   const { addForm, invite, playersSection, settings } = useGroupShowController(group, players);
 
   return (
-    <RetroLayout>
+    <RetroAppShell activeId="groups" title="GRUPOS">
       <Head title={group.name} />
 
       <RetroSectionHeader title="2. DETALHES DO GRUPO" />
@@ -34,14 +34,6 @@ export default function Show({ group, players }: ShowProps) {
             deleteProcessing={settings.deleteProcessing}
             onDeleteGroup={settings.onDeleteGroup}
           />
-          <RetroButton
-            type="button"
-            variant="success"
-            size="md"
-            onClick={() => router.visit(route('groups.players', group.id))}
-          >
-            GERENCIAR JOGADORES
-          </RetroButton>
         </div>
       </RetroInfoCard>
 
@@ -55,13 +47,16 @@ export default function Show({ group, players }: ShowProps) {
       </RetroAccordion>
 
       <RetroAccordion title={`4. JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
-        <PlayersTable
-          players={playersSection.players}
-          onRemovePlayer={playersSection.onRemovePlayer}
-          removeProcessingId={playersSection.removeProcessingId}
-        />
+        <RetroButton
+          type="button"
+          variant="success"
+          size="md"
+          onClick={() => router.visit(route('groups.players', group.id))}
+        >
+          GERENCIAR JOGADORES
+        </RetroButton>
+        <RetroRosterGrid players={playersSection.players} />
       </RetroAccordion>
-
-    </RetroLayout>
+    </RetroAppShell>
   );
 }

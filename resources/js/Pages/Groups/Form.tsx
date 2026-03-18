@@ -5,13 +5,12 @@ import { slugifyKebab } from '@/utils/slug';
 import {
   RetroButton,
   RetroFormField,
-  RetroLayout,
   RetroPanel,
   RetroRadio,
   RetroSectionHeader,
   RetroTextInput,
-  RetroValueDisplay,
 } from '@/Components/retro';
+import { RetroAppShell } from '@/Layouts/RetroAppShell';
 
 const weekdayOptions = [
   { value: '0', label: 'Domingo' },
@@ -52,7 +51,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
   const activeWeekdayId = data.weekday;
 
   return (
-    <RetroLayout>
+    <RetroAppShell activeId="groups" title="GRUPOS">
       <Head title={title} />
 
       <RetroSectionHeader title="1. CONFIGURAÇÃO DO GRUPO" />
@@ -137,6 +136,6 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
           </div>
         </form>
       </RetroPanel>
-    </RetroLayout>
+    </RetroAppShell>
   );
 }

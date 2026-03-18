@@ -25,6 +25,9 @@ export { RetroNumberStepper } from './RetroNumberStepper';
 export { RetroFileInput } from './RetroFileInput';
 export { RetroDatePicker } from './RetroDatePicker';
 export { RetroButton } from './RetroButton';
+export { RetroIconButton } from './RetroIconButton';
+export { RetroMobileNavbar } from './RetroMobileNavbar';
+export { RetroDesktopNavbar } from './RetroDesktopNavbar';
 export { RetroAccordion } from './RetroAccordion';
 export {
   RetroTable,
@@ -36,3 +39,4 @@ export {
 export { RetroInfoCard } from './RetroInfoCard';
 export { RetroPlayerList } from './RetroPlayerList';
 export { RetroSearchInput } from './RetroSearchInput';
+export { RetroRosterGrid } from './RetroRosterGrid';

@@ -3,12 +3,8 @@ import { Group, PageProps } from '@/types';
 import { useGroupsIndexController } from '@/features/groups/useGroupsIndexController';
 import { GroupsHeader } from '@/features/groups/components/GroupsHeader';
 import { GroupsTable } from '@/features/groups/components/GroupsTable';
-import {
-  RetroLayout,
-  RetroControlHintBar,
-  RetroPanel,
-  RetroSectionHeader,
-} from '@/Components/retro';
+import { RetroControlHintBar, RetroPanel, RetroSectionHeader } from '@/Components/retro';
+import { RetroAppShell } from '@/Layouts/RetroAppShell';
 
 interface IndexProps extends PageProps {
   groups: Group[];
@@ -19,7 +15,7 @@ export default function Index({ groups }: IndexProps) {
 
   if (!groups.length) {
     return (
-      <RetroLayout>
+      <RetroAppShell activeId="groups" title="GRUPOS">
         <Head title="Meus grupos" />
         <RetroSectionHeader title="1. GRUPOS" />
         <RetroPanel>
@@ -33,12 +29,12 @@ export default function Index({ groups }: IndexProps) {
             VOCÊ AINDA NÃO POSSUI GRUPOS.
           </p>
         </RetroPanel>
-      </RetroLayout>
+      </RetroAppShell>
     );
   }
 
   return (
-    <RetroLayout>
+    <RetroAppShell activeId="groups" title="GRUPOS">
       <Head title="Meus grupos" />
       <form onSubmit={controller.handleBatchDelete}>
         <RetroSectionHeader title="1. GRUPOS" />
@@ -61,6 +57,6 @@ export default function Index({ groups }: IndexProps) {
           ]}
         />
       </form>
-    </RetroLayout>
+    </RetroAppShell>
   );
 }

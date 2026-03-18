@@ -1,6 +1,5 @@
 import { Head } from '@inertiajs/react';
 import {
-  RetroLayout,
   RetroTitleBar,
   RetroSectionHeader,
   RetroPanel,
@@ -27,12 +26,13 @@ import {
   RetroDatePicker,
   RetroButton,
 } from '@/Components/retro';
+import { RetroAppShell } from '@/Layouts/RetroAppShell';
 
 export default function UiKit() {
   return (
     <>
       <Head title="Retro UI Kit" />
-      <RetroLayout>
+      <RetroAppShell title="RETRO UI KIT" activeId="home">
         <RetroTitleBar title="UI COMPONENTS" />
 
         <NavigationSection />
@@ -46,7 +46,7 @@ export default function UiKit() {
             &copy;1995-2025 KONAMI DREAM TEAM STUDIOS
           </span>
         </div>
-      </RetroLayout>
+      </RetroAppShell>
     </>
   );
 }
