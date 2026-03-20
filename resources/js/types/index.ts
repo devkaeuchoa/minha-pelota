@@ -59,3 +59,11 @@ export interface PageProps {
   };
   [key: string]: unknown;
 }
+
+export enum PhysicalCondition {
+  Otimo = 'otimo',
+  Regular = 'regular',
+  Ruim = 'ruim',
+  Machucado = 'machucado',
+  Unknown = 'unknown',
+}

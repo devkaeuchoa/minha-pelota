@@ -15,6 +15,7 @@ class Player extends Model
         'name',
         'nick',
         'phone',
+        'physical_condition',
     ];
 
     public function groups(): BelongsToMany

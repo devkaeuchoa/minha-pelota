@@ -1,7 +1,8 @@
 /* global confirm, route, navigator, window */
 import { Head, router } from '@inertiajs/react';
-import { Group, PageProps } from '@/types';
+import { Group, PageProps, PhysicalCondition } from '@/types';
 import {
+  RetroPitch,
   RetroButton,
   RetroInfoCard,
   RetroInlineInfo,
@@ -12,6 +13,7 @@ import {
   RetroTableHeaderRow,
   RetroTableRow,
   RetroValueDisplay,
+  RetroPhysicalConditionEmoji,
 } from '@/Components/retro';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { useMemo, useState } from 'react';
@@ -35,6 +37,7 @@ interface MatchPresenceManageProps extends PageProps {
     name: string;
     nick: string;
     status: 'going' | 'not_going' | null;
+    physicalCondition: PhysicalCondition | null;
   }>;
   summary: {
     going: number;
@@ -63,6 +66,7 @@ export default function Manage({
   const [copied, setCopied] = useState(false);
 
   const matchLabel = useMemo(() => formatDateTimePtBr(match.scheduled_at), [match.scheduled_at]);
+  const pitchPositions = players.slice(0, 12).map((p) => p.status);
 
   const handleGenerateLink = () => {
     if (!confirm('Deseja gerar o link de presença para esta partida?')) return;
@@ -87,6 +91,8 @@ export default function Manage({
       <RetroInfoCard>
         <div className="flex flex-col gap-4">
           {status ? <RetroInlineInfo message={status} /> : null}
+
+          <RetroPitch maxPlayers={12} positions={pitchPositions} />
 
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap gap-3">
@@ -142,6 +148,7 @@ export default function Manage({
           <RetroTable>
             <thead>
               <RetroTableHeaderRow>
+                <RetroTableHeaderCell>FÍSICO</RetroTableHeaderCell>
                 <RetroTableHeaderCell>JOGADOR</RetroTableHeaderCell>
                 <RetroTableHeaderCell>PRESENÇA</RetroTableHeaderCell>
               </RetroTableHeaderRow>
@@ -156,6 +163,9 @@ export default function Manage({
                       : 'PENDENTE';
                 return (
                   <RetroTableRow key={player.id} index={idx}>
+                    <RetroTableCell variant="default">
+                      <RetroPhysicalConditionEmoji condition={player.physicalCondition} />
+                    </RetroTableCell>
                     <RetroTableCell variant="muted">{player.nick}</RetroTableCell>
                     <RetroTableCell variant="default">{label}</RetroTableCell>
                   </RetroTableRow>

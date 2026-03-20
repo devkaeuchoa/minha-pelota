@@ -40,3 +40,5 @@ export { RetroInfoCard } from './RetroInfoCard';
 export { RetroPlayerList } from './RetroPlayerList';
 export { RetroSearchInput } from './RetroSearchInput';
 export { RetroRosterGrid } from './RetroRosterGrid';
+export { RetroPitch } from './RetroPitch';
+export { RetroPhysicalConditionEmoji } from './RetroPhysicalConditionEmoji';

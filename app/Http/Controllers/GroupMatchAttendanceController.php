@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PhysicalCondition;
 use App\Models\Game;
 use App\Models\Group;
 use App\Models\MatchAttendance;
@@ -39,6 +40,9 @@ class GroupMatchAttendanceController extends Controller
                 'name' => $player->name,
                 'nick' => $player->nick,
                 'status' => $attendance->get($player->id)?->status ?? null,
+                'physicalCondition' => PhysicalCondition::normalize(
+                    $player->physical_condition,
+                )->value,
             ];
         });
 
@@ -114,4 +118,3 @@ class GroupMatchAttendanceController extends Controller
         );
     }
 }
-
