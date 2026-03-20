@@ -1,15 +1,21 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 type PlayerVariant = 'available' | 'group';
 
 interface RetroPlayerListProps {
   title: string;
-  players: { id: number; name: string; nick?: string | null }[];
+  players: {
+    id: number;
+    name: string;
+    nick?: string | null;
+    physicalEmoji?: ReactNode;
+  }[];
   selectedId?: number | null;
   selectedIds?: number[];
   onSelect?: (id: number) => void;
   onToggle?: (id: number) => void;
   variant?: PlayerVariant;
+  highlightSelectedBackground?: boolean;
 }
 
 export function RetroPlayerList({
@@ -20,6 +26,7 @@ export function RetroPlayerList({
   onSelect,
   onToggle,
   variant = 'available',
+  highlightSelectedBackground = false,
 }: RetroPlayerListProps) {
   return (
     <RetroPlayerListShell title={title}>
@@ -29,8 +36,11 @@ export function RetroPlayerList({
             key={player.id}
             name={player.name}
             nick={player.nick}
+            physicalEmoji={player.physicalEmoji}
+            hideArrows
             active={selectedIds ? selectedIds.includes(player.id) : player.id === selectedId}
             variant={variant}
+            highlightSelectedBackground={highlightSelectedBackground}
             onClick={() => {
               if (onToggle) {
                 onToggle(player.id);
@@ -80,10 +90,22 @@ interface RetroPlayerListItemProps {
   nick?: string | null;
   active?: boolean;
   variant: PlayerVariant;
+  physicalEmoji?: ReactNode;
+  highlightSelectedBackground: boolean;
+  hideArrows?: boolean;
   onClick?: () => void;
 }
 
-function RetroPlayerListItem({ name, nick, active, variant, onClick }: RetroPlayerListItemProps) {
+function RetroPlayerListItem({
+  name,
+  nick,
+  active,
+  variant,
+  physicalEmoji,
+  highlightSelectedBackground,
+  onClick,
+  hideArrows = false,
+}: RetroPlayerListItemProps) {
   const baseColor = variant === 'available' ? 'text-[#39ff14]' : 'text-[#ffd700]';
 
   if (active) {
@@ -92,15 +114,27 @@ function RetroPlayerListItem({ name, nick, active, variant, onClick }: RetroPlay
         <button
           type="button"
           onClick={onClick}
-          className="retro-text-shadow retro-border-highlight flex w-full items-center gap-2 bg-[#1e348c] px-2 py-1 text-left"
+          className={`retro-text-shadow flex w-full items-center gap-2 px-2 py-1 text-left ${
+            highlightSelectedBackground
+              ? 'bg-[#39ff14] text-[#0b1340]'
+              : 'retro-border-highlight bg-[#1e348c]'
+          }`}
         >
-          <span className="text-lg">🙂</span>
-          <span className="retro-text-shadow left-1 text-lg text-[#ffd700]">▶</span>
-          <span className={`retro-text-shadow text-base sm:text-lg ${baseColor}`}>
-            {nick || name}
+          {physicalEmoji ? <span className="mr-1">{physicalEmoji}</span> : null}
+          {hideArrows ? null : (
+            <span className="retro-text-shadow left-1 text-lg text-[#ffd700]">▶</span>
+          )}
+          <span
+            className={`retro-text-shadow flex flex-col text-base sm:text-lg ${baseColor} ${
+              highlightSelectedBackground ? 'text-[#0b1340]' : ''
+            }`}
+          >
+            <span className="flex items-center gap-2">{nick || name}</span>
           </span>
         </button>
-        <span className="retro-text-shadow absolute right-1 text-lg text-[#ffd700]">◀</span>
+        {hideArrows ? null : (
+          <span className="retro-text-shadow absolute right-1 text-lg text-[#ffd700]">◀</span>
+        )}
       </div>
     );
   }
@@ -111,8 +145,10 @@ function RetroPlayerListItem({ name, nick, active, variant, onClick }: RetroPlay
       onClick={onClick}
       className="flex w-full items-center gap-2 border border-[#4060c0] bg-transparent px-2 py-1 text-left hover:bg-[#2540a0]"
     >
-      <span className="text-lg">🙂</span>
-      <span className={`retro-text-shadow text-base sm:text-lg ${baseColor}`}>{nick || name}</span>
+      {physicalEmoji ? <span className="mr-1">{physicalEmoji}</span> : null}
+      <span className={`retro-text-shadow text-base sm:text-lg ${baseColor}`}>
+        <span className="flex items-center gap-2">{nick || name}</span>
+      </span>
     </button>
   );
 }

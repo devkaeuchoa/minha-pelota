@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGroupPlayerRequest;
 use App\Http\Requests\UpdateGroupPlayerRequest;
+use App\Enums\PhysicalCondition;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -25,7 +26,9 @@ class GroupPlayerController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'physical_condition' => $user->physical_condition,
+                    'physical_condition' => PhysicalCondition::normalize(
+                        $user->physical_condition,
+                    )->value,
                     'is_admin' => (bool) $user->pivot->is_admin,
                 ];
             });
@@ -55,7 +58,9 @@ class GroupPlayerController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'physical_condition' => $user->physical_condition,
+            'physical_condition' => PhysicalCondition::normalize(
+                $user->physical_condition,
+            )->value,
             'is_admin' => (bool) ($data['is_admin'] ?? false),
         ], Response::HTTP_CREATED);
     }
@@ -79,7 +84,9 @@ class GroupPlayerController extends Controller
         }
 
         if (array_key_exists('physical_condition', $data)) {
-            $user->physical_condition = $data['physical_condition'];
+            $user->physical_condition = PhysicalCondition::normalize(
+                $data['physical_condition'],
+            )->value;
             $user->save();
         }
 
@@ -89,7 +96,9 @@ class GroupPlayerController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'physical_condition' => $user->physical_condition,
+            'physical_condition' => PhysicalCondition::normalize(
+                $user->physical_condition,
+            )->value,
             'is_admin' => (bool) $pivot->is_admin,
         ]);
     }

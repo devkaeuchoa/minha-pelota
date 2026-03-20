@@ -7,11 +7,7 @@ import {
   RetroInfoCard,
   RetroInlineInfo,
   RetroSectionHeader,
-  RetroTable,
-  RetroTableCell,
-  RetroTableHeaderCell,
-  RetroTableHeaderRow,
-  RetroTableRow,
+  RetroPlayerList,
   RetroValueDisplay,
   RetroPhysicalConditionEmoji,
 } from '@/Components/retro';
@@ -67,6 +63,25 @@ export default function Manage({
 
   const matchLabel = useMemo(() => formatDateTimePtBr(match.scheduled_at), [match.scheduled_at]);
   const pitchPositions = players.slice(0, 12).map((p) => p.status);
+
+  // Movimenta confirmados (`going`) para o topo da lista e mantém a ordem original
+  // entre os demais.
+  const sortedPlayers = useMemo(() => {
+    const decorated = players.map((p, originalIndex) => ({
+      p,
+      originalIndex,
+      isGoing: p.status === 'going',
+    }));
+
+    decorated.sort((a, b) => {
+      if (a.isGoing === b.isGoing) {
+        return a.originalIndex - b.originalIndex;
+      }
+      return a.isGoing ? -1 : 1;
+    });
+
+    return decorated.map((d) => d.p);
+  }, [players]);
 
   const handleGenerateLink = () => {
     if (!confirm('Deseja gerar o link de presença para esta partida?')) return;
@@ -145,34 +160,19 @@ export default function Manage({
             <RetroValueDisplay label="PENDENTES" value={summary.pending.toString()} />
           </div>
 
-          <RetroTable>
-            <thead>
-              <RetroTableHeaderRow>
-                <RetroTableHeaderCell>FÍSICO</RetroTableHeaderCell>
-                <RetroTableHeaderCell>JOGADOR</RetroTableHeaderCell>
-                <RetroTableHeaderCell>PRESENÇA</RetroTableHeaderCell>
-              </RetroTableHeaderRow>
-            </thead>
-            <tbody>
-              {players.map((player, idx) => {
-                const label =
-                  player.status === 'going'
-                    ? 'CONFIRMADO'
-                    : player.status === 'not_going'
-                      ? 'DESCONFIRMADO'
-                      : 'PENDENTE';
-                return (
-                  <RetroTableRow key={player.id} index={idx}>
-                    <RetroTableCell variant="default">
-                      <RetroPhysicalConditionEmoji condition={player.physicalCondition} />
-                    </RetroTableCell>
-                    <RetroTableCell variant="muted">{player.nick}</RetroTableCell>
-                    <RetroTableCell variant="default">{label}</RetroTableCell>
-                  </RetroTableRow>
-                );
-              })}
-            </tbody>
-          </RetroTable>
+          <RetroPlayerList
+            title="LISTA DE PRESENÇA"
+            players={sortedPlayers.map((player) => {
+              return {
+                id: player.id,
+                name: player.name,
+                nick: player.nick,
+                physicalEmoji: <RetroPhysicalConditionEmoji condition={player.physicalCondition} />,
+              };
+            })}
+            selectedIds={sortedPlayers.filter((p) => p.status === 'going').map((p) => p.id)}
+            highlightSelectedBackground
+          />
         </div>
       </RetroInfoCard>
     </RetroAppShell>
