@@ -158,7 +158,7 @@ export default function Manage({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-row gap-3 md:justify-between">
             <RetroValueDisplay label="CONFIRMADOS" value={summary.going.toString()} />
             <RetroValueDisplay label="DESCONFIRMADOS" value={summary.not_going.toString()} />
             <RetroValueDisplay label="PENDENTES" value={summary.pending.toString()} />
