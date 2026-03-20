@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('groups', function (Blueprint $table) {
-            $table->string('recurrence', 20)->default('weekly');
-        });
+        if (!Schema::hasColumn('groups', 'recurrence')) {
+            Schema::table('groups', function (Blueprint $table) {
+                $table->string('recurrence', 20)->default('weekly');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('groups', function (Blueprint $table) {
-            $table->dropColumn('recurrence');
-        });
+        if (Schema::hasColumn('groups', 'recurrence')) {
+            Schema::table('groups', function (Blueprint $table) {
+                $table->dropColumn('recurrence');
+            });
+        }
     }
 };

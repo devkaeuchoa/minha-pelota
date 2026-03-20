@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupMatchGenerationController;
+use App\Http\Controllers\GroupMatchAttendanceController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MatchAttendancePublicController;
 use App\Models\Group;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -80,6 +82,16 @@ if (app()->environment('local')) {
             GroupMatchGenerationController::class,
             'generateForMonths',
         ])->name('groups.matches.generate-months');
+
+        Route::get('/groups/{group}/matches/{match}/attendance', [
+            GroupMatchAttendanceController::class,
+            'manage',
+        ])->name('groups.matches.presence.manage');
+
+        Route::post('/groups/{group}/matches/{match}/attendance/link', [
+            GroupMatchAttendanceController::class,
+            'generateLink',
+        ])->name('groups.matches.presence.generate-link');
 
         Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
         Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');
@@ -157,6 +169,16 @@ if (app()->environment('local')) {
             'generateForMonths',
         ])->name('groups.matches.generate-months');
 
+        Route::get('/groups/{group}/matches/{match}/attendance', [
+            GroupMatchAttendanceController::class,
+            'manage',
+        ])->name('groups.matches.presence.manage');
+
+        Route::post('/groups/{group}/matches/{match}/attendance/link', [
+            GroupMatchAttendanceController::class,
+            'generateLink',
+        ])->name('groups.matches.presence.generate-link');
+
         Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
         Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');
         Route::put('/groups/{group}/players/{player}', [PlayerController::class, 'update'])->name('groups.players.update');
@@ -175,5 +197,8 @@ Route::get('/retro/ui-kit', function () {
 Route::get('/invite/{inviteCode}', [InviteController::class, 'show'])->name('invite.show');
 Route::post('/invite/{inviteCode}', [InviteController::class, 'store'])->name('invite.store');
 Route::get('/invite/{inviteCode}/success', [InviteController::class, 'success'])->name('invite.success');
+
+Route::get('/presence/{token}', [MatchAttendancePublicController::class, 'show'])->name('presence.show');
+Route::post('/presence/{token}', [MatchAttendancePublicController::class, 'store'])->name('presence.store');
 
 require __DIR__.'/auth.php';

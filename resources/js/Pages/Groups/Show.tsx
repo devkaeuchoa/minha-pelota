@@ -1,5 +1,6 @@
+/* global route */
 import { Head, router } from '@inertiajs/react';
-import { Group, Player, PageProps } from '@/types';
+import { Group, Match, Player, PageProps } from '@/types';
 import { useGroupShowController } from '@/features/groups/useGroupShowController';
 import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
 import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
@@ -16,10 +17,12 @@ import { RetroAppShell } from '@/Layouts/RetroAppShell';
 interface ShowProps extends PageProps {
   group: Group;
   players: Player[];
+  matches: Match[];
 }
 
-export default function Show({ group, players }: ShowProps) {
-  const { addForm, invite, playersSection, settings } = useGroupShowController(group, players);
+export default function Show({ group, players, matches }: ShowProps) {
+  const { invite, playersSection, settings } = useGroupShowController(group, players);
+  const nextMatch = matches[0] ?? null;
 
   return (
     <RetroAppShell activeId="groups">
@@ -27,7 +30,7 @@ export default function Show({ group, players }: ShowProps) {
 
       <RetroSectionHeader title="2. DETALHES DO GRUPO" />
       <RetroInfoCard>
-        <GroupDetailsSection group={group} />
+        <GroupDetailsSection group={group} matches={matches} />
         <div className="mt-3 flex flex-col gap-3">
           <GroupSettingsSection
             groupId={settings.groupId}
@@ -37,6 +40,20 @@ export default function Show({ group, players }: ShowProps) {
             onDeleteGroup={settings.onDeleteGroup}
             onGenerateMatches={settings.onGenerateMatches}
           />
+          {nextMatch && (
+            <RetroButton
+              variant="neutral"
+              size="sm"
+              type="button"
+              onClick={() =>
+                router.visit(
+                  route('groups.matches.presence.manage', { group: group.id, match: nextMatch.id }),
+                )
+              }
+            >
+              VER ESCALAÇÃO
+            </RetroButton>
+          )}
         </div>
       </RetroInfoCard>
 

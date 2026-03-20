@@ -33,6 +33,17 @@ export interface Group {
   deleted_at: string | null;
 }
 
+export interface Match {
+  id: number;
+  group_id: number;
+  scheduled_at: string;
+  status: string;
+  location_name: string | null;
+  duration_minutes: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Player {
   id: number;
   name: string;
