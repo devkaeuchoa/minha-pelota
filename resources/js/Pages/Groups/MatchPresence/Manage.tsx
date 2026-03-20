@@ -62,7 +62,6 @@ export default function Manage({
   const [copied, setCopied] = useState(false);
 
   const matchLabel = useMemo(() => formatDateTimePtBr(match.scheduled_at), [match.scheduled_at]);
-  const pitchPositions = players.slice(0, 12).map((p) => p.status);
 
   // Movimenta confirmados (`going`) para o topo da lista e mantém a ordem original
   // entre os demais.
@@ -82,6 +81,13 @@ export default function Manage({
 
     return decorated.map((d) => d.p);
   }, [players]);
+
+  // O campinho deve refletir somente jogadores confirmados, seguindo a ordem já
+  // priorizada por `sortedPlayers`.
+  const pitchPositions = useMemo(
+    () => sortedPlayers.filter((p) => p.status === 'going').map(() => 'going' as const),
+    [sortedPlayers],
+  );
 
   const handleGenerateLink = () => {
     if (!confirm('Deseja gerar o link de presença para esta partida?')) return;
@@ -106,8 +112,6 @@ export default function Manage({
       <RetroInfoCard>
         <div className="flex flex-col gap-4">
           {status ? <RetroInlineInfo message={status} /> : null}
-
-          <RetroPitch maxPlayers={12} positions={pitchPositions} />
 
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap gap-3">
@@ -160,19 +164,25 @@ export default function Manage({
             <RetroValueDisplay label="PENDENTES" value={summary.pending.toString()} />
           </div>
 
-          <RetroPlayerList
-            title="LISTA DE PRESENÇA"
-            players={sortedPlayers.map((player) => {
-              return {
-                id: player.id,
-                name: player.name,
-                nick: player.nick,
-                physicalEmoji: <RetroPhysicalConditionEmoji condition={player.physicalCondition} />,
-              };
-            })}
-            selectedIds={sortedPlayers.filter((p) => p.status === 'going').map((p) => p.id)}
-            highlightSelectedBackground
-          />
+          <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+            <RetroPitch maxPlayers={12} positions={pitchPositions} />
+
+            <RetroPlayerList
+              title="LISTA DE PRESENÇA"
+              players={sortedPlayers.map((player) => {
+                return {
+                  id: player.id,
+                  name: player.name,
+                  nick: player.nick,
+                  physicalEmoji: (
+                    <RetroPhysicalConditionEmoji condition={player.physicalCondition} />
+                  ),
+                };
+              })}
+              selectedIds={sortedPlayers.filter((p) => p.status === 'going').map((p) => p.id)}
+              highlightSelectedBackground
+            />
+          </div>
         </div>
       </RetroInfoCard>
     </RetroAppShell>
