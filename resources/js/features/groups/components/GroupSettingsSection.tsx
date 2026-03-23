@@ -3,20 +3,14 @@ import { RetroButton } from '@/Components/retro';
 
 interface GroupSettingsSectionProps {
   groupId: number;
-  recurrence?: string | null;
   deleteProcessing: boolean;
-  generateProcessing: boolean;
   onDeleteGroup: () => void;
-  onGenerateMatches: () => void;
 }
 
 export function GroupSettingsSection({
   groupId,
-  recurrence,
   deleteProcessing,
-  generateProcessing,
   onDeleteGroup,
-  onGenerateMatches,
 }: GroupSettingsSectionProps) {
   return (
     <div className="flex flex-col gap-3">
@@ -40,18 +34,6 @@ export function GroupSettingsSection({
           </RetroButton>
         </Link>
       </div>
-      {recurrence !== 'none' && (
-        <RetroButton
-          size="sm"
-          className="mt-2 w-full"
-          type="button"
-          variant="neutral"
-          disabled={generateProcessing}
-          onClick={onGenerateMatches}
-        >
-          GERAR JOGOS (MÊS ATUAL)
-        </RetroButton>
-      )}
     </div>
   );
 }

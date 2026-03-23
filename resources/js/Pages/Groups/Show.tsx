@@ -4,6 +4,7 @@ import { Group, Match, Player, PageProps } from '@/types';
 import { useGroupShowController } from '@/features/groups/useGroupShowController';
 import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
 import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
+import { GroupMatchesGenerationSection } from '@/features/groups/components/GroupMatchesGenerationSection';
 import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
 import {
   RetroRosterGrid,
@@ -30,15 +31,12 @@ export default function Show({ group, players, matches }: ShowProps) {
 
       <RetroSectionHeader title="2. DETALHES DO GRUPO" />
       <RetroInfoCard>
-        <GroupDetailsSection group={group} matches={matches} />
+        <GroupDetailsSection group={group} nextMatch={nextMatch} />
         <div className="mt-3 flex flex-col gap-3">
           <GroupSettingsSection
             groupId={settings.groupId}
-            recurrence={group.recurrence}
             deleteProcessing={settings.deleteProcessing}
-            generateProcessing={settings.generateProcessing}
             onDeleteGroup={settings.onDeleteGroup}
-            onGenerateMatches={settings.onGenerateMatches}
           />
           {nextMatch && (
             <RetroButton
@@ -57,7 +55,18 @@ export default function Show({ group, players, matches }: ShowProps) {
         </div>
       </RetroInfoCard>
 
-      <RetroAccordion title="3. CONVITE" defaultOpen={false}>
+      {group.recurrence !== 'none' && (
+        <RetroAccordion title="3. GERAR DATAS" defaultOpen={false}>
+          <GroupMatchesGenerationSection
+            matches={matches}
+            generateProcessing={settings.generateProcessing}
+            onGenerateCurrentMonth={settings.onGenerateCurrentMonth}
+            onGenerateForMonths={settings.onGenerateForMonths}
+          />
+        </RetroAccordion>
+      )}
+
+      <RetroAccordion title="4. CONVITE" defaultOpen={false}>
         <GroupInviteSection
           inviteUrl={invite.inviteUrl}
           processing={invite.processing}
@@ -66,7 +75,7 @@ export default function Show({ group, players, matches }: ShowProps) {
         />
       </RetroAccordion>
 
-      <RetroAccordion title={`4. JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
+      <RetroAccordion title={`5. JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
         <RetroButton
           type="button"
           variant="success"

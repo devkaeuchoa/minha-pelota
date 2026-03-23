@@ -86,14 +86,9 @@
 }
 
 @media (min-width: 768px) {
-  .row {
-    scroll-snap-align: start;
-  }
   .rosterList {
-    flex-direction: column;
-    flex-wrap: wrap;
-    overflow: hidden;
-    overflow-x: auto;
-    scroll-snap-type: y mandatory;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.5rem;
   }
 }

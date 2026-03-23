@@ -26,10 +26,10 @@ export function GroupsHeader({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-row justify-between align-items-end">
         <RetroStatusPill status={status} label={statusLabel} />
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex justify-end gap-5">
           <RetroValueDisplay label="GRUPOS" value={totalLabel} />
           <RetroValueDisplay label="SELECIONADOS" value={selectedLabel} />
         </div>

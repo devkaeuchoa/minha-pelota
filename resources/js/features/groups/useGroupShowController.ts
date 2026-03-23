@@ -1,3 +1,4 @@
+/* global confirm, route, navigator */
 import { FormEvent, useState } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import { Group, Player } from '@/types';
@@ -8,8 +9,8 @@ export function useGroupShowController(group: Group, players: Player[]) {
   const addForm = useForm({ name: '', nick: '', phone: '' });
   const inviteForm = useForm({});
   const deleteForm = useForm({});
-  const generateMatchesForm = useForm({});
   const [removeProcessingId, setRemoveProcessingId] = useState<number | null>(null);
+  const [generateProcessing, setGenerateProcessing] = useState(false);
 
   const inviteUrl = getGroupInviteUrl(group);
 
@@ -62,7 +63,25 @@ export function useGroupShowController(group: Group, players: Player[]) {
       return;
     }
 
-    generateMatchesForm.post(route('groups.matches.generate-current-month', group));
+    setGenerateProcessing(true);
+    router.post(route('groups.matches.generate-current-month', group), undefined, {
+      onFinish: () => setGenerateProcessing(false),
+    });
+  };
+
+  const handleGenerateForMonths = (months: number) => {
+    if (
+      !confirm(
+        `Deseja gerar as partidas para os próximos ${months} ${months === 1 ? 'mês' : 'meses'}?`,
+      )
+    ) {
+      return;
+    }
+
+    setGenerateProcessing(true);
+    router.post(route('groups.matches.generate-months', group), { months }, {
+      onFinish: () => setGenerateProcessing(false),
+    });
   };
 
   return {
@@ -88,8 +107,9 @@ export function useGroupShowController(group: Group, players: Player[]) {
       groupId: group.id,
       deleteProcessing: deleteForm.processing,
       onDeleteGroup: handleDeleteGroup,
-      generateProcessing: generateMatchesForm.processing,
-      onGenerateMatches: handleGenerateMatches,
+      generateProcessing,
+      onGenerateCurrentMonth: handleGenerateMatches,
+      onGenerateForMonths: handleGenerateForMonths,
     },
   };
 }
