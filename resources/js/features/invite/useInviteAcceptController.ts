@@ -9,6 +9,7 @@ export function useInviteAcceptController(inviteCode: string) {
     name: '',
     nick: '',
     phone: '',
+    rating: 3,
   });
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const [phoneAvailable, setPhoneAvailable] = useState(false);
@@ -71,7 +72,12 @@ export function useInviteAcceptController(inviteCode: string) {
     canSubmit,
     isCheckingPhone,
     phoneMessage,
-    onChange: (field: 'name' | 'nick' | 'phone', value: string) => {
+    onChange: (field: 'name' | 'nick' | 'phone' | 'rating', value: string) => {
+      if (field === 'rating') {
+        setData('rating', Number(value));
+        return;
+      }
+
       setData(field, value);
       if (field === 'phone') {
         setPhoneAvailable(false);

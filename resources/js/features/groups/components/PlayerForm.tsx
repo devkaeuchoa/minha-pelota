@@ -6,12 +6,14 @@ interface PlayerFormValues {
   name: string;
   nick: string;
   phone: string;
+  rating: number;
 }
 
 interface PlayerFormErrors {
   name?: string;
   nick?: string;
   phone?: string;
+  rating?: string;
 }
 
 interface PlayerFormProps {
@@ -31,9 +33,7 @@ export function PlayerForm({ values, errors, processing, onChange, onSubmit }: P
           value={values.name}
           onChange={(e) => onChange('name', e.target.value)}
         />
-        {errors.name && (
-          <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.name}</p>
-        )}
+        {errors.name && <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.name}</p>}
       </RetroFormField>
 
       <RetroFormField label="APELIDO" htmlFor="player_nick">
@@ -42,9 +42,7 @@ export function PlayerForm({ values, errors, processing, onChange, onSubmit }: P
           value={values.nick}
           onChange={(e) => onChange('nick', e.target.value)}
         />
-        {errors.nick && (
-          <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.nick}</p>
-        )}
+        {errors.nick && <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.nick}</p>}
       </RetroFormField>
 
       <RetroFormField label="TELEFONE" htmlFor="player_phone">
@@ -54,8 +52,20 @@ export function PlayerForm({ values, errors, processing, onChange, onSubmit }: P
           value={values.phone}
           onChange={(e) => onChange('phone', maskPhone(e.target.value))}
         />
-        {errors.phone && (
-          <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.phone}</p>
+        {errors.phone && <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.phone}</p>}
+      </RetroFormField>
+
+      <RetroFormField label="RATING (1 A 5)" htmlFor="player_rating">
+        <RetroTextInput
+          id="player_rating"
+          type="number"
+          min={1}
+          max={5}
+          value={String(values.rating)}
+          onChange={(e) => onChange('rating', e.target.value)}
+        />
+        {errors.rating && (
+          <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.rating}</p>
         )}
       </RetroFormField>
 

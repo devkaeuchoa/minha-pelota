@@ -22,6 +22,7 @@ class StorePlayerRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'nick' => ['required', 'string', 'max:60'],
             'phone' => ['required', 'string', 'max:20'],
+            'rating' => ['nullable', 'integer', 'between:1,5'],
         ];
     }
 

@@ -24,6 +24,7 @@ class UpdatePlayerRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:120'],
             'nick' => ['sometimes', 'string', 'max:60'],
             'phone' => ['sometimes', 'string', 'max:20', 'unique:players,phone,' . $playerId],
+            'rating' => ['sometimes', 'nullable', 'integer', 'between:1,5'],
         ];
     }
 

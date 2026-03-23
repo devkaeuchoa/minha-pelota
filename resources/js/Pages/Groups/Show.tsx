@@ -22,8 +22,15 @@ interface ShowProps extends PageProps {
 }
 
 export default function Show({ group, players, matches }: ShowProps) {
-  const { invite, playersSection, settings } = useGroupShowController(group, players);
-  const nextMatch = matches[0] ?? null;
+  const { invite, playersSection, settings, matchesSection } = useGroupShowController(
+    group,
+    players,
+    matches,
+  );
+  const nextMatch =
+    matches.find(
+      (match) => match.status === 'scheduled' && new Date(match.scheduled_at) >= new Date(),
+    ) ?? null;
 
   return (
     <RetroAppShell activeId="groups">
@@ -60,8 +67,16 @@ export default function Show({ group, players, matches }: ShowProps) {
           <GroupMatchesGenerationSection
             matches={matches}
             generateProcessing={settings.generateProcessing}
+            form={matchesSection.form}
+            editingMatchId={matchesSection.editingMatchId}
+            deleteProcessingId={matchesSection.deleteProcessingId}
             onGenerateCurrentMonth={settings.onGenerateCurrentMonth}
             onGenerateForMonths={settings.onGenerateForMonths}
+            onCreateMatch={matchesSection.onCreateMatch}
+            onSaveEditedMatch={matchesSection.onSaveEditedMatch}
+            onStartEditMatch={matchesSection.onStartEditMatch}
+            onCancelEditMatch={matchesSection.onCancelEditMatch}
+            onDeleteMatch={matchesSection.onDeleteMatch}
             onOpenMatchPresence={(matchId) =>
               router.visit(
                 route('groups.matches.presence.manage', { group: group.id, match: matchId }),

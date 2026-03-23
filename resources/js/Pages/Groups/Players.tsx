@@ -44,7 +44,10 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
           />
           <RetroPlayerList
             title="DISPONÍVEIS"
-            players={controller.filteredAvailable}
+            players={controller.filteredAvailable.map((player) => ({
+              ...player,
+              presenceLabel: formatPlayerMeta(player),
+            }))}
             selectedIds={Array.from(controller.selectedAvailableIds)}
             onToggle={controller.handleToggleAvailable}
             variant="available"
@@ -52,7 +55,10 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
         </div>
         <RetroPlayerList
           title="NO GRUPO"
-          players={controller.inGroup}
+          players={controller.inGroup.map((player) => ({
+            ...player,
+            presenceLabel: formatPlayerMeta(player),
+          }))}
           selectedId={controller.selectedGroupId}
           onSelect={controller.handleSelectGroup}
           variant="group"
@@ -81,4 +87,11 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
       </div>
     </RetroAppShell>
   );
+}
+
+function formatPlayerMeta(player: Player): string {
+  const rating = player.rating ? `R${player.rating}/5` : 'R-';
+  const stats = player.stats ?? { goals: 0, assists: 0, games_played: 0, games_missed: 0 };
+
+  return `${rating} G${stats.goals} A${stats.assists} J${stats.games_played} P${stats.games_missed}`;
 }

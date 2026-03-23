@@ -29,6 +29,7 @@ class PlayerHomeTest extends TestCase
                 ->where('nextMatch', null)
                 ->where('confirmedPlayers', [])
                 ->where('physicalCondition', 'unknown')
+                ->where('playerSummary', null)
         );
     }
 
@@ -59,6 +60,8 @@ class PlayerHomeTest extends TestCase
                 ->where('nextMatch.id', $match->id)
                 ->where('presenceStatus', 'not_going')
                 ->where('physicalCondition', 'unknown')
+                ->where('playerSummary.rating', null)
+                ->where('playerSummary.stats.games_missed', 1)
         );
     }
 

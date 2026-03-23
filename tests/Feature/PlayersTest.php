@@ -29,6 +29,7 @@ class PlayersTest extends TestCase
                 'name' => 'João Silva',
                 'nick' => 'joaozinho',
                 'phone' => '11999887766',
+                'rating' => 4,
             ]);
 
         $response->assertRedirect(route('groups.show', $group));
@@ -37,12 +38,20 @@ class PlayersTest extends TestCase
             'name' => 'João Silva',
             'nick' => 'joaozinho',
             'phone' => '11999887766',
+            'rating' => 4,
         ]);
 
         $player = Player::where('phone', '11999887766')->first();
         $this->assertDatabaseHas('group_player', [
             'group_id' => $group->id,
             'player_id' => $player->id,
+        ]);
+        $this->assertDatabaseHas('player_stats', [
+            'player_id' => $player->id,
+            'goals' => 0,
+            'assists' => 0,
+            'games_played' => 0,
+            'games_missed' => 0,
         ]);
     }
 
@@ -94,12 +103,16 @@ class PlayersTest extends TestCase
 
         $this->actingAs($owner)
             ->post(route('groups.players.store', $group1), [
-                'name' => 'Multi', 'nick' => 'multi', 'phone' => '11111111111',
+                'name' => 'Multi',
+                'nick' => 'multi',
+                'phone' => '11111111111',
             ]);
 
         $this->actingAs($owner)
             ->post(route('groups.players.store', $group2), [
-                'name' => 'Multi', 'nick' => 'multi', 'phone' => '11111111111',
+                'name' => 'Multi',
+                'nick' => 'multi',
+                'phone' => '11111111111',
             ]);
 
         $player = Player::where('phone', '11111111111')->first();
@@ -118,10 +131,29 @@ class PlayersTest extends TestCase
         $response = $this->actingAs($owner)
             ->put(route('groups.players.update', [$group, $player]), [
                 'nick' => 'novo-apelido',
+                'rating' => 5,
             ]);
 
         $response->assertRedirect();
-        $this->assertDatabaseHas('players', ['id' => $player->id, 'nick' => 'novo-apelido']);
+        $this->assertDatabaseHas('players', ['id' => $player->id, 'nick' => 'novo-apelido', 'rating' => 5]);
+    }
+
+    public function test_rating_must_be_between_one_and_five_on_create(): void
+    {
+        [$owner, $group] = $this->createOwnerWithGroup();
+
+        $response = $this->actingAs($owner)
+            ->post(route('groups.players.store', $group), [
+                'name' => 'Player Test',
+                'nick' => 'player',
+                'phone' => '11999887766',
+                'rating' => 6,
+            ]);
+
+        $response->assertSessionHasErrors(['rating']);
+        $this->assertDatabaseMissing('players', [
+            'phone' => '11999887766',
+        ]);
     }
 
     public function test_admin_can_remove_player_from_group(): void

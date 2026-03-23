@@ -7,6 +7,7 @@ use App\Models\Game;
 use App\Models\Group;
 use App\Models\MatchAttendance;
 use App\Models\Player;
+use App\Models\PlayerStat;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -28,6 +29,7 @@ class PlayerHomeController extends Controller
                 'presenceStatus' => 'pending',
                 'confirmedPlayers' => [],
                 'physicalCondition' => PhysicalCondition::Unknown->value,
+                'playerSummary' => null,
             ]);
         }
 
@@ -60,6 +62,21 @@ class PlayerHomeController extends Controller
                 ->all();
         }
 
+        $playerSummary = null;
+        if ($player) {
+            $stats = PlayerStat::syncForPlayer((int) $player->id);
+            $playerSummary = [
+                'id' => $player->id,
+                'rating' => $player->rating,
+                'stats' => [
+                    'goals' => $stats->goals,
+                    'assists' => $stats->assists,
+                    'games_played' => $stats->games_played,
+                    'games_missed' => $stats->games_missed,
+                ],
+            ];
+        }
+
         return Inertia::render('Home/Player', [
             'hasGroup' => true,
             'group' => [
@@ -74,6 +91,7 @@ class PlayerHomeController extends Controller
             'presenceStatus' => $presenceStatus,
             'confirmedPlayers' => $confirmedPlayers,
             'physicalCondition' => PhysicalCondition::normalize($player?->physical_condition)->value,
+            'playerSummary' => $playerSummary,
         ]);
     }
 

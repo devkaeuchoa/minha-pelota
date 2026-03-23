@@ -36,6 +36,7 @@ class InviteTest extends TestCase
             'name' => 'Carlos',
             'nick' => 'carlao',
             'phone' => '21988776655',
+            'rating' => 2,
         ]);
 
         $response->assertRedirect(route('invite.success', $group->invite_code));
@@ -44,12 +45,20 @@ class InviteTest extends TestCase
             'name' => 'Carlos',
             'nick' => 'carlao',
             'phone' => '21988776655',
+            'rating' => 2,
         ]);
 
         $player = Player::where('phone', '21988776655')->first();
         $this->assertDatabaseHas('group_player', [
             'group_id' => $group->id,
             'player_id' => $player->id,
+        ]);
+        $this->assertDatabaseHas('player_stats', [
+            'player_id' => $player->id,
+            'goals' => 0,
+            'assists' => 0,
+            'games_played' => 0,
+            'games_missed' => 0,
         ]);
     }
 
@@ -130,6 +139,23 @@ class InviteTest extends TestCase
         $response->assertRedirect();
         $player = Player::where('phone', '21988776655')->first();
         $this->assertEquals(1, $group->players()->where('player_id', $player->id)->count());
+    }
+
+    public function test_invite_rejects_rating_outside_one_to_five(): void
+    {
+        $group = Group::factory()->create();
+
+        $response = $this->post(route('invite.store', $group->invite_code), [
+            'name' => 'Carlos',
+            'nick' => 'carlao',
+            'phone' => '21988776655',
+            'rating' => 8,
+        ]);
+
+        $response->assertSessionHasErrors(['rating']);
+        $this->assertDatabaseMissing('players', [
+            'phone' => '21988776655',
+        ]);
     }
 
     public function test_group_gets_invite_code_on_creation(): void

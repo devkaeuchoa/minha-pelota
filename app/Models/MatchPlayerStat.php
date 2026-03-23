@@ -5,24 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MatchAttendance extends Model
+class MatchPlayerStat extends Model
 {
-    protected $table = 'match_attendance';
-
     protected $fillable = [
         'match_id',
         'player_id',
-        'status',
+        'goals',
+        'assists',
     ];
 
     protected static function booted(): void
     {
-        static::saved(function (self $attendance): void {
-            PlayerStat::syncForPlayer((int) $attendance->player_id);
+        static::saved(function (self $stat): void {
+            PlayerStat::syncForPlayer((int) $stat->player_id);
         });
 
-        static::deleted(function (self $attendance): void {
-            PlayerStat::syncForPlayer((int) $attendance->player_id);
+        static::deleted(function (self $stat): void {
+            PlayerStat::syncForPlayer((int) $stat->player_id);
         });
     }
 

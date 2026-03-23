@@ -6,6 +6,7 @@ use App\Http\Requests\StorePlayerRequest;
 use App\Http\Requests\UpdatePlayerRequest;
 use App\Models\Group;
 use App\Models\Player;
+use App\Models\PlayerStat;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,8 +22,14 @@ class PlayerController extends Controller
 
         $player = Player::firstOrCreate(
             ['phone' => $data['phone']],
-            ['name' => $data['name'], 'nick' => $data['nick']]
+            [
+                'name' => $data['name'],
+                'nick' => $data['nick'],
+                'rating' => $data['rating'] ?? null,
+            ]
         );
+
+        PlayerStat::ensureForPlayer((int) $player->id);
 
         if (! $group->players()->where('player_id', $player->id)->exists()) {
             $group->players()->attach($player->id);
@@ -69,7 +76,7 @@ class PlayerController extends Controller
         $group->players()->detach($player->id);
 
         $previous = url()->previous();
-        $playersPath = '/groups/'.$group->id.'/players';
+        $playersPath = '/groups/' . $group->id . '/players';
 
         $targetRoute = str_contains($previous, $playersPath)
             ? 'groups.players'

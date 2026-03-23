@@ -6,12 +6,14 @@ interface InvitePlayerFormValues {
   name: string;
   nick: string;
   phone: string;
+  rating: number;
 }
 
 interface InvitePlayerFormErrors {
   name?: string;
   nick?: string;
   phone?: string;
+  rating?: string;
 }
 
 interface InvitePlayerFormProps {
@@ -81,6 +83,20 @@ export function InvitePlayerForm({
               {isCheckingPhone ? 'Verificando telefone...' : phoneMessage}
             </p>
           ) : null}
+        </RetroFormField>
+
+        <RetroFormField label="RATING (1 A 5)" htmlFor="invite_player_rating">
+          <RetroTextInput
+            id="invite_player_rating"
+            type="number"
+            min={1}
+            max={5}
+            value={String(values.rating)}
+            onChange={(e) => onChange('rating', e.target.value)}
+          />
+          {errors.rating && (
+            <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.rating}</p>
+          )}
         </RetroFormField>
 
         <div className="mt-2 flex gap-3">

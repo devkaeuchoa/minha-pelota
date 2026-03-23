@@ -2,6 +2,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { maskPhone } from '@/utils/phone';
+import { formatDateTimePtBr } from '@/utils/datetime';
 import {
   RetroButton,
   RetroInfoCard,
@@ -27,12 +28,6 @@ interface PresenceMarkProps extends PageProps {
     scheduled_at: string;
     location_name: string | null;
   };
-}
-
-function formatDateTimePtBr(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleString('pt-BR');
 }
 
 export default function Mark({ token, expired, status, group, match }: PresenceMarkProps) {

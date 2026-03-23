@@ -1,5 +1,5 @@
 import { Group, Match } from '@/types';
-import { getWeekdayLabel } from '@/utils/datetime';
+import { formatDateTimePtBr, getWeekdayLabel } from '@/utils/datetime';
 import { getRecurrenceLabel, RecurrenceValue } from '@/utils/groups';
 
 interface GroupDetailsSectionProps {
@@ -45,13 +45,5 @@ function Row({ label, value }: RowProps) {
 
 function formatNextMatch(match: Match | null): string {
   if (!match) return 'Nenhuma partida agendada';
-
-  const date = new Date(match.scheduled_at);
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
+  return formatDateTimePtBr(match.scheduled_at);
 }

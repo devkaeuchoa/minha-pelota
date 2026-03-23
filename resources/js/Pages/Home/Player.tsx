@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { PageProps, PhysicalCondition } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { PLAYER_NAV_ITEMS } from '@/config/navigation';
+import { formatDateTimePtBr } from '@/utils/datetime';
 import {
   RetroButton,
   RetroInfoCard,
@@ -35,12 +36,16 @@ interface PlayerHomeProps extends PageProps {
     nick: string;
   }>;
   physicalCondition: PhysicalCondition;
-}
-
-function formatDateTime(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleString('pt-BR');
+  playerSummary: {
+    id: number;
+    rating: number | null;
+    stats: {
+      goals: number;
+      assists: number;
+      games_played: number;
+      games_missed: number;
+    };
+  } | null;
 }
 
 function getPresenceLabel(status: PresenceStatus): string {
@@ -58,6 +63,7 @@ export default function PlayerHome({
   presenceStatus,
   confirmedPlayers,
   physicalCondition,
+  playerSummary,
 }: PlayerHomeProps) {
   const handlePresenceUpdate = (nextStatus: Exclude<PresenceStatus, 'pending'>) => {
     if (!nextMatch) return;
@@ -126,10 +132,29 @@ export default function PlayerHome({
             <RetroValueDisplay label="GRUPO" value={group?.name ?? '-'} />
             <RetroValueDisplay
               label="PRÓXIMA PARTIDA"
-              value={nextMatch ? formatDateTime(nextMatch.scheduled_at) : 'Sem partida agendada'}
+              value={
+                nextMatch ? formatDateTimePtBr(nextMatch.scheduled_at) : 'Sem partida agendada'
+              }
             />
             <RetroValueDisplay label="LOCAL" value={nextMatch?.location_name ?? '-'} />
             <RetroValueDisplay label="SUA PRESENÇA" value={getPresenceLabel(presenceStatus)} />
+            <RetroValueDisplay
+              label="SEU RATING"
+              value={playerSummary?.rating ? `${playerSummary.rating}/5` : '-'}
+            />
+            <RetroValueDisplay label="GOLS" value={String(playerSummary?.stats.goals ?? 0)} />
+            <RetroValueDisplay
+              label="ASSISTÊNCIAS"
+              value={String(playerSummary?.stats.assists ?? 0)}
+            />
+            <RetroValueDisplay
+              label="JOGOS REALIZADOS"
+              value={String(playerSummary?.stats.games_played ?? 0)}
+            />
+            <RetroValueDisplay
+              label="JOGOS PERDIDOS"
+              value={String(playerSummary?.stats.games_missed ?? 0)}
+            />
 
             <div className="mt-2 flex flex-col gap-2">
               <span className="retro-text-shadow text-base text-[#a0b0ff]">ESCALAÇÃO</span>

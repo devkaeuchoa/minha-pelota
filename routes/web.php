@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\GroupMatchController;
 use App\Http\Controllers\GroupMatchGenerationController;
 use App\Http\Controllers\GroupMatchAttendanceController;
 use App\Http\Controllers\InviteController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\PlayerHomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MatchAttendancePublicController;
 use App\Models\Group;
+use App\Models\Player;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -70,13 +72,35 @@ Route::middleware('auth')->group(function () {
     Route::get('/groups/{group}', function (Group $group) {
         abort_unless($group->owner_id === Auth::id(), 403);
 
-        $players = $group->players()->get();
-        $upcomingMatches = $group->matches()->upcoming()->limit(10)->get();
+        $players = $group->players()
+            ->with('stats')
+            ->get()
+            ->map(function (Player $player) {
+                return [
+                    'id' => $player->id,
+                    'name' => $player->name,
+                    'nick' => $player->nick,
+                    'phone' => $player->phone,
+                    'rating' => $player->rating,
+                    'stats' => [
+                        'goals' => (int) ($player->stats?->goals ?? 0),
+                        'assists' => (int) ($player->stats?->assists ?? 0),
+                        'games_played' => (int) ($player->stats?->games_played ?? 0),
+                        'games_missed' => (int) ($player->stats?->games_missed ?? 0),
+                    ],
+                    'created_at' => $player->created_at?->toISOString(),
+                    'updated_at' => $player->updated_at?->toISOString(),
+                ];
+            })
+            ->values();
+        $matches = $group->matches()
+            ->orderBy('scheduled_at')
+            ->get();
 
         return Inertia::render('Groups/Show', [
             'group' => $group,
             'players' => $players,
-            'matches' => $upcomingMatches,
+            'matches' => $matches,
         ]);
     })->name('groups.show');
 
@@ -91,12 +115,51 @@ Route::middleware('auth')->group(function () {
     Route::get('/groups/{group}/players', function (Group $group) {
         abort_unless($group->owner_id === Auth::id(), 403);
 
-        $groupPlayers = $group->players()->get();
-        $availablePlayers = \App\Models\Player::query()
+        $groupPlayers = $group->players()
+            ->with('stats')
+            ->get()
+            ->map(function (Player $player) {
+                return [
+                    'id' => $player->id,
+                    'name' => $player->name,
+                    'nick' => $player->nick,
+                    'phone' => $player->phone,
+                    'rating' => $player->rating,
+                    'stats' => [
+                        'goals' => (int) ($player->stats?->goals ?? 0),
+                        'assists' => (int) ($player->stats?->assists ?? 0),
+                        'games_played' => (int) ($player->stats?->games_played ?? 0),
+                        'games_missed' => (int) ($player->stats?->games_missed ?? 0),
+                    ],
+                    'created_at' => $player->created_at?->toISOString(),
+                    'updated_at' => $player->updated_at?->toISOString(),
+                ];
+            })
+            ->values();
+        $availablePlayers = Player::query()
             ->where('owner_id', Auth::id())
             ->whereNotIn('id', $groupPlayers->pluck('id'))
             ->orderBy('name')
-            ->get();
+            ->with('stats')
+            ->get()
+            ->map(function (Player $player) {
+                return [
+                    'id' => $player->id,
+                    'name' => $player->name,
+                    'nick' => $player->nick,
+                    'phone' => $player->phone,
+                    'rating' => $player->rating,
+                    'stats' => [
+                        'goals' => (int) ($player->stats?->goals ?? 0),
+                        'assists' => (int) ($player->stats?->assists ?? 0),
+                        'games_played' => (int) ($player->stats?->games_played ?? 0),
+                        'games_missed' => (int) ($player->stats?->games_missed ?? 0),
+                    ],
+                    'created_at' => $player->created_at?->toISOString(),
+                    'updated_at' => $player->updated_at?->toISOString(),
+                ];
+            })
+            ->values();
 
         return Inertia::render('Groups/Players', [
             'group' => $group,
@@ -120,6 +183,12 @@ Route::middleware('auth')->group(function () {
         GroupMatchGenerationController::class,
         'generateForMonths',
     ])->name('groups.matches.generate-months');
+    Route::post('/groups/{group}/matches', [GroupMatchController::class, 'store'])
+        ->name('groups.matches.store');
+    Route::put('/groups/{group}/matches/{match}', [GroupMatchController::class, 'update'])
+        ->name('groups.matches.update');
+    Route::delete('/groups/{group}/matches/{match}', [GroupMatchController::class, 'destroy'])
+        ->name('groups.matches.destroy');
 
     Route::get('/groups/{group}/matches/{match}/attendance', [
         GroupMatchAttendanceController::class,

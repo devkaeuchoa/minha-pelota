@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Game extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'matches';
 
@@ -25,6 +27,7 @@ class Game extends Model
 
     protected $casts = [
         'scheduled_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function group(): BelongsTo
@@ -42,6 +45,11 @@ class Game extends Model
         return $this->hasMany(MatchAttendance::class, 'match_id');
     }
 
+    public function matchStats(): HasMany
+    {
+        return $this->hasMany(MatchPlayerStat::class, 'match_id');
+    }
+
     public function scopeForPeriod(Builder $query, \DateTimeInterface $start, \DateTimeInterface $end): Builder
     {
         return $query->whereBetween('scheduled_at', [$start, $end]);
@@ -52,4 +60,3 @@ class Game extends Model
         return $query->where('scheduled_at', '>=', now());
     }
 }
-

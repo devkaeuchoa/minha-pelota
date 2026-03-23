@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InvitePlayerRequest;
 use App\Models\Group;
 use App\Models\Player;
+use App\Models\PlayerStat;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -38,8 +39,14 @@ class InviteController extends Controller
 
         $player = Player::firstOrCreate(
             ['phone' => $data['phone']],
-            ['name' => $data['name'], 'nick' => $data['nick']]
+            [
+                'name' => $data['name'],
+                'nick' => $data['nick'],
+                'rating' => $data['rating'] ?? null,
+            ]
         );
+
+        PlayerStat::ensureForPlayer((int) $player->id);
 
         if (! $group->players()->where('player_id', $player->id)->exists()) {
             $group->players()->attach($player->id);

@@ -56,6 +56,11 @@ class MatchesPresenceTest extends TestCase
             'player_id' => $player->id,
             'status' => 'going',
         ]);
+        $this->assertDatabaseHas('player_stats', [
+            'player_id' => $player->id,
+            'games_played' => 1,
+            'games_missed' => 0,
+        ]);
 
         $this->post(route('presence.store', $link->token), [
             'phone' => $player->phone,
@@ -66,6 +71,11 @@ class MatchesPresenceTest extends TestCase
             'match_id' => $match->id,
             'player_id' => $player->id,
             'status' => 'not_going',
+        ]);
+        $this->assertDatabaseHas('player_stats', [
+            'player_id' => $player->id,
+            'games_played' => 0,
+            'games_missed' => 1,
         ]);
     }
 
@@ -107,4 +117,3 @@ class MatchesPresenceTest extends TestCase
         ]);
     }
 }
-

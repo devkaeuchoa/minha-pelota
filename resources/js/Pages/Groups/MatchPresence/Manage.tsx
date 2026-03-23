@@ -13,6 +13,7 @@ import {
 } from '@/Components/retro';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { useMemo, useState } from 'react';
+import { formatDateTimePtBr } from '@/utils/datetime';
 
 interface MatchPresenceManageProps extends PageProps {
   group: Pick<Group, 'id' | 'name'>;
@@ -42,12 +43,6 @@ interface MatchPresenceManageProps extends PageProps {
     pending: number;
   };
   status?: string;
-}
-
-function formatDateTimePtBr(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleString('pt-BR');
 }
 
 export default function Manage({

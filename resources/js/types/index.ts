@@ -51,6 +51,13 @@ export interface Player {
   name: string;
   nick: string;
   phone: string;
+  rating?: number | null;
+  stats?: {
+    goals: number;
+    assists: number;
+    games_played: number;
+    games_missed: number;
+  };
   created_at: string;
   updated_at: string;
 }
