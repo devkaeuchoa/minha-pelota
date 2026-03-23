@@ -7,6 +7,7 @@ interface GroupMatchesGenerationSectionProps {
   generateProcessing: boolean;
   onGenerateCurrentMonth: () => void;
   onGenerateForMonths: (months: number) => void;
+  onOpenMatchPresence: (matchId: number) => void;
 }
 
 export function GroupMatchesGenerationSection({
@@ -14,6 +15,7 @@ export function GroupMatchesGenerationSection({
   generateProcessing,
   onGenerateCurrentMonth,
   onGenerateForMonths,
+  onOpenMatchPresence,
 }: GroupMatchesGenerationSectionProps) {
   const [customMonths, setCustomMonths] = useState(3);
   const presets = [3, 6, 12];
@@ -24,7 +26,11 @@ export function GroupMatchesGenerationSection({
       <p className="retro-text-shadow text-sm text-[#a0b0ff]">
         ESCOLHA O PERIODO PARA GERAR AS DATAS DAS PARTIDAS.
       </p>
-      <DatesRow dates={currentMonthDates} nextUpcomingId={nextUpcomingId} />
+      <DatesRow
+        dates={currentMonthDates}
+        nextUpcomingId={nextUpcomingId}
+        onOpenMatchPresence={onOpenMatchPresence}
+      />
 
       <div className="grid grid-cols-3 gap-2">
         {presets.map((months) => (
@@ -119,9 +125,10 @@ function getCurrentMonthMatchDates(matches: Match[]): {
 interface DatesRowProps {
   dates: MatchDateItem[];
   nextUpcomingId: number | null;
+  onOpenMatchPresence: (matchId: number) => void;
 }
 
-function DatesRow({ dates, nextUpcomingId }: DatesRowProps) {
+function DatesRow({ dates, nextUpcomingId, onOpenMatchPresence }: DatesRowProps) {
   if (dates.length === 0) {
     return (
       <p className="retro-text-shadow text-sm text-[#e5e7eb]">DATAS: Nenhuma partida neste mês</p>
@@ -136,16 +143,19 @@ function DatesRow({ dates, nextUpcomingId }: DatesRowProps) {
           {dates.map((item) => {
             const isNext = item.id === nextUpcomingId;
             return (
-              <div
+              <button
                 key={item.id}
+                type="button"
+                onClick={isNext ? () => onOpenMatchPresence(item.id) : undefined}
+                disabled={!isNext}
                 className={
                   isNext
-                    ? 'z-10 -mx-[1px] -my-[1px] flex flex-1 items-center justify-center border-2 border-[#39ff14] bg-[#2540a0] text-sm text-[#ffd700] shadow-[0_0_4px_#39ff14]'
-                    : 'flex flex-1 items-center justify-center text-sm text-[#e5e7eb]'
+                    ? 'z-10 -mx-[1px] -my-[1px] flex flex-1 items-center justify-center border-2 border-[#39ff14] bg-[#2540a0] text-sm text-[#ffd700] shadow-[0_0_4px_#39ff14] cursor-pointer hover:brightness-110'
+                    : 'flex flex-1 items-center justify-center text-sm text-[#e5e7eb] cursor-default'
                 }
               >
                 {item.label}
-              </div>
+              </button>
             );
           })}
         </div>

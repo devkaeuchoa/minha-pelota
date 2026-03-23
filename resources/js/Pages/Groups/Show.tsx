@@ -62,6 +62,11 @@ export default function Show({ group, players, matches }: ShowProps) {
             generateProcessing={settings.generateProcessing}
             onGenerateCurrentMonth={settings.onGenerateCurrentMonth}
             onGenerateForMonths={settings.onGenerateForMonths}
+            onOpenMatchPresence={(matchId) =>
+              router.visit(
+                route('groups.matches.presence.manage', { group: group.id, match: matchId }),
+              )
+            }
           />
         </RetroAccordion>
       )}
