@@ -10,3 +10,8 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   { id: 'settings', label: 'CONFIGURAÇÕES', href: '/settings' },
 ];
 
+export const PLAYER_NAV_ITEMS: AppNavItem[] = [
+  { id: 'home', label: 'HOME', href: '/home/player' },
+  { id: 'profile', label: 'PERFIL', href: '/profile' },
+];
+

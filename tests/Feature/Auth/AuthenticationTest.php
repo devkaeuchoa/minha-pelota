@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Models\Group;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,6 +24,22 @@ class AuthenticationTest extends TestCase
 
         $response = $this->post('/login', [
             'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('player.home', absolute: false));
+    }
+
+    public function test_admin_users_are_redirected_to_dashboard_after_login(): void
+    {
+        $admin = User::factory()->create();
+        Group::factory()->create([
+            'owner_id' => $admin->id,
+        ]);
+
+        $response = $this->post('/login', [
+            'email' => $admin->email,
             'password' => 'password',
         ]);
 

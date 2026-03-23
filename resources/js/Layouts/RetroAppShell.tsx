@@ -1,7 +1,9 @@
 import { PropsWithChildren } from 'react';
 import { router } from '@inertiajs/react';
 import { RetroDesktopNavbar, RetroLayout, RetroMobileNavbar } from '@/Components/retro';
-import { APP_NAV_ITEMS, AppNavItem } from '@/config/navigation';
+import { APP_NAV_ITEMS, AppNavItem, PLAYER_NAV_ITEMS } from '@/config/navigation';
+
+const IS_PLAYER = true;
 
 interface RetroAppShellProps extends PropsWithChildren {
   title?: string;
@@ -17,7 +19,7 @@ export function RetroAppShell({
   items,
   children,
 }: RetroAppShellProps) {
-  const navItems = (items ?? APP_NAV_ITEMS).map((item) => ({
+  const navItems = ((items ?? IS_PLAYER) ? PLAYER_NAV_ITEMS : APP_NAV_ITEMS).map((item) => ({
     id: item.id,
     label: item.label,
     onClick: () => router.visit(item.href),

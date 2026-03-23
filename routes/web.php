@@ -5,10 +5,12 @@ use App\Http\Controllers\GroupMatchGenerationController;
 use App\Http\Controllers\GroupMatchAttendanceController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\PlayerController;
+use App\Http\Controllers\PlayerHomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MatchAttendancePublicController;
 use App\Models\Group;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,6 +21,12 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/home/player', [PlayerHomeController::class, 'index'])->name('player.home');
+    Route::post('/home/player/matches/{match}/confirm-presence', [PlayerHomeController::class, 'confirmPresence'])
+        ->name('player.home.presence.confirm');
+});
 
 if (app()->environment('local')) {
     Route::group([], function () {
@@ -102,7 +110,7 @@ if (app()->environment('local')) {
     Route::middleware('auth')->group(function () {
         Route::get('/groups', function () {
             $groups = Group::query()
-                ->where('owner_id', auth()->id())
+                ->where('owner_id', Auth::id())
                 ->orderByDesc('created_at')
                 ->get();
 
@@ -116,7 +124,7 @@ if (app()->environment('local')) {
         })->name('groups.create');
 
         Route::get('/groups/{group}', function (Group $group) {
-            abort_unless($group->owner_id === auth()->id(), 403);
+            abort_unless($group->owner_id === Auth::id(), 403);
 
             $players = $group->players()->get();
             $upcomingMatches = $group->matches()->upcoming()->limit(10)->get();
@@ -129,7 +137,7 @@ if (app()->environment('local')) {
         })->name('groups.show');
 
         Route::get('/groups/{group}/edit', function (Group $group) {
-            abort_unless($group->owner_id === auth()->id(), 403);
+            abort_unless($group->owner_id === Auth::id(), 403);
 
             return Inertia::render('Groups/Edit', [
                 'group' => $group,
@@ -137,11 +145,11 @@ if (app()->environment('local')) {
         })->name('groups.edit');
 
         Route::get('/groups/{group}/players', function (Group $group) {
-            abort_unless($group->owner_id === auth()->id(), 403);
+            abort_unless($group->owner_id === Auth::id(), 403);
 
             $groupPlayers = $group->players()->get();
             $availablePlayers = \App\Models\Player::query()
-                ->where('owner_id', auth()->id())
+                ->where('owner_id', Auth::id())
                 ->whereNotIn('id', $groupPlayers->pluck('id'))
                 ->orderBy('name')
                 ->get();
@@ -201,4 +209,4 @@ Route::get('/invite/{inviteCode}/success', [InviteController::class, 'success'])
 Route::get('/presence/{token}', [MatchAttendancePublicController::class, 'show'])->name('presence.show');
 Route::post('/presence/{token}', [MatchAttendancePublicController::class, 'store'])->name('presence.store');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

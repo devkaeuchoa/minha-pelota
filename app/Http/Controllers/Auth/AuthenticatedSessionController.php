@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Group;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +33,14 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        $user = $request->user();
+        $isOwner = Group::query()->where('owner_id', $user->id)->exists();
+        $isAdminInGroup = $user->groups()->wherePivot('is_admin', true)->exists();
+
+        if (! $isOwner && ! $isAdminInGroup) {
+            return redirect()->intended(route('player.home', absolute: false));
+        }
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
