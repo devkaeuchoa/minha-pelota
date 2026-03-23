@@ -4,11 +4,11 @@ Fluxo iterativo Agile para desenhar o MVP do app. Cada sprint refinamos o backlo
 
 ## Estrutura
 
-| Arquivo | Propósito |
-|---------|-----------|
-| `01-discovery.plan.md` | Problema, personas, visão do produto |
-| `02-mvp-backlog.plan.md` | User stories e tarefas do MVP |
-| `sprints/` | Planos por sprint quando iniciarmos desenvolvimento |
+| Arquivo                  | Propósito                                           |
+| ------------------------ | --------------------------------------------------- |
+| `01-discovery.plan.md`   | Problema, personas, visão do produto                |
+| `02-mvp-backlog.plan.md` | User stories e tarefas do MVP                       |
+| `sprints/`               | Planos por sprint quando iniciarmos desenvolvimento |
 
 ## Ciclo de Refinamento
 
@@ -16,3 +16,9 @@ Fluxo iterativo Agile para desenhar o MVP do app. Cada sprint refinamos o backlo
 2. **Backlog** → Priorizar com MoSCoW (Must / Should / Could / Won't)
 3. **Sprint 0** → Definir MVP mínimo viável
 4. **Iterar** → Revisar e ajustar a cada ciclo
+
+## Status Atual (Mar/2026)
+
+- Discovery e Sprint 0 concluídos
+- MVP core entregue para: grupos, convites, geração/lista de partidas e presença (incluindo "talvez")
+- Próximo foco de planejamento: pagamentos por partida e fechamento do CRUD completo de partidas

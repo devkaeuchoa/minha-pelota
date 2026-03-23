@@ -170,5 +170,6 @@ O frontend segue uma separação **Model / View / Controller** adaptada para Rea
 
 ## Next Steps
 
-1. Executar tasks Sprint 0
-2. Iniciar Sprint 1 (US-1, US-2, US-3)
+1. Consolidar Sprint 2 com foco em US-5 (pagamentos por partida)
+2. Fechar pendências de CRUD completo de partidas e resumo admin financeiro
+3. Planejar Sprint 3 (divisão de times e recorrência de pagamento)

@@ -20,9 +20,9 @@ Definir claramente o problema que o app resolve, para quem e qual a proposta de 
 
 ## Personas / Usuários-alvo
 
-| Persona | Descrição | Necessidade principal | Gatilho de uso |
-|---------|-----------|----------------------|----------------|
-| **Admin** | Grupo de 2–3 organizadores | Criar partidas, cobrar, formar times | Antes/depois de cada pelada |
+| Persona     | Descrição                                | Necessidade principal                    | Gatilho de uso                          |
+| ----------- | ---------------------------------------- | ---------------------------------------- | --------------------------------------- |
+| **Admin**   | Grupo de 2–3 organizadores               | Criar partidas, cobrar, formar times     | Antes/depois de cada pelada             |
 | **Jogador** | Amigos do grupo + convidados esporádicos | Confirmar presença, pagar, ver escalação | Convite no grupo, lembrete de pagamento |
 
 > MVP foca em **ambos**: o admin organiza, mas precisa dos jogadores para ter conteúdo a administrar.
@@ -34,21 +34,25 @@ Definir claramente o problema que o app resolve, para quem e qual a proposta de 
 ## Escopo do MVP (MoSCoW)
 
 ### Must Have
-- [ ] Grupo/quadra (admin cria e gerencia)
-- [ ] Cadastro e convite de jogadores
-- [ ] Datas de partidas (criar e listar)
-- [ ] Lista de presença ("quem vem?")
+
+- [x] Grupo/quadra (admin cria e gerencia)
+- [x] Cadastro e convite de jogadores
+- [x] Datas de partidas (criar e listar)
+- [x] Lista de presença ("quem vem?")
 - [ ] Status de pagamento (pago / pendente)
 
 ### Should Have
+
 - [ ] Divisão de times (manual ou automática)
 - [ ] Recorrência de pagamento (mensal / semanal)
 
 ### Could Have
+
 - [ ] Histórico de partidas
 - [ ] Notificações / lembretes
 
 ### Won't Have (v1)
+
 - [ ] Pagamento integrado (PIX, cartão)
 - [ ] Estatísticas de jogadores
 - [ ] Convites automáticos por e-mail/SMS
@@ -61,5 +65,6 @@ Definir claramente o problema que o app resolve, para quem e qual a proposta de 
 ## Next Steps
 
 1. ~~Validar problem statement~~ ✅ Discovery concluído
-2. Refinar backlog com user stories (02-mvp-backlog.plan.md)
-3. Sprint 0: definir tech stack e setup inicial
+2. ~~Refinar backlog com user stories (02-mvp-backlog.plan.md)~~ ✅ Concluído
+3. ~~Sprint 0: definir tech stack e setup inicial~~ ✅ Concluído
+4. Foco do próximo ciclo: pagamentos (US-5) + fechamento de CRUD completo de partidas
