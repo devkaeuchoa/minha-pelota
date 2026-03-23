@@ -47,8 +47,10 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home/player', [PlayerHomeController::class, 'index'])->name('player.home');
-    Route::post('/home/player/matches/{match}/confirm-presence', [PlayerHomeController::class, 'confirmPresence'])
-        ->name('player.home.presence.confirm');
+    Route::post('/home/player/matches/{match}/presence', [PlayerHomeController::class, 'updatePresence'])
+        ->name('player.home.presence.update');
+    Route::post('/home/player/groups/{group}/physical-condition', [PlayerHomeController::class, 'updatePhysicalCondition'])
+        ->name('player.home.physical-condition.update');
 
     Route::get('/groups', function () {
         $groups = Group::query()

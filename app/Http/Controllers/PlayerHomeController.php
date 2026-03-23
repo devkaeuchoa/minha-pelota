@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PhysicalCondition;
 use App\Models\Game;
+use App\Models\Group;
 use App\Models\MatchAttendance;
 use App\Models\Player;
 use Illuminate\Http\RedirectResponse;
@@ -24,7 +26,8 @@ class PlayerHomeController extends Controller
                 'group' => null,
                 'nextMatch' => null,
                 'presenceStatus' => 'pending',
-                'canQuickConfirm' => false,
+                'confirmedPlayers' => [],
+                'physicalCondition' => PhysicalCondition::Unknown->value,
             ]);
         }
 
@@ -40,6 +43,23 @@ class PlayerHomeController extends Controller
             $presenceStatus = $attendance?->status ?? 'pending';
         }
 
+        $confirmedPlayers = [];
+        if ($nextMatch) {
+            $confirmedPlayers = MatchAttendance::query()
+                ->where('match_id', $nextMatch->id)
+                ->where('status', 'going')
+                ->with('player')
+                ->get()
+                ->map(fn(MatchAttendance $row) => [
+                    'id' => $row->player?->id,
+                    'name' => $row->player?->name,
+                    'nick' => $row->player?->nick,
+                ])
+                ->filter(fn(array $row) => ! empty($row['id']))
+                ->values()
+                ->all();
+        }
+
         return Inertia::render('Home/Player', [
             'hasGroup' => true,
             'group' => [
@@ -52,11 +72,12 @@ class PlayerHomeController extends Controller
                 'location_name' => $nextMatch->location_name,
             ] : null,
             'presenceStatus' => $presenceStatus,
-            'canQuickConfirm' => (bool) ($nextMatch && $player && $presenceStatus !== 'going'),
+            'confirmedPlayers' => $confirmedPlayers,
+            'physicalCondition' => PhysicalCondition::normalize($player?->physical_condition)->value,
         ]);
     }
 
-    public function confirmPresence(Request $request, Game $match): RedirectResponse
+    public function updatePresence(Request $request, Game $match): RedirectResponse
     {
         $user = $request->user();
         abort_unless($user, 401);
@@ -77,19 +98,56 @@ class PlayerHomeController extends Controller
                 ->with('status', 'Não foi possível identificar seu jogador neste grupo.');
         }
 
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:going,not_going,maybe'],
+        ]);
+
         MatchAttendance::query()->updateOrCreate(
             [
                 'match_id' => $match->id,
                 'player_id' => $player->id,
             ],
             [
-                'status' => 'going',
+                'status' => $validated['status'],
             ],
         );
 
+        $statusLabel = match ($validated['status']) {
+            'going' => 'confirmada',
+            'not_going' => 'desconfirmada',
+            default => 'marcada como talvez',
+        };
+
         return redirect()
             ->route('player.home')
-            ->with('status', 'Presença confirmada com sucesso.');
+            ->with('status', "Presença {$statusLabel} com sucesso.");
+    }
+
+    public function updatePhysicalCondition(Request $request, Group $group): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless($user, 401);
+
+        $isMember = $user->groups()->where('groups.id', $group->id)->exists();
+        abort_unless($isMember, 403);
+
+        $validated = $request->validate([
+            'physical_condition' => ['required', 'string', 'in:otimo,regular,ruim,machucado,unknown'],
+        ]);
+
+        $player = $this->resolvePlayerForUserInGroup($request, (int) $group->id);
+        if (! $player) {
+            return redirect()
+                ->route('player.home')
+                ->with('status', 'Não foi possível identificar seu jogador neste grupo.');
+        }
+
+        $player->physical_condition = PhysicalCondition::normalize($validated['physical_condition'])->value;
+        $player->save();
+
+        return redirect()
+            ->route('player.home')
+            ->with('status', 'Condição física atualizada com sucesso.');
     }
 
     private function resolvePlayerForUserInGroup(Request $request, int $groupId): ?Player

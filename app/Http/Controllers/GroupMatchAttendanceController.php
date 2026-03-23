@@ -69,6 +69,7 @@ class GroupMatchAttendanceController extends Controller
             'summary' => [
                 'going' => $playersWithAttendance->where('status', 'going')->count(),
                 'not_going' => $playersWithAttendance->where('status', 'not_going')->count(),
+                'maybe' => $playersWithAttendance->where('status', 'maybe')->count(),
                 'pending' => $playersWithAttendance->where('status', null)->count(),
             ],
         ]);

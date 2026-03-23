@@ -16,7 +16,7 @@ class StoreMatchAttendanceRequest extends FormRequest
     {
         return [
             'phone' => ['required', 'string', 'max:20'],
-            'status' => ['required', 'string', 'in:going,not_going'],
+            'status' => ['required', 'string', 'in:going,not_going,maybe'],
         ];
     }
 
@@ -29,4 +29,3 @@ class StoreMatchAttendanceRequest extends FormRequest
         }
     }
 }
-

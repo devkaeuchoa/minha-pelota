@@ -12,7 +12,7 @@ import {
 } from '@/Components/retro';
 import { FormEvent, useMemo } from 'react';
 
-type PresenceStatus = 'going' | 'not_going';
+type PresenceStatus = 'going' | 'not_going' | 'maybe';
 
 interface PresenceMarkProps extends PageProps {
   token: string;
@@ -48,6 +48,7 @@ export default function Mark({ token, expired, status, group, match }: PresenceM
 
   const options = [
     { id: 'going', label: 'CONFIRMAR' },
+    { id: 'maybe', label: 'TALVEZ' },
     { id: 'not_going', label: 'DESCONFIRMAR' },
   ];
 

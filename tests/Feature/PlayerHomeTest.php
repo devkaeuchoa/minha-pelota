@@ -27,7 +27,8 @@ class PlayerHomeTest extends TestCase
                 ->component('Home/Player')
                 ->where('hasGroup', false)
                 ->where('nextMatch', null)
-                ->where('canQuickConfirm', false)
+                ->where('confirmedPlayers', [])
+                ->where('physicalCondition', 'unknown')
         );
     }
 
@@ -57,6 +58,7 @@ class PlayerHomeTest extends TestCase
                 ->where('group.id', $group->id)
                 ->where('nextMatch.id', $match->id)
                 ->where('presenceStatus', 'not_going')
+                ->where('physicalCondition', 'unknown')
         );
     }
 
@@ -70,7 +72,9 @@ class PlayerHomeTest extends TestCase
             'status' => 'scheduled',
         ]);
 
-        $response = $this->actingAs($user)->post(route('player.home.presence.confirm', $match));
+        $response = $this->actingAs($user)->post(route('player.home.presence.update', $match), [
+            'status' => 'going',
+        ]);
 
         $response->assertRedirect(route('player.home'));
         $this->assertDatabaseHas('match_attendance', [
@@ -90,9 +94,47 @@ class PlayerHomeTest extends TestCase
             'status' => 'scheduled',
         ]);
 
-        $response = $this->actingAs($user)->post(route('player.home.presence.confirm', $otherMatch));
+        $response = $this->actingAs($user)->post(route('player.home.presence.update', $otherMatch), [
+            'status' => 'going',
+        ]);
 
         $response->assertStatus(403);
+    }
+
+    public function test_player_can_mark_presence_as_maybe(): void
+    {
+        [$user, $group, $player] = $this->createPlayerMemberContext();
+        $match = Game::query()->create([
+            'group_id' => $group->id,
+            'scheduled_at' => now()->addDay(),
+            'status' => 'scheduled',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('player.home.presence.update', $match), [
+            'status' => 'maybe',
+        ]);
+
+        $response->assertRedirect(route('player.home'));
+        $this->assertDatabaseHas('match_attendance', [
+            'match_id' => $match->id,
+            'player_id' => $player->id,
+            'status' => 'maybe',
+        ]);
+    }
+
+    public function test_player_can_update_physical_condition_from_home(): void
+    {
+        [$user, $group, $player] = $this->createPlayerMemberContext();
+
+        $response = $this->actingAs($user)->post(route('player.home.physical-condition.update', $group), [
+            'physical_condition' => 'ruim',
+        ]);
+
+        $response->assertRedirect(route('player.home'));
+        $this->assertDatabaseHas('players', [
+            'id' => $player->id,
+            'physical_condition' => 'ruim',
+        ]);
     }
 
     private function createPlayerMemberContext(): array

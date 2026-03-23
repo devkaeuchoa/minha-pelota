@@ -32,12 +32,13 @@ interface MatchPresenceManageProps extends PageProps {
     id: number;
     name: string;
     nick: string;
-    status: 'going' | 'not_going' | null;
+    status: 'going' | 'not_going' | 'maybe' | null;
     physicalCondition: PhysicalCondition | null;
   }>;
   summary: {
     going: number;
     not_going: number;
+    maybe: number;
     pending: number;
   };
   status?: string;
@@ -161,6 +162,7 @@ export default function Manage({
           <div className="flex flex-row gap-3 md:justify-between">
             <RetroValueDisplay label="CONFIRMADOS" value={summary.going.toString()} />
             <RetroValueDisplay label="DESCONFIRMADOS" value={summary.not_going.toString()} />
+            <RetroValueDisplay label="TALVEZ" value={summary.maybe.toString()} />
             <RetroValueDisplay label="PENDENTES" value={summary.pending.toString()} />
           </div>
 
