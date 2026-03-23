@@ -1,14 +1,20 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
+/* global route */
 import { Head, Link, useForm } from '@inertiajs/react';
+import { maskPhone } from '@/utils/phone';
+import PropTypes from 'prop-types';
+import {
+  RetroButton,
+  RetroCheckbox,
+  RetroInfoCard,
+  RetroInlineInfo,
+  RetroPasswordInput,
+  RetroSectionHeader,
+  RetroTextInput,
+} from '@/Components/retro';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
   const { data, setData, post, processing, errors, reset } = useForm({
-    email: '',
+    phone: '',
     password: '',
     remember: false,
   });
@@ -22,71 +28,69 @@ export default function Login({ status, canResetPassword }) {
   };
 
   return (
-    <GuestLayout>
+    <div className="retro-body-bg retro-scanlines flex min-h-screen flex-col items-center pt-6">
       <Head title="Log in" />
 
-      {status && <div className="mb-4 text-sm font-medium text-green-600">{status}</div>}
-
-      <form onSubmit={submit}>
-        <div>
-          <InputLabel htmlFor="email" value="Email" />
-
-          <TextInput
-            id="email"
-            type="email"
-            name="email"
-            value={data.email}
-            className="mt-1 block w-full"
-            autoComplete="username"
-            isFocused={true}
-            onChange={(e) => setData('email', e.target.value)}
-          />
-
-          <InputError message={errors.email} className="mt-2" />
-        </div>
-
+      <div className="w-full max-w-xl px-3">
+        <RetroSectionHeader title="LOGIN" />
         <div className="mt-4">
-          <InputLabel htmlFor="password" value="Password" />
+          <RetroInfoCard>
+            {status && <RetroInlineInfo message={status} />}
 
-          <TextInput
-            id="password"
-            type="password"
-            name="password"
-            value={data.password}
-            className="mt-1 block w-full"
-            autoComplete="current-password"
-            onChange={(e) => setData('password', e.target.value)}
-          />
+            <form onSubmit={submit} className="flex flex-col gap-4">
+              <RetroTextInput
+                id="phone"
+                type="tel"
+                name="phone"
+                label="TELEFONE"
+                value={data.phone}
+                autoComplete="tel"
+                autoFocus
+                onChange={(e) => setData('phone', maskPhone(e.target.value))}
+              />
+              {errors.phone && (
+                <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.phone}</p>
+              )}
 
-          <InputError message={errors.password} className="mt-2" />
+              <RetroPasswordInput
+                id="password"
+                name="password"
+                label="SENHA"
+                value={data.password}
+                autoComplete="current-password"
+                onChange={(e) => setData('password', e.target.value)}
+              />
+              {errors.password && (
+                <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.password}</p>
+              )}
+
+              <RetroCheckbox
+                label="LEMBRAR DE MIM"
+                checked={data.remember}
+                onChange={(checked) => setData('remember', checked)}
+              />
+
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <div className="flex flex-col w-full text-center items-start gap-3">
+                  <RetroButton type="submit" variant="success" disabled={processing}>
+                    ENTRAR
+                  </RetroButton>
+                  <Link
+                    href={route('register')}
+                    className="retro-text-shadow text-sm text-[#a0b0ff] text-center w-full underline hover:text-white"
+                  >
+                    Criar conta
+                  </Link>
+                </div>
+              </div>
+            </form>
+          </RetroInfoCard>
         </div>
-
-        <div className="mt-4 block">
-          <label className="flex items-center">
-            <Checkbox
-              name="remember"
-              checked={data.remember}
-              onChange={(e) => setData('remember', e.target.checked)}
-            />
-            <span className="ms-2 text-sm text-gray-600">Remember me</span>
-          </label>
-        </div>
-
-        <div className="mt-4 flex items-center justify-end">
-          {canResetPassword && (
-            <Link
-              href={route('password.request')}
-              className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              Forgot your password?
-            </Link>
-          )}
-
-          <PrimaryButton className="ms-4" disabled={processing}>
-            Log in
-          </PrimaryButton>
-        </div>
-      </form>
-    </GuestLayout>
+      </div>
+    </div>
   );
 }
+
+Login.propTypes = {
+  status: PropTypes.string,
+};

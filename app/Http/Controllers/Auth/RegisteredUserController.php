@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,15 +32,21 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'phone' => preg_replace('/\D/', '', (string) $request->input('phone')),
+        ]);
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'nickname' => 'nullable|string|max:120',
+            'phone' => 'required|string|max:20|unique:' . User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'nickname' => $request->nickname,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
 
@@ -47,6 +54,25 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('player.home', absolute: false));
+    }
+
+    public function phoneAvailability(Request $request): JsonResponse
+    {
+        $phone = preg_replace('/\D/', '', (string) $request->query('phone', ''));
+
+        if ($phone === '' || strlen($phone) < 10) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Telefone inválido.',
+            ], 422);
+        }
+
+        $isAvailable = ! User::query()->where('phone', $phone)->exists();
+
+        return response()->json([
+            'available' => $isAvailable,
+            'message' => $isAvailable ? 'Telefone disponível.' : 'Este telefone já está cadastrado.',
+        ]);
     }
 }

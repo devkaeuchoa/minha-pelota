@@ -1,7 +1,8 @@
 export interface User {
   id: number;
   name: string;
-  email: string;
+  nickname?: string | null;
+  email?: string | null;
   phone?: string | null;
   email_verified_at?: string | null;
   created_at: string;
