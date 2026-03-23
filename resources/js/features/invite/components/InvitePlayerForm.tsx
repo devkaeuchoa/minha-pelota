@@ -18,7 +18,11 @@ interface InvitePlayerFormProps {
   values: InvitePlayerFormValues;
   errors: InvitePlayerFormErrors;
   processing: boolean;
+  canSubmit: boolean;
+  isCheckingPhone: boolean;
+  phoneMessage?: string;
   onChange: (field: keyof InvitePlayerFormValues, value: string) => void;
+  onPhoneBlur: () => void;
   onSubmit: (e: FormEvent) => void;
 }
 
@@ -26,7 +30,11 @@ export function InvitePlayerForm({
   values,
   errors,
   processing,
+  canSubmit,
+  isCheckingPhone,
+  phoneMessage,
   onChange,
+  onPhoneBlur,
   onSubmit,
 }: InvitePlayerFormProps) {
   return (
@@ -59,14 +67,24 @@ export function InvitePlayerForm({
             type="tel"
             value={values.phone}
             onChange={(e) => onChange('phone', maskPhone(e.target.value))}
+            onBlur={onPhoneBlur}
           />
           {errors.phone && (
             <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.phone}</p>
           )}
+          {phoneMessage ? (
+            <p
+              className={`retro-text-shadow text-sm ${
+                phoneMessage.includes('disponível') ? 'text-[#39ff14]' : 'text-[#ff0055]'
+              }`}
+            >
+              {isCheckingPhone ? 'Verificando telefone...' : phoneMessage}
+            </p>
+          ) : null}
         </RetroFormField>
 
         <div className="mt-2 flex gap-3">
-          <RetroButton type="submit" variant="success" disabled={processing}>
+          <RetroButton type="submit" variant="success" disabled={processing || !canSubmit}>
             PARTICIPAR
           </RetroButton>
         </div>

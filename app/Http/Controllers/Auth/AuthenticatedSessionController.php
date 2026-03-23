@@ -38,10 +38,10 @@ class AuthenticatedSessionController extends Controller
         $isAdminInGroup = $user->groups()->wherePivot('is_admin', true)->exists();
 
         if (! $isOwner && ! $isAdminInGroup) {
-            return redirect()->intended(route('player.home', absolute: false));
+            return redirect()->route('player.home');
         }
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('groups.index', absolute: false));
     }
 
     /**

@@ -38,7 +38,11 @@ export default function Accept({ group, inviteCode }: AcceptProps) {
               values={form.values}
               errors={form.errors}
               processing={form.processing}
+              canSubmit={form.canSubmit}
+              isCheckingPhone={form.isCheckingPhone}
+              phoneMessage={form.phoneMessage}
               onChange={form.onChange}
+              onPhoneBlur={form.onPhoneBlur}
               onSubmit={form.onSubmit}
             />
           </RetroInfoCard>

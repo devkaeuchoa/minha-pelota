@@ -86,16 +86,45 @@ class InviteTest extends TestCase
         ]);
     }
 
+    public function test_invite_phone_availability_returns_unavailable_for_existing_phone(): void
+    {
+        $group = Group::factory()->create();
+        Player::factory()->create(['phone' => '21988776655']);
+
+        $response = $this->get(route('invite.phone-availability', $group->invite_code) . '?phone=21988776655');
+
+        $response->assertOk();
+        $response->assertJson([
+            'available' => false,
+        ]);
+    }
+
+    public function test_invite_phone_availability_returns_available_for_new_phone(): void
+    {
+        $group = Group::factory()->create();
+
+        $response = $this->get(route('invite.phone-availability', $group->invite_code) . '?phone=21900000000');
+
+        $response->assertOk();
+        $response->assertJson([
+            'available' => true,
+        ]);
+    }
+
     public function test_duplicate_player_in_same_group_does_not_fail(): void
     {
         $group = Group::factory()->create();
 
         $this->post(route('invite.store', $group->invite_code), [
-            'name' => 'Carlos', 'nick' => 'carlao', 'phone' => '21988776655',
+            'name' => 'Carlos',
+            'nick' => 'carlao',
+            'phone' => '21988776655',
         ]);
 
         $response = $this->post(route('invite.store', $group->invite_code), [
-            'name' => 'Carlos', 'nick' => 'carlao', 'phone' => '21988776655',
+            'name' => 'Carlos',
+            'nick' => 'carlao',
+            'phone' => '21988776655',
         ]);
 
         $response->assertRedirect();

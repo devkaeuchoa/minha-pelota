@@ -15,10 +15,33 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    if (! Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+    $isOwner = Group::query()->where('owner_id', $user->id)->exists();
+    $isAdminInGroup = $user->groups()->wherePivot('is_admin', true)->exists();
+
+    if (! $isOwner && ! $isAdminInGroup) {
+        return redirect()->route('player.home');
+    }
+
     return redirect()->route('groups.index');
 });
 
 Route::get('/dashboard', function () {
+    /** @var \App\Models\User|null $user */
+    $user = Auth::user();
+    abort_unless($user, 401);
+
+    $isOwner = Group::query()->where('owner_id', $user->id)->exists();
+    $isAdminInGroup = $user->groups()->wherePivot('is_admin', true)->exists();
+    if (! $isOwner && ! $isAdminInGroup) {
+        return redirect()->route('player.home');
+    }
+
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -122,6 +145,8 @@ Route::get('/retro/ui-kit', function () {
 
 Route::get('/invite/{inviteCode}', [InviteController::class, 'show'])->name('invite.show');
 Route::post('/invite/{inviteCode}', [InviteController::class, 'store'])->name('invite.store');
+Route::get('/invite/{inviteCode}/phone-availability', [InviteController::class, 'phoneAvailability'])
+    ->name('invite.phone-availability');
 Route::get('/invite/{inviteCode}/success', [InviteController::class, 'success'])->name('invite.success');
 
 Route::get('/presence/{token}', [MatchAttendancePublicController::class, 'show'])->name('presence.show');
