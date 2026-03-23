@@ -12,9 +12,10 @@ interface RetroMobileNavbarProps {
   title: string;
   items: RetroNavItem[];
   activeId?: string;
+  onLogout?: () => void;
 }
 
-export function RetroMobileNavbar({ title, items, activeId }: RetroMobileNavbarProps) {
+export function RetroMobileNavbar({ title, items, activeId, onLogout }: RetroMobileNavbarProps) {
   const [open, setOpen] = useState(false);
 
   const toggle = () => setOpen((prev) => !prev);
@@ -118,6 +119,18 @@ export function RetroMobileNavbar({ title, items, activeId }: RetroMobileNavbarP
         </nav>
 
         <div className="mt-auto shrink-0 border-t-2 border-[#4060c0] bg-[#1a2c7a] p-3">
+          {onLogout ? (
+            <button
+              type="button"
+              onClick={() => {
+                onLogout();
+                setOpen(false);
+              }}
+              className="mb-3 w-full border-2 border-[#4060c0] bg-[#1e348c] py-2 text-xl font-bold tracking-widest text-[#ff7a7a] shadow-[2px_2px_0_#000] retro-text-shadow transition-colors focus:outline-none focus:border-[#ffd700] hover:bg-[#2540a0] hover:text-white"
+            >
+              SAIR
+            </button>
+          ) : null}
           <div className="flex items-center justify-between px-2">
             <span className="retro-text-shadow animate-pulse text-base text-[#a0b0ff]">
               SYSTEM AWAITING INPUT...

@@ -1,9 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { router } from '@inertiajs/react';
 import { RetroDesktopNavbar, RetroLayout, RetroMobileNavbar } from '@/Components/retro';
-import { APP_NAV_ITEMS, AppNavItem, PLAYER_NAV_ITEMS } from '@/config/navigation';
-
-const IS_PLAYER = true;
+import { APP_NAV_ITEMS, AppNavItem } from '@/config/navigation';
 
 interface RetroAppShellProps extends PropsWithChildren {
   title?: string;
@@ -19,17 +17,25 @@ export function RetroAppShell({
   items,
   children,
 }: RetroAppShellProps) {
-  const navItems = ((items ?? IS_PLAYER) ? PLAYER_NAV_ITEMS : APP_NAV_ITEMS).map((item) => ({
+  const navItems = (items ?? APP_NAV_ITEMS).map((item) => ({
     id: item.id,
     label: item.label,
     onClick: () => router.visit(item.href),
   }));
+  const handleLogout = () => {
+    router.post('/logout');
+  };
 
   return (
     <RetroLayout>
       <div className="mb-3">
         <div className="md:hidden">
-          <RetroMobileNavbar title={title} items={navItems} activeId={activeId} />
+          <RetroMobileNavbar
+            title={title}
+            items={navItems}
+            activeId={activeId}
+            onLogout={handleLogout}
+          />
         </div>
         <div className="hidden md:block">
           <RetroDesktopNavbar
@@ -37,6 +43,7 @@ export function RetroAppShell({
             versionLabel={versionLabel}
             items={navItems}
             activeId={activeId}
+            onLogout={handleLogout}
           />
         </div>
       </div>

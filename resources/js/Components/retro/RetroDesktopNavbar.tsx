@@ -9,6 +9,7 @@ interface RetroDesktopNavbarProps {
   versionLabel?: string;
   items: RetroNavItem[];
   activeId?: string;
+  onLogout?: () => void;
 }
 
 export function RetroDesktopNavbar({
@@ -16,6 +17,7 @@ export function RetroDesktopNavbar({
   versionLabel = 'VER 1.0',
   items,
   activeId,
+  onLogout,
 }: RetroDesktopNavbarProps) {
   return (
     <header data-component="retro-desktop-navbar" className="relative z-40 w-full">
@@ -74,6 +76,15 @@ export function RetroDesktopNavbar({
               );
             })}
           </ul>
+          {onLogout ? (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="mt-1 h-10 w-full border-2 border-[#4060c0] bg-[#1e348c] text-lg font-bold tracking-wider text-[#ff7a7a] retro-text-shadow shadow-[4px_4px_0_#000] transition-all duration-100 hover:bg-[#2540a0] hover:text-white focus:outline-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-[1px_1px_0_#000]"
+            >
+              SAIR
+            </button>
+          ) : null}
         </div>
       </nav>
     </header>
