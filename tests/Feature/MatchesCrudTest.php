@@ -54,6 +54,27 @@ class MatchesCrudTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_admin_in_group_can_create_match(): void
+    {
+        $owner = User::factory()->create();
+        $admin = User::factory()->create();
+        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        $admin->groups()->attach($group->id, ['is_admin' => true]);
+
+        $response = $this->actingAs($admin)->post(route('groups.matches.store', $group), [
+            'scheduled_at' => '2026-04-02T19:30',
+            'location_name' => 'Arena Norte',
+            'duration_minutes' => 75,
+            'status' => 'scheduled',
+        ]);
+
+        $response->assertRedirect(route('groups.show', $group));
+        $this->assertDatabaseHas('matches', [
+            'group_id' => $group->id,
+            'location_name' => 'Arena Norte',
+        ]);
+    }
+
     public function test_owner_can_update_match(): void
     {
         $owner = User::factory()->create();
@@ -159,5 +180,25 @@ class MatchesCrudTest extends TestCase
 
         $response->assertRedirect(route('groups.show', $group));
         $this->assertDatabaseCount('matches', 2);
+    }
+
+    public function test_create_match_can_redirect_to_dates_page(): void
+    {
+        $owner = User::factory()->create();
+        $group = Group::factory()->create([
+            'owner_id' => $owner->id,
+            'location_name' => 'Arena Central',
+            'default_match_duration_minutes' => 90,
+        ]);
+
+        $response = $this->actingAs($owner)->post(route('groups.matches.store', $group), [
+            'scheduled_at' => '2026-04-02T19:30',
+            'location_name' => 'Arena Norte',
+            'duration_minutes' => 75,
+            'status' => 'scheduled',
+            'redirect_to_dates' => true,
+        ]);
+
+        $response->assertRedirect(route('dates.index', ['group' => $group->id]));
     }
 }

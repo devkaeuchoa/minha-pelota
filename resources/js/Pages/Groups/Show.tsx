@@ -4,7 +4,7 @@ import { Group, Match, Player, PageProps } from '@/types';
 import { useGroupShowController } from '@/features/groups/useGroupShowController';
 import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
 import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
-import { GroupMatchesGenerationSection } from '@/features/groups/components/GroupMatchesGenerationSection';
+import { GroupMatchesQuickActionsSection } from '@/features/groups/components/GroupMatchesQuickActionsSection';
 import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
 import {
   RetroRosterGrid,
@@ -22,11 +22,7 @@ interface ShowProps extends PageProps {
 }
 
 export default function Show({ group, players, matches }: ShowProps) {
-  const { invite, playersSection, settings, matchesSection } = useGroupShowController(
-    group,
-    players,
-    matches,
-  );
+  const { invite, playersSection, settings } = useGroupShowController(group, players, matches);
   const nextMatch =
     matches.find(
       (match) => match.status === 'scheduled' && new Date(match.scheduled_at) >= new Date(),
@@ -64,24 +60,17 @@ export default function Show({ group, players, matches }: ShowProps) {
 
       {group.recurrence !== 'none' && (
         <RetroAccordion title="3. GERAR DATAS" defaultOpen={false}>
-          <GroupMatchesGenerationSection
+          <GroupMatchesQuickActionsSection
             matches={matches}
             generateProcessing={settings.generateProcessing}
-            form={matchesSection.form}
-            editingMatchId={matchesSection.editingMatchId}
-            deleteProcessingId={matchesSection.deleteProcessingId}
             onGenerateCurrentMonth={settings.onGenerateCurrentMonth}
             onGenerateForMonths={settings.onGenerateForMonths}
-            onCreateMatch={matchesSection.onCreateMatch}
-            onSaveEditedMatch={matchesSection.onSaveEditedMatch}
-            onStartEditMatch={matchesSection.onStartEditMatch}
-            onCancelEditMatch={matchesSection.onCancelEditMatch}
-            onDeleteMatch={matchesSection.onDeleteMatch}
             onOpenMatchPresence={(matchId) =>
               router.visit(
                 route('groups.matches.presence.manage', { group: group.id, match: matchId }),
               )
             }
+            onOpenDatesPage={() => router.visit(route('dates.index', { group: group.id }))}
           />
         </RetroAccordion>
       )}

@@ -49,6 +49,8 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home/player', [PlayerHomeController::class, 'index'])->name('player.home');
+    Route::get('/home/player/groups/{group}', [PlayerHomeController::class, 'showGroup'])
+        ->name('player.groups.show');
     Route::post('/home/player/matches/{match}/presence', [PlayerHomeController::class, 'updatePresence'])
         ->name('player.home.presence.update');
     Route::post('/home/player/groups/{group}/physical-condition', [PlayerHomeController::class, 'updatePhysicalCondition'])
@@ -64,6 +66,43 @@ Route::middleware('auth')->group(function () {
             'groups' => $groups,
         ]);
     })->name('groups.index');
+
+    Route::get('/dates', function (\Illuminate\Http\Request $request) {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        abort_unless($user, 401);
+
+        $ownedGroups = Group::query()
+            ->where('owner_id', $user->id)
+            ->get();
+
+        $adminGroups = $user->groups()
+            ->wherePivot('is_admin', true)
+            ->get();
+
+        $groups = $ownedGroups
+            ->merge($adminGroups)
+            ->unique('id')
+            ->sortBy('name')
+            ->values();
+
+        $selectedGroupId = (int) $request->integer('group');
+        $selectedGroup = $groups->firstWhere('id', $selectedGroupId) ?? $groups->first();
+
+        $matches = collect();
+        if ($selectedGroup) {
+            $matches = $selectedGroup->matches()
+                ->orderBy('scheduled_at')
+                ->get();
+        }
+
+        return Inertia::render('Groups/Dates', [
+            'groups' => $groups->values()->all(),
+            'selectedGroupId' => $selectedGroup?->id,
+            'selectedGroup' => $selectedGroup,
+            'matches' => $matches->values()->all(),
+        ]);
+    })->name('dates.index');
 
     Route::get('/groups/create', function () {
         return Inertia::render('Groups/Create');

@@ -32,7 +32,7 @@ class GroupMatchController extends Controller
         ]);
 
         return redirect()
-            ->route('groups.show', $group)
+            ->to($this->targetUrl($request, $group))
             ->with('status', 'Partida criada com sucesso.');
     }
 
@@ -56,7 +56,7 @@ class GroupMatchController extends Controller
         ]);
 
         return redirect()
-            ->route('groups.show', $group)
+            ->to($this->targetUrl($request, $group))
             ->with('status', 'Partida atualizada com sucesso.');
     }
 
@@ -68,8 +68,17 @@ class GroupMatchController extends Controller
         $match->delete();
 
         return redirect()
-            ->route('groups.show', $group)
+            ->to($this->targetUrl($request, $group))
             ->with('status', 'Partida removida com sucesso.');
+    }
+
+    private function targetUrl(Request $request, Group $group): string
+    {
+        if ($request->boolean('redirect_to_dates')) {
+            return route('dates.index', ['group' => $group->id]);
+        }
+
+        return route('groups.show', $group);
     }
 
     private function authorizeOwner(Request $request, Group $group): void
@@ -78,8 +87,15 @@ class GroupMatchController extends Controller
             return;
         }
 
+        $user = $request->user();
+        $isOwner = $group->owner_id === $user->id;
+        $isAdminInGroup = $user->groups()
+            ->where('groups.id', $group->id)
+            ->wherePivot('is_admin', true)
+            ->exists();
+
         abort_unless(
-            $group->owner_id === $request->user()->id,
+            $isOwner || $isAdminInGroup,
             403,
             'You are not allowed to access this group.'
         );

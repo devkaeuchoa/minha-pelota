@@ -7,7 +7,8 @@ export type AppNavItem = {
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { id: 'home', label: 'HOME', href: '/' },
   { id: 'groups', label: 'GRUPOS', href: '/groups' },
-  { id: 'settings', label: 'CONFIGURAÇÕES', href: '/settings' },
+  { id: 'dates', label: 'DATAS', href: '/dates' },
+  { id: 'profile', label: 'PERFIL', href: '/profile' },
 ];
 
 export const PLAYER_NAV_ITEMS: AppNavItem[] = [
