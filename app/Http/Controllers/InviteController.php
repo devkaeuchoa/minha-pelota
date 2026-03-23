@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InvitePlayerRequest;
 use App\Models\Group;
 use App\Models\Player;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,13 @@ class InviteController extends Controller
 
         if (! $group->players()->where('player_id', $player->id)->exists()) {
             $group->players()->attach($player->id);
+        }
+
+        $user = User::query()->where('phone', $data['phone'])->first();
+        if ($user && ! $user->groups()->where('groups.id', $group->id)->exists()) {
+            $user->groups()->attach($group->id, [
+                'is_admin' => false,
+            ]);
         }
 
         return redirect()->route('invite.success', $inviteCode);
