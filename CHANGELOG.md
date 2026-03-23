@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.0 — Match attendance and generation options
+
+### Added
+
+- **Match attendance flow** (admin + public):
+  - Admin management page for presence and lineup visualization.
+  - Public token-based page for players to confirm or decline attendance by phone number.
+  - Match attendance link generation per match with expiration at the match date/time.
+- **Attendance domain models and persistence**:
+  - `match_attendance_links` and `match_attendance` tables with proper relations and constraints.
+  - `MatchAttendanceLink` and `MatchAttendance` models with integration into `Game` and `Player`.
+- **Retro components for lineup and presence UX**:
+  - `RetroPitch` for field visualization with configurable player limit.
+  - Reserve indicators above the field with visual placeholders when empty.
+  - `RetroPhysicalConditionEmoji` to display physical condition status in list UIs.
+- **Physical condition canonical enum support**:
+  - Backend enum normalization and API consistency for `otimo`, `regular`, `ruim`, `machucado`, `unknown`.
+  - Frontend enum alignment in shared TypeScript types.
+- **Match generation options in Group UI**:
+  - Dedicated generation section in `Groups/Show` inside accordion.
+  - Presets for current month, 3, 6, and 12 months.
+  - Custom month selection (1–12) posting to `groups.matches.generate-months`.
+- **Feature tests**:
+  - Coverage for multi-month generation (`generate-months`) including owner authorization and months validation.
+
+### Changed
+
+- **Groups show page layout**:
+  - Added a dedicated “Gerar Datas” accordion between details and invite sections.
+  - Group details now display only the next scheduled match as a value field.
+  - Dates strip moved out of details and into generation context.
+- **Presence list behavior**:
+  - Confirmed players are prioritized to the top and highlighted in green.
+  - Presence management desktop layout updated to show field on the left and list on the right from large screens.
+- **Retro list/grid styling architecture**:
+  - `RetroPlayerList` and `RetroRosterGrid` styles migrated to CSS modules.
+  - Mobile overflow and desktop scroll-snap improvements in roster/list presentation.
+
 ## v0.1.0 — Retro UI & Players domain
 
 ### Added

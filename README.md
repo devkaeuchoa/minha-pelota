@@ -16,7 +16,7 @@ Aplicação web para organizar **peladas e grupos de futebol amador**, substitui
   - ESLint (flat config v9) + `@typescript-eslint` + `eslint-plugin-react` + Prettier
   - Scripts: `npm run lint`, `npm run lint:fix`, `npm run format`, `npm run typecheck`
 
-### Domínio atual (v0.0.1)
+### Domínio atual (v0.2.0)
 
 #### Grupos
 
@@ -37,13 +37,31 @@ Aplicação web para organizar **peladas e grupos de futebol amador**, substitui
   - Campo **Nome** edita o **Slug** automaticamente (apenas leitura).
   - Dia da semana via checkboxes (0–6).
 - **Detalhe (`Groups/Show`)**
-  - Mostra informações do grupo e jogadores associados.
+  - Mostra informações do grupo (incluindo próxima partida) e jogadores associados.
+  - Seção dedicada em accordion para **geração de datas**:
+    - Mês atual
+    - Presets 3/6/12 meses
+    - Seleção personalizada (1–12 meses)
   - Ação de remover grupo com confirmação.
 
 #### Jogadores
 
-- Endpoints de API para jogadores de grupo (`GroupPlayer`) e testes de integração básicos.
-- Próxima etapa planejada: fluxos de convite/cadastro de jogadores e UI dedicada, integrando com grupos.
+- Endpoints de API para jogadores de grupo (`GroupPlayer`) e testes de integração.
+- Gestão de jogadores na UI com lista retro, seleção e vínculo por grupo.
+
+#### Presença e escalação
+
+- **Admin (`Groups/MatchPresence/Manage`)**
+  - Visualização de presença por partida com resumo (confirmados, desconfirmados, pendentes).
+  - Geração de link público por partida para auto-confirmação dos jogadores.
+  - Visualização de escalação em `RetroPitch` com reservas.
+- **Jogador (`Presence/Mark`)**
+  - Página pública por token para confirmar/desconfirmar presença.
+  - Identificação por telefone vinculado ao grupo.
+  - Atualização de status permitida a qualquer momento enquanto o link estiver válido.
+- **Condição física**
+  - Enum canônico no backend e TypeScript no frontend.
+  - Exibição por emoji nas listas de presença.
 
 ### Planejamento e releases
 
