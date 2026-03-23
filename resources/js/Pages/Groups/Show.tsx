@@ -71,7 +71,6 @@ export default function Show({ group, players, matches }: ShowProps) {
           inviteUrl={invite.inviteUrl}
           processing={invite.processing}
           onGenerateInvite={invite.onGenerate}
-          onCopyInvite={invite.onCopy}
         />
       </RetroAccordion>
 

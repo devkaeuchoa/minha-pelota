@@ -1,5 +1,6 @@
 import { FormEvent } from 'react';
 import { maskPhone } from '@/utils/phone';
+import { RetroButton, RetroFormField, RetroTextInput } from '@/Components/retro';
 
 interface InvitePlayerFormValues {
   name: string;
@@ -30,45 +31,44 @@ export function InvitePlayerForm({
 }: InvitePlayerFormProps) {
   return (
     <>
-      <h3>Entrar no grupo</h3>
-      <form onSubmit={onSubmit} className="form">
-        <div className="form__group">
-          <label htmlFor="name">Nome completo</label>
-          <input
-            id="name"
+      <h3 className="retro-text-shadow text-lg tracking-wider text-[#ffd700]">ENTRAR NO GRUPO</h3>
+      <form onSubmit={onSubmit} className="mt-3 flex flex-col gap-4">
+        <RetroFormField label="NOME COMPLETO" htmlFor="invite_player_name">
+          <RetroTextInput
+            id="invite_player_name"
             type="text"
             value={values.name}
             onChange={(e) => onChange('name', e.target.value)}
           />
-          {errors.name && <p>{errors.name}</p>}
-        </div>
+          {errors.name && <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.name}</p>}
+        </RetroFormField>
 
-        <div className="form__group">
-          <label htmlFor="nick">Apelido</label>
-          <input
-            id="nick"
+        <RetroFormField label="APELIDO" htmlFor="invite_player_nick">
+          <RetroTextInput
+            id="invite_player_nick"
             type="text"
             value={values.nick}
             onChange={(e) => onChange('nick', e.target.value)}
           />
-          {errors.nick && <p>{errors.nick}</p>}
-        </div>
+          {errors.nick && <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.nick}</p>}
+        </RetroFormField>
 
-        <div className="form__group">
-          <label htmlFor="phone">Telefone</label>
-          <input
-            id="phone"
+        <RetroFormField label="TELEFONE" htmlFor="invite_player_phone">
+          <RetroTextInput
+            id="invite_player_phone"
             type="tel"
             value={values.phone}
             onChange={(e) => onChange('phone', maskPhone(e.target.value))}
           />
-          {errors.phone && <p>{errors.phone}</p>}
-        </div>
+          {errors.phone && (
+            <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.phone}</p>
+          )}
+        </RetroFormField>
 
-        <div className="form__actions">
-          <button type="submit" disabled={processing}>
-            Participar
-          </button>
+        <div className="mt-2 flex gap-3">
+          <RetroButton type="submit" variant="success" disabled={processing}>
+            PARTICIPAR
+          </RetroButton>
         </div>
       </form>
     </>

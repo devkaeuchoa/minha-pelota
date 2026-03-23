@@ -39,12 +39,6 @@ export function useGroupShowController(group: Group, players: Player[]) {
     inviteForm.post(route('groups.invite.regenerate', group));
   };
 
-  const handleCopyInvite = () => {
-    if (inviteUrl) {
-      navigator.clipboard.writeText(inviteUrl);
-    }
-  };
-
   const handleDeleteGroup = () => {
     if (
       !confirm('Tem certeza que deseja remover este grupo? Essa ação não pode ser desfeita.')
@@ -96,7 +90,6 @@ export function useGroupShowController(group: Group, players: Player[]) {
       inviteUrl,
       processing: inviteForm.processing,
       onGenerate: handleGenerateInvite,
-      onCopy: handleCopyInvite,
     },
     playersSection: {
       players,

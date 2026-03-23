@@ -1,8 +1,10 @@
 /* global route */
 import { Head, useForm } from '@inertiajs/react';
 import { PageProps } from '@/types';
+import { maskPhone } from '@/utils/phone';
 import {
   RetroButton,
+  RetroInfoCard,
   RetroInlineInfo,
   RetroRadio,
   RetroSectionHeader,
@@ -58,57 +60,61 @@ export default function Mark({ token, expired, status, group, match }: PresenceM
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6">
+    <div className="retro-body-bg retro-scanlines flex min-h-screen flex-col items-center pt-6">
       <Head title={`Presença — ${group.name}`} />
 
       <div className="w-full max-w-xl px-3">
         <RetroSectionHeader title="PRESENÇA" />
 
-        <div className="mt-4 flex flex-col gap-4 overflow-hidden bg-white px-6 py-4 shadow-md rounded-lg">
-          {status ? <RetroInlineInfo message={status} /> : null}
+        <div className="mt-4">
+          <RetroInfoCard>
+            {status ? <RetroInlineInfo message={status} /> : null}
 
-          <div className="flex flex-col gap-1">
-            <div className="retro-text-shadow text-base text-[#a0b0ff]">GRUPO</div>
-            <div className="retro-text-shadow text-lg text-[#ffd700]">{group.name}</div>
-          </div>
+            <div className="flex flex-col gap-1">
+              <div className="retro-text-shadow text-base text-[#a0b0ff]">GRUPO</div>
+              <div className="retro-text-shadow text-lg text-[#ffd700]">{group.name}</div>
+            </div>
 
-          <div className="flex flex-col gap-1">
-            <div className="retro-text-shadow text-base text-[#a0b0ff]">PARTIDA</div>
-            <div className="retro-text-shadow text-lg text-white">{matchLabel}</div>
-            {match.location_name ? (
-              <div className="retro-text-shadow text-sm text-[#a0b0ff]">{match.location_name}</div>
-            ) : null}
-          </div>
-
-          {expired ? (
-            <RetroInlineInfo message="Este link expirou. A presença não pode mais ser atualizada." />
-          ) : (
-            <form onSubmit={submit} className="flex flex-col gap-4">
-              <RetroTextInput
-                id="phone"
-                label="TELEFONE"
-                value={form.data.phone}
-                onChange={(e) => form.setData('phone', e.target.value)}
-                autoComplete="tel"
-                placeholder="(DDD) 9xxxx-xxxx"
-                disabled={form.processing}
-              />
-              {form.errors.phone ? (
-                <div className="text-sm text-red-600">{form.errors.phone}</div>
+            <div className="flex flex-col gap-1">
+              <div className="retro-text-shadow text-base text-[#a0b0ff]">PARTIDA</div>
+              <div className="retro-text-shadow text-lg text-white">{matchLabel}</div>
+              {match.location_name ? (
+                <div className="retro-text-shadow text-sm text-[#a0b0ff]">
+                  {match.location_name}
+                </div>
               ) : null}
+            </div>
 
-              <RetroRadio
-                label="PRESENÇA"
-                options={options}
-                activeId={form.data.status}
-                onChange={(id) => form.setData('status', id as PresenceStatus)}
-              />
+            {expired ? (
+              <RetroInlineInfo message="Este link expirou. A presença não pode mais ser atualizada." />
+            ) : (
+              <form onSubmit={submit} className="flex flex-col gap-4">
+                <RetroTextInput
+                  id="phone"
+                  label="TELEFONE"
+                  value={form.data.phone}
+                  onChange={(e) => form.setData('phone', maskPhone(e.target.value))}
+                  autoComplete="tel"
+                  placeholder="(DD) 9xxxx-xxxx"
+                  disabled={form.processing}
+                />
+                {form.errors.phone ? (
+                  <div className="text-sm text-red-600">{form.errors.phone}</div>
+                ) : null}
 
-              <RetroButton type="submit" variant="neutral" disabled={form.processing}>
-                ATUALIZAR
-              </RetroButton>
-            </form>
-          )}
+                <RetroRadio
+                  label="PRESENÇA"
+                  options={options}
+                  activeId={form.data.status}
+                  onChange={(id) => form.setData('status', id as PresenceStatus)}
+                />
+
+                <RetroButton type="submit" variant="success" disabled={form.processing}>
+                  ATUALIZAR
+                </RetroButton>
+              </form>
+            )}
+          </RetroInfoCard>
         </div>
       </div>
     </div>
