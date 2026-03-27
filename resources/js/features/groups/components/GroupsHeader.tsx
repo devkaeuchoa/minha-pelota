@@ -1,3 +1,5 @@
+/* global route */
+
 import { Link } from '@inertiajs/react';
 import {
   RetroButton,
@@ -48,7 +50,7 @@ export function GroupsHeader({
           >
             REMOVER SELECIONADOS
           </RetroButton>
-          <Link href="/groups/create" className="flex-1">
+          <Link href={route('groups.create')} className="flex-1">
             <RetroButton size="sm" type="button" variant="success">
               NOVO GRUPO
             </RetroButton>

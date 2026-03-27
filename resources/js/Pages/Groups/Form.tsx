@@ -1,3 +1,5 @@
+/* global route */
+
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import { Group, PageProps } from '@/types';
@@ -142,7 +144,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
           </RetroFormField>
 
           <div className="mt-2 flex gap-3">
-            <Link href="/groups" className="flex-1">
+            <Link href={route('groups.index')} className="flex-1">
               <RetroButton type="button" variant="danger">
                 CANCELAR
               </RetroButton>

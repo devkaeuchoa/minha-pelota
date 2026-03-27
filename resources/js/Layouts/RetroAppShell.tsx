@@ -1,3 +1,5 @@
+/* global route */
+
 import { PropsWithChildren } from 'react';
 import { router } from '@inertiajs/react';
 import { RetroDesktopNavbar, RetroLayout, RetroMobileNavbar } from '@/Components/retro';
@@ -23,7 +25,7 @@ export function RetroAppShell({
     onClick: () => router.visit(item.href),
   }));
   const handleLogout = () => {
-    router.post('/logout');
+    router.post(route('logout'));
   };
 
   return (

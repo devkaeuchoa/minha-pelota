@@ -23,3 +23,12 @@ The full Prettier config is in `.prettierrc.json`:
 - `arrowParens: "always"`
 
 When generating or editing frontend code, follow these settings exactly.
+
+## Retro UI Components
+
+All new or updated components inside `resources/js/Components/retro/` MUST use CSS Modules for styling.
+
+- Prefer `ComponentName.module.css` in the same folder as the component.
+- Import styles as `import styles from './ComponentName.module.css';`.
+- Avoid adding new Tailwind utility classes directly in Retro UI component markup.
+- If a Retro UI component still uses inline utility classes from legacy code, migrate it to CSS Modules whenever that component is touched.

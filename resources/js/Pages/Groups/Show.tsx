@@ -88,7 +88,7 @@ export default function Show({ group, players, matches }: ShowProps) {
           type="button"
           variant="success"
           size="md"
-          onClick={() => router.visit(route('groups.players', group.id))}
+          onClick={() => router.visit(route('groups.players', { group: group.id }))}
         >
           GERENCIAR JOGADORES
         </RetroButton>

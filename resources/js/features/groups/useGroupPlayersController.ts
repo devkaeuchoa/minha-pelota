@@ -1,3 +1,5 @@
+/* global route */
+
 import { router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { Player } from '@/types';
@@ -57,7 +59,7 @@ export function useGroupPlayersController({
     const ids = Array.from(selectedAvailableIds);
 
     router.post(
-      route('groups.players.attach', groupId),
+      route('groups.players.attach', { group: groupId }),
       { player_ids: ids },
       {
         onFinish: () => setProcessingAdd(false),
