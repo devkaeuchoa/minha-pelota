@@ -29,6 +29,7 @@ export { RetroIconButton } from './RetroIconButton';
 export { RetroMobileNavbar } from './RetroMobileNavbar';
 export { RetroDesktopNavbar } from './RetroDesktopNavbar';
 export { RetroAccordion } from './RetroAccordion';
+export { RetroModal } from './RetroModal';
 export {
   RetroTable,
   RetroTableHeaderRow,

@@ -18,14 +18,22 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
+            'nickname' => ['nullable', 'string', 'max:60'],
+            'phone' => [
                 'required',
                 'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
+                'max:20',
+                Rule::unique(User::class, 'phone')->ignore($this->user()->id),
             ],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('phone')) {
+            $this->merge([
+                'phone' => preg_replace('/\D/', '', (string) $this->input('phone')),
+            ]);
+        }
     }
 }

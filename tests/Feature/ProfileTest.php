@@ -29,7 +29,8 @@ class ProfileTest extends TestCase
             ->actingAs($user)
             ->patch('/profile', [
                 'name' => 'Test User',
-                'email' => 'test@example.com',
+                'nickname' => 'tester',
+                'phone' => '11999998888',
             ]);
 
         $response
@@ -39,26 +40,46 @@ class ProfileTest extends TestCase
         $user->refresh();
 
         $this->assertSame('Test User', $user->name);
-        $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
+        $this->assertSame('tester', $user->nickname);
+        $this->assertSame('11999998888', $user->phone);
     }
 
-    public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
+    public function test_profile_update_keeps_existing_email_unchanged(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'email' => 'same-email@example.com',
+        ]);
 
         $response = $this
             ->actingAs($user)
             ->patch('/profile', [
                 'name' => 'Test User',
-                'email' => $user->email,
+                'phone' => $user->phone,
             ]);
 
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
-        $this->assertNotNull($user->refresh()->email_verified_at);
+        $this->assertSame('same-email@example.com', $user->refresh()->email);
+    }
+
+    public function test_phone_must_be_unique_when_updating_profile(): void
+    {
+        $user = User::factory()->create(['phone' => '11999998888']);
+        $otherUser = User::factory()->create(['phone' => '11911112222']);
+
+        $response = $this
+            ->actingAs($user)
+            ->from('/profile')
+            ->patch('/profile', [
+                'name' => 'Test User',
+                'phone' => $otherUser->phone,
+            ]);
+
+        $response
+            ->assertSessionHasErrors('phone')
+            ->assertRedirect('/profile');
     }
 
     public function test_user_can_delete_their_account(): void
