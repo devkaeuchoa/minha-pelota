@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use App\Models\Game;
 use App\Models\Group;
 use App\Models\MatchAttendance;
+use App\Models\MatchPlayerStat;
 use App\Models\Player;
+use App\Models\PlayerConditionHistory;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Inertia\Testing\AssertableInertia as Assert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -137,6 +140,173 @@ class PlayerHomeTest extends TestCase
         $this->assertDatabaseHas('players', [
             'id' => $player->id,
             'physical_condition' => 'ruim',
+        ]);
+    }
+
+    public function test_player_group_details_page_requires_membership(): void
+    {
+        [$user] = $this->createPlayerMemberContext();
+        $otherGroup = Group::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('player.groups.show', $otherGroup));
+
+        $response->assertStatus(403);
+    }
+
+    public function test_player_group_details_page_shows_monthly_rankings(): void
+    {
+        CarbonImmutable::setTestNow('2026-04-10 10:00:00');
+
+        $owner = User::factory()->create();
+        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        $user = User::factory()->create(['phone' => '11999999999']);
+        $user->groups()->attach($group->id, ['is_admin' => false]);
+
+        $playerMain = Player::factory()->create([
+            'phone' => '11999999999',
+            'name' => 'Main Player',
+            'nick' => 'main',
+        ]);
+        $playerB = Player::factory()->create(['name' => 'Bruno', 'nick' => 'bruno']);
+        $playerC = Player::factory()->create(['name' => 'Carlos', 'nick' => 'carlos']);
+
+        $group->players()->attach([$playerMain->id, $playerB->id, $playerC->id]);
+
+        $match1 = Game::query()->create([
+            'group_id' => $group->id,
+            'scheduled_at' => '2026-04-04 19:00:00',
+            'status' => 'scheduled',
+            'location_name' => 'Arena 1',
+        ]);
+        $match2 = Game::query()->create([
+            'group_id' => $group->id,
+            'scheduled_at' => '2026-04-07 19:00:00',
+            'status' => 'scheduled',
+            'location_name' => 'Arena 1',
+        ]);
+        $previousMonthMatch = Game::query()->create([
+            'group_id' => $group->id,
+            'scheduled_at' => '2026-03-20 19:00:00',
+            'status' => 'scheduled',
+            'location_name' => 'Arena 1',
+        ]);
+
+        MatchPlayerStat::query()->create([
+            'match_id' => $match1->id,
+            'player_id' => $playerMain->id,
+            'goals' => 2,
+            'assists' => 1,
+        ]);
+        MatchPlayerStat::query()->create([
+            'match_id' => $match2->id,
+            'player_id' => $playerMain->id,
+            'goals' => 1,
+            'assists' => 3,
+        ]);
+        MatchPlayerStat::query()->create([
+            'match_id' => $match1->id,
+            'player_id' => $playerB->id,
+            'goals' => 2,
+            'assists' => 0,
+        ]);
+        MatchPlayerStat::query()->create([
+            'match_id' => $previousMonthMatch->id,
+            'player_id' => $playerB->id,
+            'goals' => 10,
+            'assists' => 10,
+        ]);
+
+        MatchAttendance::query()->create([
+            'match_id' => $match1->id,
+            'player_id' => $playerMain->id,
+            'status' => 'going',
+        ]);
+        MatchAttendance::query()->create([
+            'match_id' => $match2->id,
+            'player_id' => $playerMain->id,
+            'status' => 'going',
+        ]);
+        MatchAttendance::query()->create([
+            'match_id' => $match1->id,
+            'player_id' => $playerB->id,
+            'status' => 'going',
+        ]);
+        MatchAttendance::query()->create([
+            'match_id' => $match1->id,
+            'player_id' => $playerC->id,
+            'status' => 'not_going',
+        ]);
+        MatchAttendance::query()->create([
+            'match_id' => $match2->id,
+            'player_id' => $playerC->id,
+            'status' => 'not_going',
+        ]);
+
+        PlayerConditionHistory::query()->create([
+            'player_id' => $playerMain->id,
+            'group_id' => $group->id,
+            'condition' => 'machucado',
+            'started_at' => '2026-04-01 00:00:00',
+            'ended_at' => '2026-04-05 00:00:00',
+        ]);
+        PlayerConditionHistory::query()->create([
+            'player_id' => $playerB->id,
+            'group_id' => $group->id,
+            'condition' => 'machucado',
+            'started_at' => '2026-04-01 00:00:00',
+            'ended_at' => '2026-04-03 00:00:00',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('player.groups.show', $group));
+
+        $response->assertOk();
+        $response->assertInertia(
+            fn(Assert $page) => $page
+                ->component('Home/PlayerGroupShow')
+                ->where('group.id', $group->id)
+                ->where('rankings.artilheiro.nick', 'main')
+                ->where('rankings.artilheiro.metric', 3)
+                ->where('rankings.garcom.nick', 'main')
+                ->where('rankings.garcom.metric', 4)
+                ->where('rankings.ta_em_todas.nick', 'main')
+                ->where('rankings.ta_em_todas.metric', 2)
+                ->where('rankings.so_migue.nick', 'bruno')
+                ->where('rankings.so_migue.metric', 1)
+                ->where('rankings.neymar.nick', 'main')
+                ->where('rankings.neymar.metric', 4)
+        );
+    }
+
+    public function test_update_physical_condition_creates_history_rows_on_change(): void
+    {
+        CarbonImmutable::setTestNow('2026-04-10 10:00:00');
+
+        [$user, $group, $player] = $this->createPlayerMemberContext();
+
+        $this->actingAs($user)->post(route('player.home.physical-condition.update', $group), [
+            'physical_condition' => 'machucado',
+        ])->assertRedirect(route('player.home'));
+
+        CarbonImmutable::setTestNow('2026-04-12 10:00:00');
+
+        $this->actingAs($user)->post(route('player.home.physical-condition.update', $group), [
+            'physical_condition' => 'regular',
+        ])->assertRedirect(route('player.home'));
+
+        $this->assertDatabaseHas('player_condition_histories', [
+            'player_id' => $player->id,
+            'group_id' => $group->id,
+            'condition' => 'machucado',
+            'started_at' => '2026-04-10 10:00:00',
+            'ended_at' => '2026-04-12 10:00:00',
+        ]);
+
+        $this->assertDatabaseHas('player_condition_histories', [
+            'player_id' => $player->id,
+            'group_id' => $group->id,
+            'condition' => 'regular',
+            'started_at' => '2026-04-12 10:00:00',
+            'ended_at' => null,
         ]);
     }
 

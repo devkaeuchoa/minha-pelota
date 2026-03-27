@@ -155,6 +155,16 @@ export default function PlayerHome({
               label="JOGOS PERDIDOS"
               value={String(playerSummary?.stats.games_missed ?? 0)}
             />
+            {group ? (
+              <RetroButton
+                type="button"
+                variant="neutral"
+                size="sm"
+                onClick={() => router.visit(route('player.groups.show', { group: group.id }))}
+              >
+                VER DETALHES DO GRUPO
+              </RetroButton>
+            ) : null}
 
             <div className="mt-2 flex flex-col gap-2">
               <span className="retro-text-shadow text-base text-[#a0b0ff]">ESCALAÇÃO</span>

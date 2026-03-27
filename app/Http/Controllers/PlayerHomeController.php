@@ -6,10 +6,14 @@ use App\Enums\PhysicalCondition;
 use App\Models\Game;
 use App\Models\Group;
 use App\Models\MatchAttendance;
+use App\Models\MatchPlayerStat;
 use App\Models\Player;
+use App\Models\PlayerConditionHistory;
 use App\Models\PlayerStat;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -160,12 +164,69 @@ class PlayerHomeController extends Controller
                 ->with('status', 'Não foi possível identificar seu jogador neste grupo.');
         }
 
-        $player->physical_condition = PhysicalCondition::normalize($validated['physical_condition'])->value;
+        $nextCondition = PhysicalCondition::normalize($validated['physical_condition'])->value;
+        $previousCondition = PhysicalCondition::normalize($player->physical_condition)->value;
+
+        if ($nextCondition !== $previousCondition) {
+            PlayerConditionHistory::query()
+                ->where('player_id', $player->id)
+                ->where('group_id', $group->id)
+                ->whereNull('ended_at')
+                ->update([
+                    'ended_at' => now(),
+                ]);
+
+            PlayerConditionHistory::query()->create([
+                'player_id' => $player->id,
+                'group_id' => $group->id,
+                'condition' => $nextCondition,
+                'started_at' => now(),
+                'ended_at' => null,
+            ]);
+        }
+
+        $player->physical_condition = $nextCondition;
         $player->save();
 
         return redirect()
             ->route('player.home')
             ->with('status', 'Condição física atualizada com sucesso.');
+    }
+
+    public function showGroup(Request $request, Group $group): Response
+    {
+        $user = $request->user();
+        abort_unless($user, 401);
+
+        $isMember = $user->groups()->where('groups.id', $group->id)->exists();
+        abort_unless($isMember, 403);
+
+        $player = $this->resolvePlayerForUserInGroup($request, (int) $group->id);
+        abort_unless($player, 403, 'Não foi possível identificar seu jogador neste grupo.');
+
+        $periodStart = CarbonImmutable::now()->startOfMonth();
+        $periodEnd = CarbonImmutable::now()->endOfMonth();
+
+        $rankings = [
+            'artilheiro' => $this->buildTopScorerRanking((int) $group->id, $periodStart, $periodEnd),
+            'garcom' => $this->buildTopAssistRanking((int) $group->id, $periodStart, $periodEnd),
+            'ta_em_todas' => $this->buildPresenceRanking((int) $group->id, $periodStart, $periodEnd, false),
+            'so_migue' => $this->buildPresenceRanking((int) $group->id, $periodStart, $periodEnd, true),
+            'neymar' => $this->buildInjuryDaysRanking((int) $group->id, $periodStart, $periodEnd),
+        ];
+
+        return Inertia::render('Home/PlayerGroupShow', [
+            'group' => [
+                'id' => $group->id,
+                'name' => $group->name,
+            ],
+            'period' => [
+                'start' => $periodStart->toIso8601String(),
+                'end' => $periodEnd->toIso8601String(),
+                'label' => $periodStart->translatedFormat('F/Y'),
+            ],
+            'rankings' => $rankings,
+        ]);
     }
 
     private function resolvePlayerForUserInGroup(Request $request, int $groupId): ?Player
@@ -179,5 +240,166 @@ class PlayerHomeController extends Controller
             ->where('phone', $phone)
             ->whereHas('groups', fn($query) => $query->where('groups.id', $groupId))
             ->first();
+    }
+
+    private function buildTopScorerRanking(
+        int $groupId,
+        CarbonImmutable $periodStart,
+        CarbonImmutable $periodEnd,
+    ): ?array {
+        $row = MatchPlayerStat::query()
+            ->join('matches', 'matches.id', '=', 'match_player_stats.match_id')
+            ->join('players', 'players.id', '=', 'match_player_stats.player_id')
+            ->where('matches.group_id', $groupId)
+            ->whereBetween('matches.scheduled_at', [$periodStart, $periodEnd])
+            ->groupBy('players.id', 'players.name', 'players.nick')
+            ->orderByRaw('SUM(match_player_stats.goals) DESC')
+            ->orderBy('players.name')
+            ->selectRaw('players.id as player_id, players.name, players.nick, SUM(match_player_stats.goals) as metric')
+            ->first();
+
+        return $this->mapRankingRow($row, 'gols');
+    }
+
+    private function buildTopAssistRanking(
+        int $groupId,
+        CarbonImmutable $periodStart,
+        CarbonImmutable $periodEnd,
+    ): ?array {
+        $row = MatchPlayerStat::query()
+            ->join('matches', 'matches.id', '=', 'match_player_stats.match_id')
+            ->join('players', 'players.id', '=', 'match_player_stats.player_id')
+            ->where('matches.group_id', $groupId)
+            ->whereBetween('matches.scheduled_at', [$periodStart, $periodEnd])
+            ->groupBy('players.id', 'players.name', 'players.nick')
+            ->orderByRaw('SUM(match_player_stats.assists) DESC')
+            ->orderBy('players.name')
+            ->selectRaw('players.id as player_id, players.name, players.nick, SUM(match_player_stats.assists) as metric')
+            ->first();
+
+        return $this->mapRankingRow($row, 'assistências');
+    }
+
+    private function buildPresenceRanking(
+        int $groupId,
+        CarbonImmutable $periodStart,
+        CarbonImmutable $periodEnd,
+        bool $lowest,
+    ): ?array {
+        $base = MatchAttendance::query()
+            ->join('matches', 'matches.id', '=', 'match_attendance.match_id')
+            ->join('players', 'players.id', '=', 'match_attendance.player_id')
+            ->where('matches.group_id', $groupId)
+            ->whereBetween('matches.scheduled_at', [$periodStart, $periodEnd])
+            ->where('match_attendance.status', 'going')
+            ->groupBy('players.id', 'players.name', 'players.nick')
+            ->selectRaw('players.id as player_id, players.name, players.nick, COUNT(*) as metric');
+
+        if ($lowest) {
+            $base->orderByRaw('COUNT(*) ASC')->orderBy('players.name');
+        } else {
+            $base->orderByRaw('COUNT(*) DESC')->orderBy('players.name');
+        }
+
+        $row = $base->first();
+
+        return $this->mapRankingRow($row, 'presenças');
+    }
+
+    private function buildInjuryDaysRanking(
+        int $groupId,
+        CarbonImmutable $periodStart,
+        CarbonImmutable $periodEnd,
+    ): ?array {
+        $rows = PlayerConditionHistory::query()
+            ->join('players', 'players.id', '=', 'player_condition_histories.player_id')
+            ->where('player_condition_histories.group_id', $groupId)
+            ->where('player_condition_histories.condition', PhysicalCondition::Machucado->value)
+            ->where(function ($query) use ($periodStart, $periodEnd) {
+                $query
+                    ->whereBetween('player_condition_histories.started_at', [$periodStart, $periodEnd])
+                    ->orWhereBetween('player_condition_histories.ended_at', [$periodStart, $periodEnd])
+                    ->orWhere(function ($inner) use ($periodStart, $periodEnd) {
+                        $inner
+                            ->where('player_condition_histories.started_at', '<', $periodStart)
+                            ->where(function ($nested) use ($periodEnd) {
+                                $nested
+                                    ->whereNull('player_condition_histories.ended_at')
+                                    ->orWhere('player_condition_histories.ended_at', '>', $periodEnd);
+                            });
+                    });
+            })
+            ->select([
+                'player_condition_histories.player_id',
+                'player_condition_histories.started_at',
+                'player_condition_histories.ended_at',
+                'players.name',
+                'players.nick',
+            ])
+            ->get();
+
+        if ($rows->isEmpty()) {
+            return null;
+        }
+
+        $byPlayer = $rows->groupBy('player_id')
+            ->map(function (Collection $entries) use ($periodStart, $periodEnd) {
+                $days = 0;
+                $name = '';
+                $nick = null;
+
+                foreach ($entries as $entry) {
+                    $name = (string) $entry->name;
+                    $nick = $entry->nick;
+                    $start = CarbonImmutable::parse($entry->started_at)->max($periodStart);
+                    $end = $entry->ended_at
+                        ? CarbonImmutable::parse($entry->ended_at)->min($periodEnd)
+                        : $periodEnd;
+
+                    if ($end->greaterThan($start)) {
+                        $days += $start->diffInDays($end);
+                    }
+                }
+
+                return [
+                    'player_id' => (int) $entries->first()->player_id,
+                    'name' => $name,
+                    'nick' => $nick,
+                    'metric' => $days,
+                ];
+            })
+            ->sortBy([
+                ['metric', 'desc'],
+                ['name', 'asc'],
+            ])
+            ->values()
+            ->first();
+
+        if (! $byPlayer || $byPlayer['metric'] <= 0) {
+            return null;
+        }
+
+        return [
+            'player_id' => $byPlayer['player_id'],
+            'name' => $byPlayer['name'],
+            'nick' => $byPlayer['nick'],
+            'metric' => $byPlayer['metric'],
+            'metric_label' => 'dias machucado',
+        ];
+    }
+
+    private function mapRankingRow(mixed $row, string $metricLabel): ?array
+    {
+        if (! $row || (int) ($row->metric ?? 0) <= 0) {
+            return null;
+        }
+
+        return [
+            'player_id' => (int) $row->player_id,
+            'name' => (string) $row->name,
+            'nick' => $row->nick,
+            'metric' => (int) $row->metric,
+            'metric_label' => $metricLabel,
+        ];
     }
 }

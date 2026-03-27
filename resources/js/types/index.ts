@@ -69,6 +69,14 @@ export interface PageProps {
   [key: string]: unknown;
 }
 
+export interface GroupRankingEntry {
+  player_id: number;
+  name: string;
+  nick?: string | null;
+  metric: number;
+  metric_label: string;
+}
+
 export enum PhysicalCondition {
   Otimo = 'otimo',
   Regular = 'regular',

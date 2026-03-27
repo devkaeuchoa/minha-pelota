@@ -31,7 +31,7 @@ Route::get('/', function () {
     }
 
     return redirect()->route('groups.index');
-});
+})->name('home');
 
 Route::get('/dashboard', function () {
     /** @var \App\Models\User|null $user */
