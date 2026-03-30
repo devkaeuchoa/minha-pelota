@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.0.3 — Players view, phone auth and match management
+
+### Added
+
+- **Player experience and attendance**:
+  - Player home page with group management and attendance confirmation flow.
+  - Lineup support with `maybe` attendance status and physical condition tracking.
+  - Group rankings and player condition history tracking.
+- **Phone-first authentication and invite onboarding**:
+  - Phone-first registration and login flow.
+  - Invite registration flow now checks phone availability and links existing users when applicable.
+- **Match and schedule operations**:
+  - Match CRUD moved to a dedicated dates page.
+  - Group details now highlight and open attendance from the next scheduled date.
+
+### Changed
+
+- **Navigation and shell behavior**:
+  - App navigation switched to named routes for consistency across pages.
+  - Desktop and mobile navigation bars include a dedicated logout action.
+- **UI and profile flows**:
+  - Profile page migrated to the retro UI with a phone-first update experience.
+  - Invite, group and players interfaces were streamlined for clearer action flows.
+
+### Planning
+
+- Updated backlog and planning notes to reflect completed MVP slices and next priorities.
+
 ## v0.2.0 — Match attendance and generation options
 
 ### Added
