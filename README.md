@@ -16,7 +16,7 @@ Aplicação web para organizar **peladas e grupos de futebol amador**, substitui
   - ESLint (flat config v9) + `@typescript-eslint` + `eslint-plugin-react` + Prettier
   - Scripts: `npm run lint`, `npm run lint:fix`, `npm run format`, `npm run typecheck`
 
-### Domínio atual (v0.2.0)
+### Domínio atual (v0.0.3)
 
 #### Grupos
 
@@ -48,6 +48,7 @@ Aplicação web para organizar **peladas e grupos de futebol amador**, substitui
 
 - Endpoints de API para jogadores de grupo (`GroupPlayer`) e testes de integração.
 - Gestão de jogadores na UI com lista retro, seleção e vínculo por grupo.
+- Página do jogador com visão de grupos e histórico recente de participação/condição.
 
 #### Presença e escalação
 
@@ -63,6 +64,22 @@ Aplicação web para organizar **peladas e grupos de futebol amador**, substitui
   - Enum canônico no backend e TypeScript no frontend.
   - Exibição por emoji nas listas de presença.
 
+#### Autenticação e convites por telefone
+
+- Fluxo de autenticação orientado a telefone (cadastro/login).
+- Convites validam disponibilidade do telefone antes do cadastro.
+- Quando o telefone já existe, o usuário é vinculado ao grupo no fluxo de convite.
+
+#### Datas e partidas
+
+- CRUD de partidas centralizado em página dedicada de datas.
+- Tela de grupo destaca a próxima data e facilita abertura da gestão de presença.
+
+#### Navegação
+
+- Navegação da aplicação baseada em rotas nomeadas para maior consistência.
+- Navbar desktop/mobile com ação explícita de logout.
+
 ### Planejamento e releases
 
 - A pasta `planning/` contém:
@@ -70,6 +87,7 @@ Aplicação web para organizar **peladas e grupos de futebol amador**, substitui
   - `02-mvp-backlog.plan.md` — backlog de MVP (US-1…).
   - `03-sprint-0-tech-stack.plan.md` — decisões de stack e deploy.
 - `CHANGELOG.md` documenta as mudanças de cada versão (iniciando em **v0.0.1 – Groups domain foundation**).
+- Próximo foco de implementação no MVP: controle de pagamento por jogador em cada partida (US-5).
 
 ### Comandos úteis
 
