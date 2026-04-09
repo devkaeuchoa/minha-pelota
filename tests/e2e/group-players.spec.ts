@@ -9,7 +9,7 @@ async function login(page: Page): Promise<void> {
     await page.locator("#phone").fill(OWNER_PHONE);
     await page.locator("#password").fill(SEEDED_PASSWORD);
     await page.getByRole("button", { name: "ENTRAR" }).click();
-    await expect(page).toHaveURL(/\/groups$/);
+    await expect(page).toHaveURL(/\/home\/admin$/);
 }
 
 async function openGroupPlayers(page: Page, groupName: string): Promise<number> {

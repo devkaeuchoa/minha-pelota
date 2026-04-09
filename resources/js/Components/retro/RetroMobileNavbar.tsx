@@ -1,5 +1,5 @@
+/* global window */
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
 import { RetroIconButton } from '@/Components/retro';
 
 interface RetroNavItem {
@@ -13,9 +13,30 @@ interface RetroMobileNavbarProps {
   items: RetroNavItem[];
   activeId?: string;
   onLogout?: () => void;
+  backAriaLabel: string;
+  openMenuAriaLabel: string;
+  closeMenuAriaLabel: string;
+  modeSelectLabel: string;
+  logoutLabel: string;
+  statusHint: string;
+  aHintLabel: string;
+  bHintLabel: string;
 }
 
-export function RetroMobileNavbar({ title, items, activeId, onLogout }: RetroMobileNavbarProps) {
+export function RetroMobileNavbar({
+  title,
+  items,
+  activeId,
+  onLogout,
+  backAriaLabel,
+  openMenuAriaLabel,
+  closeMenuAriaLabel,
+  modeSelectLabel,
+  logoutLabel,
+  statusHint,
+  aHintLabel,
+  bHintLabel,
+}: RetroMobileNavbarProps) {
   const [open, setOpen] = useState(false);
 
   const toggle = () => setOpen((prev) => !prev);
@@ -30,7 +51,7 @@ export function RetroMobileNavbar({ title, items, activeId, onLogout }: RetroMob
       <header className="retro-bg-metallic retro-border-emboss relative z-20 flex shrink-0 items-center justify-between px-3 py-2 shadow-[0_4px_10px_rgba(0,0,0,0.8)]">
         <div className="flex items-center gap-2">
           <RetroIconButton
-            aria-label="Voltar"
+            aria-label={backAriaLabel}
             icon={
               <span className="text-[0.9em] leading-none -ml-[2px] mt-[2px] drop-shadow-[1px_1px_0px_white]">
                 ◀
@@ -47,7 +68,7 @@ export function RetroMobileNavbar({ title, items, activeId, onLogout }: RetroMob
         </div>
 
         <RetroIconButton
-          aria-label="Abrir menu"
+          aria-label={openMenuAriaLabel}
           onClick={toggle}
           flat
           icon={
@@ -68,12 +89,12 @@ export function RetroMobileNavbar({ title, items, activeId, onLogout }: RetroMob
         <div className="flex items-center justify-between border-b-2 border-[#1e348c] bg-[#1a2c7a] p-3">
           <div className="retro-bg-metallic retro-border-emboss mr-4 flex-1 px-4 py-1 text-center shadow-[0_4px_10px_rgba(0,0,0,0.5)]">
             <span className="retro-text-shadow-light block pt-1 text-2xl font-bold leading-none tracking-widest text-blue-900 italic">
-              MODE SELECT
+              {modeSelectLabel}
             </span>
           </div>
           <button
             type="button"
-            aria-label="Fechar menu"
+            aria-label={closeMenuAriaLabel}
             onClick={toggle}
             className="flex h-10 w-10 items-center justify-center border-2 border-white bg-[#ff0055] text-2xl text-white shadow-[0_0_8px_#ff0055] transition-all focus:outline-none hover:brightness-110 active:scale-95 retro-text-shadow"
           >
@@ -128,19 +149,19 @@ export function RetroMobileNavbar({ title, items, activeId, onLogout }: RetroMob
               }}
               className="mb-3 w-full border-2 border-[#4060c0] bg-[#1e348c] py-2 text-xl font-bold tracking-widest text-[#ff7a7a] shadow-[2px_2px_0_#000] retro-text-shadow transition-colors focus:outline-none focus:border-[#ffd700] hover:bg-[#2540a0] hover:text-white"
             >
-              SAIR
+              {logoutLabel}
             </button>
           ) : null}
           <div className="flex items-center justify-between px-2">
             <span className="retro-text-shadow animate-pulse text-base text-[#a0b0ff]">
-              SYSTEM AWAITING INPUT...
+              {statusHint}
             </span>
             <div className="flex gap-4">
               <span className="flex items-center gap-1 text-lg text-white retro-text-shadow">
-                <span className="text-xl text-[#39ff14]">A</span> SELECT
+                <span className="text-xl text-[#39ff14]">A</span> {aHintLabel}
               </span>
               <span className="flex items-center gap-1 text-lg text-white retro-text-shadow">
-                <span className="text-xl text-[#ff0055]">B</span> BACK
+                <span className="text-xl text-[#ff0055]">B</span> {bHintLabel}
               </span>
             </div>
           </div>

@@ -101,7 +101,12 @@ function CardsSection() {
   return (
     <div className="flex flex-col gap-2">
       <RetroSectionHeader title="3. CARDS & PANELS" />
-      <RetroTeamCard teamName="ENGLAND" playerLabel="1P" formation="4-4-2" />
+      <RetroTeamCard
+        teamName="ENGLAND"
+        playerLabel="1P"
+        formationLabel="FORMATION"
+        formation="4-4-2"
+      />
       <RetroStatsPanel title="TEAM STATISTICS">
         <RetroStatBar label="GK" value={75} variant="purple" />
         <RetroStatBar label="DF" value={85} variant="green" />
@@ -173,7 +178,11 @@ function FormSection() {
           ]}
         />
         <RetroSlider label="PLAYER RATING" value={75} />
-        <RetroFileInput label="UPLOAD PLAYER PHOTO" />
+        <RetroFileInput
+          label="UPLOAD PLAYER PHOTO"
+          browseLabel="BROWSE"
+          emptyFileLabel="NO FILE SELECTED"
+        />
         <RetroNumberStepper label="JERSEY NUMBER" value={10} />
         <div className="mt-2 flex gap-2">
           <RetroButton variant="success">SAVE</RetroButton>

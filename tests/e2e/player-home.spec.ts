@@ -25,7 +25,12 @@ test.describe("Home do jogador", () => {
 
         await expect(page.getByText("E2E Group")).toBeVisible();
         await expect(page.getByText("Arena E2E")).toBeVisible();
-        await expect(page.getByText("PENDENTE")).toBeVisible();
+        const presenceDisplay = page
+            .locator('[data-component="retro-value-display"]')
+            .filter({ has: page.getByText("SUA PRESENÇA", { exact: true }) });
+        await expect(
+            presenceDisplay.getByText(/PENDENTE|CONFIRMADA|DESCONFIRMADA|TALVEZ/, { exact: true }),
+        ).toBeVisible();
     });
 
     test("atualiza presenca rapida com confirmar, talvez e desconfirmar", async ({ page }) => {

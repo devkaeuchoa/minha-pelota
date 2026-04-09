@@ -14,6 +14,7 @@ import {
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { useMemo, useState } from 'react';
 import { formatDateTimePtBr } from '@/utils/datetime';
+import { useLocale } from '@/hooks/useLocale';
 
 interface MatchPresenceManageProps extends PageProps {
   group: Pick<Group, 'id' | 'name'>;
@@ -59,6 +60,7 @@ export default function Manage({
   status,
   permissions,
 }: MatchPresenceManageProps) {
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
   const canManageAttendance = permissions?.can_manage_attendance ?? true;
 
@@ -175,13 +177,17 @@ export default function Manage({
 
             <RetroPlayerList
               title="LISTA DE PRESENÇA"
+              emptyLabel={t('retro.playerList.empty')}
               players={sortedPlayers.map((player) => {
                 return {
                   id: player.id,
                   name: player.name,
                   nick: player.nick,
                   physicalEmoji: (
-                    <RetroPhysicalConditionEmoji condition={player.physicalCondition} />
+                    <RetroPhysicalConditionEmoji
+                      emoji={getPhysicalConditionEmoji(player.physicalCondition)}
+                      ariaLabel={t('retro.condition.ariaLabel')}
+                    />
                   ),
                 };
               })}
@@ -193,4 +199,12 @@ export default function Manage({
       </RetroInfoCard>
     </RetroAppShell>
   );
+}
+
+function getPhysicalConditionEmoji(condition: PhysicalCondition | null): string {
+  if (condition === PhysicalCondition.Otimo) return '😊';
+  if (condition === PhysicalCondition.Regular) return '😐';
+  if (condition === PhysicalCondition.Ruim) return '☹️';
+  if (condition === PhysicalCondition.Machucado) return '🏥';
+  return '❓';
 }

@@ -5,6 +5,7 @@ type PlayerVariant = 'available' | 'group';
 
 interface RetroPlayerListProps {
   title: string;
+  emptyLabel: string;
   players: {
     id: number;
     name: string;
@@ -22,6 +23,7 @@ interface RetroPlayerListProps {
 
 export function RetroPlayerList({
   title,
+  emptyLabel,
   players,
   selectedId,
   selectedIds,
@@ -53,7 +55,7 @@ export function RetroPlayerList({
             }}
           />
         ))}
-        {players.length === 0 && <div className={styles.empty}>NENHUM JOGADOR</div>}
+        {players.length === 0 && <div className={styles.empty}>{emptyLabel}</div>}
       </div>
     </RetroPlayerListShell>
   );

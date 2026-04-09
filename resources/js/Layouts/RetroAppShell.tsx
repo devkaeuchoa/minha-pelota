@@ -44,6 +44,14 @@ export function RetroAppShell({
             items={navItems}
             activeId={activeId}
             onLogout={handleLogout}
+            backAriaLabel={t('retro.mobile.backAriaLabel')}
+            openMenuAriaLabel={t('retro.mobile.openMenuAriaLabel')}
+            closeMenuAriaLabel={t('retro.mobile.closeMenuAriaLabel')}
+            modeSelectLabel={t('retro.mobile.modeSelectLabel')}
+            logoutLabel={t('common.logout')}
+            statusHint={t('retro.mobile.statusHint')}
+            aHintLabel={t('retro.mobile.aHintLabel')}
+            bHintLabel={t('retro.mobile.bHintLabel')}
           />
         </div>
         <div className="hidden md:block">

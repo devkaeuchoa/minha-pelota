@@ -29,7 +29,7 @@ test.describe("Perfil do jogador", () => {
 
     test("edita nome sem mudar telefone", async ({ page }) => {
         await login(page, OWNER_PHONE);
-        await expect(page).toHaveURL(/\/groups$/);
+        await expect(page).toHaveURL(/\/home\/admin$/);
         await openProfile(page);
         await openProfileEditMode(page);
         await page.locator("#profile_name").fill("Owner Player E2E");
@@ -39,7 +39,7 @@ test.describe("Perfil do jogador", () => {
 
     test("edicao com telefone duplicado exibe erro apos confirmar modal", async ({ page }) => {
         await login(page, OWNER_PHONE);
-        await expect(page).toHaveURL(/\/groups$/);
+        await expect(page).toHaveURL(/\/home\/admin$/);
         await openProfile(page);
         await openProfileEditMode(page);
 

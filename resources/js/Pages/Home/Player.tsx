@@ -58,6 +58,18 @@ function getPresenceLabel(
   return t('home.player.presence.pending');
 }
 
+function getPhysicalConditionOptions(
+  t: (key: string, replacements?: Record<string, string | number>) => string,
+): Array<{ id: PhysicalCondition; emoji: string; label: string }> {
+  return [
+    { id: PhysicalCondition.Unknown, emoji: '❓', label: t('retro.condition.unknown') },
+    { id: PhysicalCondition.Machucado, emoji: '🏥', label: t('retro.condition.injured') },
+    { id: PhysicalCondition.Ruim, emoji: '☹️', label: t('retro.condition.bad') },
+    { id: PhysicalCondition.Regular, emoji: '😐', label: t('retro.condition.regular') },
+    { id: PhysicalCondition.Otimo, emoji: '😊', label: t('retro.condition.great') },
+  ];
+}
+
 export default function PlayerHome({
   status,
   hasGroup,
@@ -108,6 +120,7 @@ export default function PlayerHome({
     () => confirmedPlayers.map(() => 'going' as const),
     [confirmedPlayers],
   );
+  const conditionOptions = useMemo(() => getPhysicalConditionOptions(t), [t]);
 
   return (
     <RetroAppShell activeId="home">
@@ -142,6 +155,8 @@ export default function PlayerHome({
               </div>
             )}
             <RetroPhysicalConditionScale
+              label={t('retro.condition.scaleLabel')}
+              options={conditionOptions}
               value={physicalCondition}
               onChange={handlePhysicalConditionUpdate}
             />

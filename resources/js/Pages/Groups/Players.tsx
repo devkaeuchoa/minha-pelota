@@ -8,6 +8,7 @@ import {
 } from '@/Components/retro';
 import { useGroupPlayersController } from '@/features/groups/useGroupPlayersController';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
+import { useLocale } from '@/hooks/useLocale';
 
 interface PlayersPageProps extends PageProps {
   group: Group;
@@ -16,6 +17,7 @@ interface PlayersPageProps extends PageProps {
 }
 
 export default function Players({ group, availablePlayers, groupPlayers }: PlayersPageProps) {
+  const { t } = useLocale();
   const controller = useGroupPlayersController({
     groupId: group.id,
     availablePlayers,
@@ -44,6 +46,7 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
           />
           <RetroPlayerList
             title="DISPONÍVEIS"
+            emptyLabel={t('retro.playerList.empty')}
             players={controller.filteredAvailable.map((player) => ({
               ...player,
               presenceLabel: formatPlayerMeta(player),
@@ -55,6 +58,7 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
         </div>
         <RetroPlayerList
           title="NO GRUPO"
+          emptyLabel={t('retro.playerList.empty')}
           players={controller.inGroup.map((player) => ({
             ...player,
             presenceLabel: formatPlayerMeta(player),

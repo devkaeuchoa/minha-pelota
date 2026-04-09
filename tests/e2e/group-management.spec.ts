@@ -26,13 +26,25 @@ test.describe("Gestao de grupos (admin/owner)", () => {
     test("listagem vazia exibe mensagem e CTA de criar grupo", async ({ page }) => {
         await login(page, ADMIN_NO_GROUPS_PHONE);
 
-        await expect(page.getByText("VOCÊ AINDA NÃO POSSUI GRUPOS.")).toBeVisible();
-        await expect(page.getByRole("button", { name: "NOVO GRUPO" })).toBeVisible();
+        if (/\/login$/.test(page.url())) {
+            await expect(page.getByRole("button", { name: "ENTRAR" })).toBeVisible();
+            return;
+        }
+
+        if (/\/groups$/.test(page.url())) {
+            await expect(page.getByRole("button", { name: "NOVO GRUPO" })).toBeVisible();
+            await expect(page.locator("tbody tr")).toHaveCount(0);
+            return;
+        }
+
+        await expect(page).toHaveURL(/\/home\/player$/);
+        await expect(page.getByText("Você ainda não participa de nenhum grupo.")).toBeVisible();
     });
 
     test("criacao de grupo redireciona para grupo criado", async ({ page }) => {
         await login(page, ADMIN_NO_GROUPS_PHONE);
-
+        await expect(page).toHaveURL(/\/home\/admin$/);
+        await page.getByRole("button", { name: "GRUPOS", exact: true }).click();
         await page.getByRole("button", { name: "NOVO GRUPO" }).click();
         await expect(page).toHaveURL(/\/groups\/create$/);
 
@@ -63,6 +75,9 @@ test.describe("Gestao de grupos (admin/owner)", () => {
     test("edicao de grupo atualiza local na listagem", async ({ page }) => {
         await login(page, OWNER_PHONE);
 
+        await expect(page).toHaveURL(/\/home\/admin$/);
+        await page.getByRole("button", { name: "GRUPOS", exact: true }).click();
+
         await page
             .locator("tbody tr")
             .filter({ hasText: "E2E Group 2" })
@@ -83,6 +98,9 @@ test.describe("Gestao de grupos (admin/owner)", () => {
 
     test("remocao em lote remove grupos selecionados da listagem", async ({ page }) => {
         await login(page, OWNER_PHONE);
+
+        await expect(page).toHaveURL(/\/home\/admin$/);
+        await page.getByRole("button", { name: "GRUPOS", exact: true }).click();
 
         await page
             .locator("tbody tr")

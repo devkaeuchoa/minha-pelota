@@ -1,40 +1,37 @@
-import { PhysicalCondition } from '@/types';
 import styles from './RetroPhysicalConditionScale.module.css';
 
-interface ConditionOption {
-  id: PhysicalCondition;
+interface ConditionOption<TValue extends string | number> {
+  id: TValue;
   emoji: string;
   label: string;
 }
 
-interface RetroPhysicalConditionScaleProps {
-  value: PhysicalCondition;
-  onChange: (condition: PhysicalCondition) => void;
+interface RetroPhysicalConditionScaleProps<TValue extends string | number> {
+  label: string;
+  options: Array<ConditionOption<TValue>>;
+  value: TValue;
+  onChange: (condition: TValue) => void;
   disabled?: boolean;
 }
 
-const OPTIONS: ConditionOption[] = [
-  { id: PhysicalCondition.Unknown, emoji: '❓', label: 'NÃO SEI' },
-  { id: PhysicalCondition.Machucado, emoji: '🏥', label: 'MACHUCADO' },
-  { id: PhysicalCondition.Ruim, emoji: '☹️', label: 'RUIM' },
-  { id: PhysicalCondition.Regular, emoji: '😐', label: 'REGULAR' },
-  { id: PhysicalCondition.Otimo, emoji: '😊', label: 'ÓTIMO' },
-];
-
-export function RetroPhysicalConditionScale({
+export function RetroPhysicalConditionScale<TValue extends string | number>({
+  label,
+  options,
   value,
   onChange,
   disabled = false,
-}: RetroPhysicalConditionScaleProps) {
-  const active = OPTIONS.find((option) => option.id === value) ?? OPTIONS[0];
+}: RetroPhysicalConditionScaleProps<TValue>) {
+  const active = options.find((option) => option.id === value) ?? options[0];
 
   return (
     <div data-component="retro-physical-condition-scale" className={styles.container}>
-      <span className={`retro-text-shadow ${styles.label}`}>CONDIÇÃO FÍSICA</span>
-      <span className={`retro-text-shadow ${styles.status}`}>[{active.label}]</span>
+      <span className={`retro-text-shadow ${styles.label}`}>{label}</span>
+      <span className={`retro-text-shadow ${styles.status}`}>
+        {active ? `[${active.label}]` : ''}
+      </span>
 
       <div className={styles.buttons}>
-        {OPTIONS.map((option) => {
+        {options.map((option) => {
           const isActive = option.id === value;
           return (
             <button

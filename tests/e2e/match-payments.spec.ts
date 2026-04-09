@@ -13,6 +13,8 @@ async function login(page: Page, phone: string): Promise<void> {
 
 async function loginOwner(page: Page): Promise<void> {
     await login(page, OWNER_PHONE);
+    await expect(page).toHaveURL(/\/home\/admin$/);
+    await page.goto("/groups");
     await expect(page).toHaveURL(/\/groups$/);
 }
 

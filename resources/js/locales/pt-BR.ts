@@ -89,6 +89,21 @@ const ptBR = {
   'home.playerGroupShow.ghost': 'SÓ MIGUÉ',
   'home.playerGroupShow.neymar': 'NEYMAR',
   'home.playerGroupShow.noDataThisMonth': 'SEM DADOS NO MÊS',
+  'retro.mobile.backAriaLabel': 'Voltar',
+  'retro.mobile.openMenuAriaLabel': 'Abrir menu',
+  'retro.mobile.closeMenuAriaLabel': 'Fechar menu',
+  'retro.mobile.modeSelectLabel': 'MODE SELECT',
+  'retro.mobile.statusHint': 'SYSTEM AWAITING INPUT...',
+  'retro.mobile.aHintLabel': 'SELECT',
+  'retro.mobile.bHintLabel': 'BACK',
+  'retro.playerList.empty': 'NENHUM JOGADOR',
+  'retro.condition.scaleLabel': 'CONDIÇÃO FÍSICA',
+  'retro.condition.ariaLabel': 'Condição física',
+  'retro.condition.unknown': 'NÃO SEI',
+  'retro.condition.injured': 'MACHUCADO',
+  'retro.condition.bad': 'RUIM',
+  'retro.condition.regular': 'REGULAR',
+  'retro.condition.great': 'ÓTIMO',
 } as const;
 
 export default ptBR;
