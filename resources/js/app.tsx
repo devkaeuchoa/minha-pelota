@@ -2,18 +2,20 @@ import '../css/app.css';
 import './bootstrap';
 
 import { createInertiaApp } from '@inertiajs/react';
+import type { ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
+import { LocaleProvider } from '@/providers/LocaleProvider';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-type PageModule = () => Promise<{ default: React.ComponentType }>;
+type PageModule = () => Promise<{ default: ComponentType }>;
 
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
   resolve: (name) => {
     const pages: Record<string, PageModule> = {
-      ...import.meta.glob<{ default: React.ComponentType }>('./Pages/**/*.jsx'),
-      ...import.meta.glob<{ default: React.ComponentType }>('./Pages/**/*.tsx'),
+      ...import.meta.glob<{ default: ComponentType }>('./Pages/**/*.jsx'),
+      ...import.meta.glob<{ default: ComponentType }>('./Pages/**/*.tsx'),
     };
     const page = pages[`./Pages/${name}.tsx`] ?? pages[`./Pages/${name}.jsx`];
     if (!page) {
@@ -23,7 +25,12 @@ createInertiaApp({
   },
   setup({ el, App, props }) {
     const root = createRoot(el);
-    root.render(<App {...props} />);
+    const locale = typeof document !== 'undefined' ? document.documentElement?.lang : undefined;
+    root.render(
+      <LocaleProvider locale={locale}>
+        <App {...props} />
+      </LocaleProvider>,
+    );
   },
   progress: {
     color: '#4B5563',

@@ -13,6 +13,7 @@ import {
   RetroValueDisplay,
 } from '@/Components/retro';
 import { useMemo } from 'react';
+import { useLocale } from '@/hooks/useLocale';
 
 type PresenceStatus = 'going' | 'not_going' | 'maybe' | 'pending';
 
@@ -47,11 +48,14 @@ interface PlayerHomeProps extends PageProps {
   } | null;
 }
 
-function getPresenceLabel(status: PresenceStatus): string {
-  if (status === 'going') return 'CONFIRMADA';
-  if (status === 'not_going') return 'DESCONFIRMADA';
-  if (status === 'maybe') return 'TALVEZ';
-  return 'PENDENTE';
+function getPresenceLabel(
+  status: PresenceStatus,
+  t: (key: string, replacements?: Record<string, string | number>) => string,
+): string {
+  if (status === 'going') return t('home.player.presence.confirmed');
+  if (status === 'not_going') return t('home.player.presence.unconfirmed');
+  if (status === 'maybe') return t('home.player.presence.maybe');
+  return t('home.player.presence.pending');
 }
 
 export default function PlayerHome({
@@ -64,6 +68,7 @@ export default function PlayerHome({
   physicalCondition,
   playerSummary,
 }: PlayerHomeProps) {
+  const { t } = useLocale();
   const handlePresenceUpdate = (nextStatus: Exclude<PresenceStatus, 'pending'>) => {
     if (!nextMatch) return;
     router.post(route('player.home.presence.update', { match: nextMatch.id }), {
@@ -86,7 +91,7 @@ export default function PlayerHome({
 
   const handleLeaveGroup = () => {
     if (!group) return;
-    if (!confirm('Tem certeza que deseja sair deste grupo?')) return;
+    if (!confirm(t('home.player.leaveGroupConfirm'))) return;
 
     router.delete(route('api.player.groups.leave', { group: group.id }), {
       preserveScroll: true,
@@ -94,9 +99,9 @@ export default function PlayerHome({
   };
 
   const presenceActions: Array<{ id: Exclude<PresenceStatus, 'pending'>; label: string }> = [
-    { id: 'going', label: 'CONFIRMAR' },
-    { id: 'maybe', label: 'TALVEZ' },
-    { id: 'not_going', label: 'DESCONFIRMAR' },
+    { id: 'going', label: t('home.player.confirm') },
+    { id: 'maybe', label: t('home.player.maybe') },
+    { id: 'not_going', label: t('home.player.unconfirm') },
   ];
 
   const pitchPositions = useMemo(
@@ -106,15 +111,15 @@ export default function PlayerHome({
 
   return (
     <RetroAppShell activeId="home">
-      <Head title="Home do jogador" />
+      <Head title={t('home.player.title')} />
 
-      <RetroSectionHeader title="HOME DO JOGADOR" />
+      <RetroSectionHeader title={t('home.player.header')} />
       <RetroInfoCard>
         {status && <RetroInlineInfo message={status} />}
 
         {!hasGroup ? (
           <div className="retro-text-shadow text-base text-[#e5e7eb]">
-            Você ainda não participa de nenhum grupo.
+            {t('home.player.noGroup')}
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -140,30 +145,41 @@ export default function PlayerHome({
               value={physicalCondition}
               onChange={handlePhysicalConditionUpdate}
             />
-            <RetroValueDisplay label="GRUPO" value={group?.name ?? '-'} />
+            <RetroValueDisplay label={t('home.player.group')} value={group?.name ?? '-'} />
             <RetroValueDisplay
-              label="PRÓXIMA PARTIDA"
+              label={t('home.player.nextMatch')}
               value={
-                nextMatch ? formatDateTimePtBr(nextMatch.scheduled_at) : 'Sem partida agendada'
+                nextMatch
+                  ? formatDateTimePtBr(nextMatch.scheduled_at)
+                  : t('home.player.noScheduledMatch')
               }
             />
-            <RetroValueDisplay label="LOCAL" value={nextMatch?.location_name ?? '-'} />
-            <RetroValueDisplay label="SUA PRESENÇA" value={getPresenceLabel(presenceStatus)} />
             <RetroValueDisplay
-              label="SEU RATING"
+              label={t('home.player.location')}
+              value={nextMatch?.location_name ?? '-'}
+            />
+            <RetroValueDisplay
+              label={t('home.player.yourPresence')}
+              value={getPresenceLabel(presenceStatus, t)}
+            />
+            <RetroValueDisplay
+              label={t('home.player.yourRating')}
               value={playerSummary?.rating ? `${playerSummary.rating}/5` : '-'}
             />
-            <RetroValueDisplay label="GOLS" value={String(playerSummary?.stats.goals ?? 0)} />
             <RetroValueDisplay
-              label="ASSISTÊNCIAS"
+              label={t('home.player.goals')}
+              value={String(playerSummary?.stats.goals ?? 0)}
+            />
+            <RetroValueDisplay
+              label={t('home.player.assists')}
               value={String(playerSummary?.stats.assists ?? 0)}
             />
             <RetroValueDisplay
-              label="JOGOS REALIZADOS"
+              label={t('home.player.gamesPlayed')}
               value={String(playerSummary?.stats.games_played ?? 0)}
             />
             <RetroValueDisplay
-              label="JOGOS PERDIDOS"
+              label={t('home.player.gamesMissed')}
               value={String(playerSummary?.stats.games_missed ?? 0)}
             />
             {group && (
@@ -174,22 +190,24 @@ export default function PlayerHome({
                   size="sm"
                   onClick={() => router.visit(route('player.groups.show', { group: group.id }))}
                 >
-                  VER DETALHES DO GRUPO
+                  {t('home.player.viewGroupDetails')}
                 </RetroButton>
                 <RetroButton type="button" variant="danger" size="sm" onClick={handleLeaveGroup}>
-                  SAIR DO GRUPO
+                  {t('home.player.leaveGroup')}
                 </RetroButton>
               </div>
             )}
 
             <div className="mt-2 flex flex-col gap-2">
-              <span className="retro-text-shadow text-base text-[#a0b0ff]">ESCALAÇÃO</span>
+              <span className="retro-text-shadow text-base text-[#a0b0ff]">
+                {t('home.player.lineup')}
+              </span>
               <div className="max-w-[500px] w-full mx-auto">
                 <RetroPitch maxPlayers={12} positions={pitchPositions} />
               </div>
               <div className="flex flex-col gap-1 rounded border-2 border-[#4060c0] bg-[#1e348c] p-2">
                 <span className="retro-text-shadow text-sm text-[#a0b0ff]">
-                  CONFIRMADOS ({confirmedPlayers.length})
+                  {t('home.player.confirmedPlayers', { count: confirmedPlayers.length })}
                 </span>
                 {confirmedPlayers.length > 0 ? (
                   confirmedPlayers.map((player) => (
@@ -199,7 +217,7 @@ export default function PlayerHome({
                   ))
                 ) : (
                   <span className="retro-text-shadow text-sm text-[#e5e7eb]">
-                    Ninguém confirmou ainda.
+                    {t('home.player.noConfirmedPlayers')}
                   </span>
                 )}
               </div>

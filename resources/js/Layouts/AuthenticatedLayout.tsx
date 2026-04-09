@@ -7,12 +7,14 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState, PropsWithChildren, ReactNode } from 'react';
 import { PageProps } from '@/types';
+import { useLocale } from '@/hooks/useLocale';
 
 interface AuthenticatedLayoutProps extends PropsWithChildren {
   header?: ReactNode;
 }
 
 export default function AuthenticatedLayout({ header, children }: AuthenticatedLayoutProps) {
+  const { t } = useLocale();
   const page = usePage<PageProps>();
   const auth = page.props.auth ?? {};
   const user = auth.user ?? null;
@@ -33,7 +35,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
 
               <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                 <NavLink href={'#'} active={false}>
-                  Dashboard
+                  {t('common.home')}
                 </NavLink>
               </div>
             </div>
@@ -47,7 +49,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                         type="button"
                         className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                       >
-                        {user ? user.name : 'Guest'}
+                        {user ? user.name : t('common.guest')}
 
                         <svg
                           className="-me-0.5 ms-2 h-4 w-4"
@@ -66,9 +68,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                   </Dropdown.Trigger>
 
                   <Dropdown.Content>
-                    <Dropdown.Link href={'#'}>Profile</Dropdown.Link>
+                    <Dropdown.Link href={'#'}>{t('common.profile')}</Dropdown.Link>
                     <Dropdown.Link href={'#'} method="post" as="button">
-                      Log Out
+                      {t('common.logout')}
                     </Dropdown.Link>
                   </Dropdown.Content>
                 </Dropdown>
@@ -104,7 +106,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
         <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
           <div className="space-y-1 pb-3 pt-2">
             <ResponsiveNavLink href={'#'} active={false}>
-              Dashboard
+              {t('common.home')}
             </ResponsiveNavLink>
           </div>
 
@@ -119,9 +121,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
             </div>
 
             <div className="mt-3 space-y-1">
-              <ResponsiveNavLink href={'#'}>Profile</ResponsiveNavLink>
+              <ResponsiveNavLink href={'#'}>{t('common.profile')}</ResponsiveNavLink>
               <ResponsiveNavLink method="post" href={'#'} as="button">
-                Log Out
+                {t('common.logout')}
               </ResponsiveNavLink>
             </div>
           </div>

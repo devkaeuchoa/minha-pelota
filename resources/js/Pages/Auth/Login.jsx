@@ -11,8 +11,10 @@ import {
   RetroSectionHeader,
   RetroTextInput,
 } from '@/Components/retro';
+import { useLocale } from '@/hooks/useLocale';
 
 export default function Login({ status }) {
+  const { t } = useLocale();
   const { data, setData, post, processing, errors, reset } = useForm({
     phone: '',
     password: '',
@@ -29,7 +31,7 @@ export default function Login({ status }) {
 
   return (
     <div className="retro-body-bg retro-scanlines flex min-h-screen flex-col items-center pt-6">
-      <Head title="Log in" />
+      <Head title={t('auth.loginPageTitle')} />
 
       <div className="w-full max-w-xl px-3">
         <RetroSectionHeader title="LOGIN" />
@@ -79,7 +81,7 @@ export default function Login({ status }) {
                     href={route('register')}
                     className="retro-text-shadow text-sm text-[#a0b0ff] text-center w-full underline hover:text-white"
                   >
-                    Criar conta
+                    {t('auth.loginCreateAccount')}
                   </Link>
                 </div>
               </div>

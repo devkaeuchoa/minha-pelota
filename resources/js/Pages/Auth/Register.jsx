@@ -13,8 +13,10 @@ import {
 } from '@/Components/retro';
 import { RetroInlineAlert } from '@/Components/retro/RetroInlineAlert';
 import { validatePhone } from '@/utils/formValidation';
+import { useLocale } from '@/hooks/useLocale';
 
 export default function Register() {
+  const { t } = useLocale();
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const [phoneAvailable, setPhoneAvailable] = useState(false);
   const [phoneCheckMessage, setPhoneCheckMessage] = useState('');
@@ -75,7 +77,7 @@ export default function Register() {
 
   return (
     <div className="retro-body-bg retro-scanlines flex min-h-screen flex-col items-center pt-6">
-      <Head title="Register" />
+      <Head title={t('auth.registerPageTitle')} />
 
       <div className="w-full max-w-xl px-3">
         <RetroSectionHeader title="CADASTRO" />
@@ -107,7 +109,7 @@ export default function Register() {
               <RetroTextInput
                 id="nickname"
                 name="nickname"
-                label="NICKNAME (OPCIONAL)"
+                label={t('auth.registerNicknameOptional')}
                 value={data.nickname}
                 autoComplete="nickname"
                 onChange={(e) => setData('nickname', e.target.value)}
@@ -175,7 +177,7 @@ export default function Register() {
                   href={route('login')}
                   className="retro-text-shadow text-sm text-[#a0b0ff] text-center w-full underline hover:text-white"
                 >
-                  Já tem conta?
+                  {t('auth.registerHasAccount')}
                 </Link>
               </div>
             </form>

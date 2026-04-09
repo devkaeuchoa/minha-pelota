@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import { GroupRankingEntry, PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { RetroInfoCard, RetroSectionHeader, RetroValueDisplay } from '@/Components/retro';
+import { useLocale } from '@/hooks/useLocale';
 
 interface PlayerGroupShowProps extends PageProps {
   group: {
@@ -23,29 +24,51 @@ interface PlayerGroupShowProps extends PageProps {
 }
 
 export default function PlayerGroupShow({ group, period, rankings }: PlayerGroupShowProps) {
+  const { t } = useLocale();
   return (
     <RetroAppShell activeId="home">
-      <Head title={`Detalhes do grupo — ${group.name}`} />
+      <Head title={t('home.playerGroupShow.title', { name: group.name })} />
 
-      <RetroSectionHeader title="DETALHES DO GRUPO" />
+      <RetroSectionHeader title={t('home.playerGroupShow.header')} />
       <RetroInfoCard>
         <div className="flex flex-col gap-3">
-          <RetroValueDisplay label="GRUPO" value={group.name} />
-          <RetroValueDisplay label="PERÍODO" value={period.label.toUpperCase()} />
-          <RetroValueDisplay label="ARTILHEIRO" value={formatRankingValue(rankings.artilheiro)} />
-          <RetroValueDisplay label="GARÇOM" value={formatRankingValue(rankings.garcom)} />
-          <RetroValueDisplay label="TÁ EM TODAS" value={formatRankingValue(rankings.ta_em_todas)} />
-          <RetroValueDisplay label="SÓ MIGUÉ" value={formatRankingValue(rankings.so_migue)} />
-          <RetroValueDisplay label="NEYMAR" value={formatRankingValue(rankings.neymar)} />
+          <RetroValueDisplay label={t('home.player.group')} value={group.name} />
+          <RetroValueDisplay
+            label={t('home.playerGroupShow.period')}
+            value={period.label.toUpperCase()}
+          />
+          <RetroValueDisplay
+            label={t('home.playerGroupShow.topScorer')}
+            value={formatRankingValue(rankings.artilheiro, t)}
+          />
+          <RetroValueDisplay
+            label={t('home.playerGroupShow.assistLeader')}
+            value={formatRankingValue(rankings.garcom, t)}
+          />
+          <RetroValueDisplay
+            label={t('home.playerGroupShow.alwaysThere')}
+            value={formatRankingValue(rankings.ta_em_todas, t)}
+          />
+          <RetroValueDisplay
+            label={t('home.playerGroupShow.ghost')}
+            value={formatRankingValue(rankings.so_migue, t)}
+          />
+          <RetroValueDisplay
+            label={t('home.playerGroupShow.neymar')}
+            value={formatRankingValue(rankings.neymar, t)}
+          />
         </div>
       </RetroInfoCard>
     </RetroAppShell>
   );
 }
 
-function formatRankingValue(entry: GroupRankingEntry | null): string {
+function formatRankingValue(
+  entry: GroupRankingEntry | null,
+  t: (key: string, replacements?: Record<string, string | number>) => string,
+): string {
   if (!entry) {
-    return 'SEM DADOS NO MÊS';
+    return t('home.playerGroupShow.noDataThisMonth');
   }
 
   const displayName = entry.nick || entry.name;

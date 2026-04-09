@@ -4,19 +4,19 @@ import { User } from '@/types';
 
 export type AppNavItem = {
   id: string;
-  label: string;
+  labelKey: string;
   href: string;
 };
 
 export const PLAYER_ADMIN_NAV_ITEMS: AppNavItem[] = [
-  { id: 'home', label: 'HOME', href: route('home') },
-  { id: 'groups', label: 'GRUPOS', href: route('groups.index') },
-  { id: 'profile', label: 'PERFIL', href: route('profile.edit') },
+  { id: 'home', labelKey: 'common.home', href: route('home') },
+  { id: 'groups', labelKey: 'common.groups', href: route('groups.index') },
+  { id: 'profile', labelKey: 'common.profile', href: route('profile.edit') },
 ];
 
 export const PLAYER_NAV_ITEMS: AppNavItem[] = [
-  { id: 'home', label: 'HOME', href: route('player.home') },
-  { id: 'profile', label: 'PERFIL', href: route('profile.edit') },
+  { id: 'home', labelKey: 'common.home', href: route('player.home') },
+  { id: 'profile', labelKey: 'common.profile', href: route('profile.edit') },
 ];
 
 export function getDefaultNavItemsForUser(user: User | null | undefined): AppNavItem[] {

@@ -5,6 +5,7 @@ import { router, usePage } from '@inertiajs/react';
 import { RetroDesktopNavbar, RetroLayout, RetroMobileNavbar } from '@/Components/retro';
 import { AppNavItem, getDefaultNavItemsForUser } from '@/config/navigation';
 import { PageProps } from '@/types';
+import { useLocale } from '@/hooks/useLocale';
 
 interface RetroAppShellProps extends PropsWithChildren {
   title?: string;
@@ -14,17 +15,20 @@ interface RetroAppShellProps extends PropsWithChildren {
 }
 
 export function RetroAppShell({
-  title = 'MINHA PELOTA',
-  versionLabel = 'VER 1.0',
+  title,
+  versionLabel,
   activeId,
   items,
   children,
 }: RetroAppShellProps) {
+  const { t } = useLocale();
   const page = usePage<PageProps>();
   const defaultItems = getDefaultNavItemsForUser(page.props.auth?.user);
+  const titleValue = title ?? t('layout.appTitle');
+  const versionLabelValue = versionLabel ?? t('common.versionLabel');
   const navItems = (items ?? defaultItems).map((item) => ({
     id: item.id,
-    label: item.label,
+    label: t(item.labelKey),
     onClick: () => router.visit(item.href),
   }));
   const handleLogout = () => {
@@ -36,7 +40,7 @@ export function RetroAppShell({
       <div className="mb-3">
         <div className="md:hidden">
           <RetroMobileNavbar
-            title={title}
+            title={titleValue}
             items={navItems}
             activeId={activeId}
             onLogout={handleLogout}
@@ -44,8 +48,8 @@ export function RetroAppShell({
         </div>
         <div className="hidden md:block">
           <RetroDesktopNavbar
-            title={title}
-            versionLabel={versionLabel}
+            title={titleValue}
+            versionLabel={versionLabelValue}
             items={navItems}
             activeId={activeId}
             onLogout={handleLogout}

@@ -7,6 +7,7 @@ import {
   RetroStatusPill,
   RetroValueDisplay,
 } from '@/Components/retro';
+import { useLocale } from '@/hooks/useLocale';
 
 interface GroupsHeaderProps {
   processing: boolean;
@@ -33,7 +34,8 @@ export function GroupsHeader({
   canManageGroups = true,
   canManagePayments = true,
 }: GroupsHeaderProps) {
-  const statusLabel = 'SELEÇÃO';
+  const { t } = useLocale();
+  const statusLabel = t('groups.selection');
   const status = hasSelection ? 'on' : 'off';
   const totalLabel = total.toString();
   const selectedLabel = selectedCount.toString();
@@ -42,8 +44,8 @@ export function GroupsHeader({
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div className="flex w-full justify-between gap-5 md:w-auto md:justify-start">
-          <RetroValueDisplay label="GRUPOS" value={totalLabel} />
-          <RetroValueDisplay label="SELECIONADOS" value={selectedLabel} />
+          <RetroValueDisplay label={t('common.groups')} value={totalLabel} />
+          <RetroValueDisplay label={t('groups.selected')} value={selectedLabel} />
         </div>
         <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-end md:w-auto">
           <RetroStatusPill status={status} label={statusLabel} isLabelCentered />
@@ -57,11 +59,11 @@ export function GroupsHeader({
                 disabled={!hasSelection || processing}
                 onClick={onBatchDeleteClick}
               >
-                REMOVER SELECIONADOS
+                {t('groups.removeSelected')}
               </RetroButton>
               <Link href={route('groups.create')} className="w-full sm:w-auto">
                 <RetroButton size="sm" type="button" variant="success">
-                  NOVO GRUPO
+                  {t('groups.newGroup')}
                 </RetroButton>
               </Link>
             </>
@@ -69,7 +71,7 @@ export function GroupsHeader({
         </div>
       </div>
 
-      <RetroInlineInfo message="GERENCIE SEUS GRUPOS E PARTIDAS." />
+      <RetroInlineInfo message={t('groups.manageGroupsAndMatches')} />
 
       <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-1 justify-end gap-3">
@@ -82,7 +84,7 @@ export function GroupsHeader({
               className="flex-1"
             >
               <RetroButton size="sm" type="button" variant="neutral">
-                PAGAMENTOS ÚLTIMA PARTIDA
+                {t('groups.lastMatchPayments')}
               </RetroButton>
             </Link>
           ) : null}

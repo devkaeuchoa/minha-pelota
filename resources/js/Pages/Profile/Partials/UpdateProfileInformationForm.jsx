@@ -1,11 +1,14 @@
+/* global route */
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { useForm, usePage } from '@inertiajs/react';
+import { useLocale } from '@/hooks/useLocale';
 
 export default function UpdateProfileInformation({ className = '' }) {
+  const { t } = useLocale();
   const user = usePage().props.auth.user;
 
   const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
@@ -22,14 +25,14 @@ export default function UpdateProfileInformation({ className = '' }) {
   return (
     <section className={className}>
       <header>
-        <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
+        <h2 className="text-lg font-medium text-gray-900">{t('profile.infoTitle')}</h2>
 
-        <p className="mt-1 text-sm text-gray-600">Update your account's profile information.</p>
+        <p className="mt-1 text-sm text-gray-600">{t('profile.infoDescription')}</p>
       </header>
 
       <form onSubmit={submit} className="mt-6 space-y-6">
         <div>
-          <InputLabel htmlFor="name" value="Name" />
+          <InputLabel htmlFor="name" value={t('common.name')} />
 
           <TextInput
             id="name"
@@ -45,7 +48,7 @@ export default function UpdateProfileInformation({ className = '' }) {
         </div>
 
         <div>
-          <InputLabel htmlFor="phone" value="Phone" />
+          <InputLabel htmlFor="phone" value={t('common.phone')} />
 
           <TextInput
             id="phone"
@@ -61,7 +64,7 @@ export default function UpdateProfileInformation({ className = '' }) {
         </div>
 
         <div className="flex items-center gap-4">
-          <PrimaryButton disabled={processing}>Save</PrimaryButton>
+          <PrimaryButton disabled={processing}>{t('common.save')}</PrimaryButton>
 
           <Transition
             show={recentlySuccessful}
@@ -70,7 +73,7 @@ export default function UpdateProfileInformation({ className = '' }) {
             leave="transition ease-in-out"
             leaveTo="opacity-0"
           >
-            <p className="text-sm text-gray-600">Saved.</p>
+            <p className="text-sm text-gray-600">{t('common.saved')}</p>
           </Transition>
         </div>
       </form>
