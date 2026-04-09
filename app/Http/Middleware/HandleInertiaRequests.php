@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
                         ...$user->toArray(),
                         'can_access_player_admin_area' => $canAccessPlayerAdminArea,
                         'home_route' => $canAccessPlayerAdminArea
-                            ? route('groups.index')
+                            ? route('admin.home')
                             : route('player.home'),
                     ]
                     : null,

@@ -5,7 +5,7 @@ Baseado na seção **5. Jogadores no grupo** do manual de testes.
 ### Pré-condições
 
 - Seed padrão carregada (`DatabaseSeeder`).
-- Usuário owner/admin para login: `11988888888` / `password`.
+- Usuário owner/admin para login: `11111111111` / `password`.
 - Grupo alvo para gestão: `E2E Group 2`.
 
 ### Cenários

@@ -5,7 +5,7 @@ Baseado na seção **8. Pagamentos por partida** do manual (`docs/manual-test-sc
 ### Pré-condições
 
 - Seed padrão (`DatabaseSeeder`).
-- Owner: `11988888888` / `password`.
+- Owner: `11111111111` / `password`.
 - Grupo **E2E Match Payments**: partida **finished** com `scheduled_at` no passado (mais recente que outras partidas finalizadas do owner no seed), `Grouped Player` com presença **going** (único confirmado na listagem de pagamentos).
 
 ### Cenários

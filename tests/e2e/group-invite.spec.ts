@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const OWNER_PHONE = "11988888888";
+const OWNER_PHONE = "11111111111";
 const SEEDED_PASSWORD = "password";
 
 function escapeRegex(value: string): string {

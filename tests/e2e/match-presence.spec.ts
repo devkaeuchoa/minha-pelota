@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const OWNER_PHONE = "11988888888";
+const OWNER_PHONE = "11111111111";
 const SEEDED_PASSWORD = "password";
 const E2E_GROUP_NAME = "E2E Group";
 /** Padded to 64 chars — must match DatabaseSeeder str_pad('e2e_presence_expired', 64, '0'). */

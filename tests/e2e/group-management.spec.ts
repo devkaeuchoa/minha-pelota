@@ -7,7 +7,7 @@ test.describe.configure({ mode: "serial" });
 
 // Phones match fixtures in database/seeders/DatabaseSeeder.php
 const ADMIN_NO_GROUPS_PHONE = "11966666666"; // Admin sem grupos — estado vazio + criacao
-const OWNER_PHONE = "11988888888"; //            Owner com grupos — edicao + remocao em lote
+const OWNER_PHONE = "11111111111"; //            Owner com grupos — edicao + remocao em lote
 const SEEDED_PASSWORD = "password";
 
 // No overlap with other suites:

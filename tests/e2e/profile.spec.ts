@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const SEEDED_PASSWORD = "password";
-const OWNER_PHONE = "11988888888";
+const OWNER_PHONE = "11111111111";
 const TEST_PLAYER_PHONE_MASKED = "(11) 99999-9999";
 const PROFILE_PASSWORD_PHONE = "11944444444";
 const PROFILE_DELETE_PHONE = "11955555555";

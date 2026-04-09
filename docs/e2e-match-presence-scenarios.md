@@ -5,7 +5,7 @@ Baseado na seção **7. Presença em partidas** do manual de testes (`docs/manua
 ### Pré-condições
 
 - Seed padrão (`DatabaseSeeder`).
-- Owner: `11988888888` / `password`.
+- Owner: `11111111111` / `password`.
 - Grupo **E2E Group** com partida futura e o jogador **Grouped Player** (`11977777777`) já vinculado ao grupo.
 - Grupo **E2E Presence Expired** (seed): partida no passado + `match_attendance_links` com token fixo alinhado ao spec `tests/e2e/match-presence.spec.ts`.
 

@@ -5,7 +5,7 @@ Baseado na seção **6. Convites por link** do manual de testes.
 ### Pré-condições
 
 - Seed padrão carregada (`DatabaseSeeder`).
-- Owner para login: `11988888888` / `password`.
+- Owner para login: `11111111111` / `password`.
 - Grupos com `group_settings` e `invite_token` (criação via factory / boot do `Group`).
 
 ### Cenários

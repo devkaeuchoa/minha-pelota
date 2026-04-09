@@ -14,7 +14,7 @@ Baseado no cenario manual em `docs/manual-test-scenarios.md` (secao 4).
 | Fixture              | Telefone    | Descricao                                 |
 | -------------------- | ----------- | ----------------------------------------- |
 | `Admin No Groups`    | 11966666666 | Admin sem grupos — estado vazio + criacao |
-| `Owner Player`       | 11988888888 | Dono de grupos — edicao + remocao em lote |
+| `Owner Player`       | 11111111111 | Dono de grupos — edicao + remocao em lote |
 | `E2E Group 2`        | —           | Grupo para o teste de edicao              |
 | `E2E Batch Delete 1` | —           | Grupo para o teste de remocao em lote     |
 | `E2E Batch Delete 2` | —           | Grupo para o teste de remocao em lote     |

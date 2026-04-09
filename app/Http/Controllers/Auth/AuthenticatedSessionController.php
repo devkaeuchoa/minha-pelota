@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('player.home');
         }
 
-        return redirect()->intended(route('groups.index', absolute: false));
+        return redirect()->intended(route('admin.home', absolute: false));
     }
 
     /**

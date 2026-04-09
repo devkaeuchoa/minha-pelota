@@ -29,12 +29,54 @@ Route::get('/', function () {
         return redirect()->route('player.home');
     }
 
-    return redirect()->route('groups.index');
+    return redirect()->route('admin.home');
 })->name('home');
 
 
 Route::middleware('auth')->group(function () {
     Route::get('/home/player', [PlayerHomeController::class, 'index'])->name('player.home');
+    Route::get('/home/admin', function () {
+        /** @var \App\Models\Player|null $user */
+        $user = Auth::user();
+        abort_unless($user, 401);
+        abort_unless((bool) ($user->is_admin ?? false), 403);
+
+        $ownedGroups = Group::query()
+            ->where('owner_player_id', $user->id)
+            ->get(['id']);
+
+        $ownedGroupIds = $ownedGroups->pluck('id')->all();
+
+        $lastMatch = \App\Models\Game::query()
+            ->whereIn('group_id', $ownedGroupIds)
+            ->where('scheduled_at', '<=', now())
+            ->orderByDesc('scheduled_at')
+            ->first();
+
+        $nextMatch = \App\Models\Game::query()
+            ->whereIn('group_id', $ownedGroupIds)
+            ->where('scheduled_at', '>', now())
+            ->orderBy('scheduled_at')
+            ->first();
+
+        $pastMatchesCount = \App\Models\Game::query()
+            ->whereIn('group_id', $ownedGroupIds)
+            ->where('scheduled_at', '<=', now())
+            ->count();
+
+        $upcomingMatchesCount = \App\Models\Game::query()
+            ->whereIn('group_id', $ownedGroupIds)
+            ->where('scheduled_at', '>', now())
+            ->count();
+
+        return Inertia::render('Home/Admin', [
+            'ownerGroupsCount' => count($ownedGroupIds),
+            'pastMatchesCount' => $pastMatchesCount,
+            'upcomingMatchesCount' => $upcomingMatchesCount,
+            'lastMatchDate' => $lastMatch?->scheduled_at?->toISOString(),
+            'nextMatchDate' => $nextMatch?->scheduled_at?->toISOString(),
+        ]);
+    })->name('admin.home');
     Route::get('/home/player/groups/{group}', [PlayerHomeController::class, 'showGroup'])
         ->name('player.groups.show');
     Route::post('/home/player/matches/{match}/presence', [PlayerHomeController::class, 'updatePresence'])

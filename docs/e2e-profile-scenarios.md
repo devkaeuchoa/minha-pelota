@@ -6,7 +6,7 @@ Baseado na seção **9. Perfil do jogador** do manual (`docs/manual-test-scenari
 
 - Seed padrão (`DatabaseSeeder`).
 - `password` padrão dos factories: `password`.
-- **Owner** (`11988888888`): edição de perfil e validação de telefone duplicado.
+- **Owner** (`11111111111`): edição de perfil e validação de telefone duplicado.
 - **E2E Profile Password** (`11944444444`): fluxo de alteração de senha.
 - **E2E Profile Delete** (`11955555555`): fluxo de exclusão de conta.
 - **Test Player** (`11999999999`): telefone já usado; usado no teste de unicidade ao editar o owner.

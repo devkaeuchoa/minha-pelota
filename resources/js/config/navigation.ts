@@ -11,7 +11,6 @@ export type AppNavItem = {
 export const PLAYER_ADMIN_NAV_ITEMS: AppNavItem[] = [
   { id: 'home', label: 'HOME', href: route('home') },
   { id: 'groups', label: 'GRUPOS', href: route('groups.index') },
-  { id: 'dates', label: 'DATAS', href: route('dates.index') },
   { id: 'profile', label: 'PERFIL', href: route('profile.edit') },
 ];
 

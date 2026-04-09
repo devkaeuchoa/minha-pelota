@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         $owner = Player::factory()->create([
             'name' => 'Owner Player',
             'nick' => 'owner-player',
-            'phone' => '11988888888',
+            'phone' => '11111111111',
             'is_admin' => true,
         ]);
 

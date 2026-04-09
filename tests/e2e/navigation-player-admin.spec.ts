@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 const SEEDED_PASSWORD = "password";
 const TEST_PLAYER_PHONE = "11999999999";
 const GROUPED_PLAYER_PHONE = "11977777777";
-const OWNER_PHONE = "11988888888";
+const OWNER_PHONE = "11111111111";
 
 async function login(page: Page, phone: string): Promise<void> {
     await page.goto("/login");
@@ -32,16 +32,16 @@ test.describe("Navegacao jogador vs admin", () => {
         await expect(page.getByRole("heading", { name: "HOME DO JOGADOR" })).toBeVisible();
     });
 
-    test("jogador com is_admin cai em grupos apos login", async ({ page }) => {
+    test("jogador com is_admin cai na home do admin apos login", async ({ page }) => {
         await login(page, OWNER_PHONE);
-        await expect(page).toHaveURL(/\/groups$/);
-        await expect(page.getByRole("heading", { name: "1. GRUPOS" })).toBeVisible();
+        await expect(page).toHaveURL(/\/home\/admin$/);
+        await expect(page.getByRole("heading", { name: "HOME DO ADMIN" })).toBeVisible();
     });
 
     test("admin navega entre home do jogador e grupos com menus distintos", async ({ page }) => {
         await login(page, OWNER_PHONE);
-        await expect(page).toHaveURL(/\/groups$/);
-        await expect(page.getByRole("heading", { name: "1. GRUPOS" })).toBeVisible();
+        await expect(page).toHaveURL(/\/home\/admin$/);
+        await expect(page.getByRole("heading", { name: "HOME DO ADMIN" })).toBeVisible();
 
         await page.goto("/home/player");
         await expect(page).toHaveURL(/\/home\/player$/);
@@ -51,5 +51,17 @@ test.describe("Navegacao jogador vs admin", () => {
         await page.getByRole("button", { name: "GRUPOS" }).click();
         await expect(page).toHaveURL(/\/groups$/);
         await expect(page.getByRole("heading", { name: "1. GRUPOS" })).toBeVisible();
+    });
+
+    test("home do admin exibe resumo basico", async ({ page }) => {
+        await login(page, OWNER_PHONE);
+
+        await expect(page).toHaveURL(/\/home\/admin$/);
+        await expect(page.getByRole("heading", { name: "HOME DO ADMIN" })).toBeVisible();
+        await expect(page.getByText("GRUPOS QUE VOCÊ É DONO")).toBeVisible();
+        await expect(page.getByText("ÚLTIMA PARTIDA")).toBeVisible();
+        await expect(page.getByText("PRÓXIMA PARTIDA")).toBeVisible();
+        await expect(page.getByText("QUADRO DE AVISOS")).toBeVisible();
+        await expect(page.getByText("BEM-VINDO! AQUI ESTÁ UM RESUMO RÁPIDO DA SUA GESTÃO.")).toBeVisible();
     });
 });

@@ -8,7 +8,7 @@ Baseado na seção **10. Fluxos de navegação/admin vs jogador** do manual (`do
 - Senha: `password`.
 - **Test Player** (`11999999999`): `is_admin` false, sem grupos — representa “jogador comum” no manual.
 - **Grouped Player** (`11977777777`): membro de grupo, `is_admin` false — reforça que o redirect pós-login usa o flag de plataforma, não só posse de grupo.
-- **Owner Player** (`11988888888`): `is_admin` true — área admin (`/groups` após login).
+- **Owner Player** (`11111111111`): `is_admin` true — área admin (`/groups` após login).
 
 > Nota de produto: o redirect pós-login hoje depende de `Player.is_admin` (área “player-admin”), não de ser owner de um grupo. **Admin No Groups** (`11966666666`) também cai em `/groups`.
 

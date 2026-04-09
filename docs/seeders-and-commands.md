@@ -9,7 +9,7 @@ Este documento lista os seeders atuais do projeto e os comandos para executar ca
 - Seeder base do projeto com fixtures usadas nas suítes E2E gerais.
 - Cria jogadores e grupos de teste como:
   - `Test Player` (`11999999999`)
-  - `Owner Player` (`11988888888`)
+  - `Owner Player` (`11111111111`)
   - `Grouped Player` (`11977777777`)
   - `Admin No Groups` (`11966666666`)
   - grupos `E2E Group`, `E2E Group 2`, `E2E Batch Delete 1`, `E2E Batch Delete 2`
