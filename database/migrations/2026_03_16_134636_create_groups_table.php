@@ -32,7 +32,7 @@ return new class extends Migration
             $table->boolean('join_approval_required')->default(true);
 
             $table->boolean('has_monthly_fee')->default(false);
-            $table->unsignedInteger('monthly_fee_cents')->nullable();
+            $table->float('monthly_fee')->nullable();
             $table->unsignedTinyInteger('payment_day')->nullable();
             $table->string('currency', 3)->default('BRL');
 
