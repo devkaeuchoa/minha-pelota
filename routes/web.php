@@ -4,6 +4,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupMatchController;
 use App\Http\Controllers\GroupMatchGenerationController;
 use App\Http\Controllers\GroupMatchAttendanceController;
+use App\Http\Controllers\GroupMatchPaymentController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\PlayerHomeController;
@@ -11,7 +12,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MatchAttendancePublicController;
 use App\Models\Group;
 use App\Models\Player;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,31 +21,17 @@ Route::get('/', function () {
         return redirect()->route('login');
     }
 
-    /** @var \App\Models\User $user */
+    /** @var \App\Models\Player $user */
     $user = Auth::user();
-    $isOwner = Group::query()->where('owner_id', $user->id)->exists();
-    $isAdminInGroup = $user->groups()->wherePivot('is_admin', true)->exists();
+    $isPlatformAdmin = (bool) ($user->is_admin ?? false);
 
-    if (! $isOwner && ! $isAdminInGroup) {
+    if (! $isPlatformAdmin) {
         return redirect()->route('player.home');
     }
 
     return redirect()->route('groups.index');
 })->name('home');
 
-Route::get('/dashboard', function () {
-    /** @var \App\Models\User|null $user */
-    $user = Auth::user();
-    abort_unless($user, 401);
-
-    $isOwner = Group::query()->where('owner_id', $user->id)->exists();
-    $isAdminInGroup = $user->groups()->wherePivot('is_admin', true)->exists();
-    if (! $isOwner && ! $isAdminInGroup) {
-        return redirect()->route('player.home');
-    }
-
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/home/player', [PlayerHomeController::class, 'index'])->name('player.home');
@@ -55,35 +41,50 @@ Route::middleware('auth')->group(function () {
         ->name('player.home.presence.update');
     Route::post('/home/player/groups/{group}/physical-condition', [PlayerHomeController::class, 'updatePhysicalCondition'])
         ->name('player.home.physical-condition.update');
+    Route::delete('/api/player/groups/{group}/leave', [PlayerHomeController::class, 'leaveGroup'])
+        ->name('api.player.groups.leave');
 
     Route::get('/groups', function () {
+        /** @var \App\Models\Player|null $user */
+        $user = Auth::user();
+        abort_unless($user, 401);
+        abort_unless((bool) ($user->is_admin ?? false), 403);
+
         $groups = Group::query()
-            ->where('owner_id', Auth::id())
+            ->where('owner_player_id', $user->id)
             ->orderByDesc('created_at')
             ->get();
 
+        $groupIds = $groups->pluck('id')->all();
+        $lastFinishedMatch = \App\Models\Game::query()
+            ->whereIn('group_id', $groupIds)
+            ->where('status', 'finished')
+            ->where('scheduled_at', '<=', now())
+            ->orderByDesc('scheduled_at')
+            ->first();
+
         return Inertia::render('Groups/Index', [
-            'groups' => $groups,
+            'groups' => $groups->values()->all(),
+            'lastFinishedMatchForPayments' => $lastFinishedMatch
+                ? [
+                    'group_id' => $lastFinishedMatch->group_id,
+                    'match_id' => $lastFinishedMatch->id,
+                    'scheduled_at' => $lastFinishedMatch->scheduled_at?->toISOString(),
+                ]
+                : null,
         ]);
     })->name('groups.index');
 
     Route::get('/dates', function (\Illuminate\Http\Request $request) {
-        /** @var \App\Models\User|null $user */
+        /** @var \App\Models\Player|null $user */
         $user = Auth::user();
         abort_unless($user, 401);
+        abort_unless((bool) ($user->is_admin ?? false), 403);
 
-        $ownedGroups = Group::query()
-            ->where('owner_id', $user->id)
-            ->get();
-
-        $adminGroups = $user->groups()
-            ->wherePivot('is_admin', true)
-            ->get();
-
-        $groups = $ownedGroups
-            ->merge($adminGroups)
-            ->unique('id')
-            ->sortBy('name')
+        $groups = Group::query()
+            ->where('owner_player_id', $user->id)
+            ->orderBy('name')
+            ->get()
             ->values();
 
         $selectedGroupId = (int) $request->integer('group');
@@ -105,11 +106,13 @@ Route::middleware('auth')->group(function () {
     })->name('dates.index');
 
     Route::get('/groups/create', function () {
+        abort_unless((bool) (Auth::user()?->is_admin ?? false), 403);
         return Inertia::render('Groups/Create');
     })->name('groups.create');
 
     Route::get('/groups/{group}', function (Group $group) {
-        abort_unless($group->owner_id === Auth::id(), 403);
+        abort_unless((bool) (Auth::user()?->is_admin ?? false), 403);
+        abort_unless($group->owner_player_id === Auth::id(), 403);
 
         $players = $group->players()
             ->with('stats')
@@ -144,7 +147,8 @@ Route::middleware('auth')->group(function () {
     })->name('groups.show');
 
     Route::get('/groups/{group}/edit', function (Group $group) {
-        abort_unless($group->owner_id === Auth::id(), 403);
+        abort_unless((bool) (Auth::user()?->is_admin ?? false), 403);
+        abort_unless($group->owner_player_id === Auth::id(), 403);
 
         return Inertia::render('Groups/Edit', [
             'group' => $group,
@@ -152,7 +156,8 @@ Route::middleware('auth')->group(function () {
     })->name('groups.edit');
 
     Route::get('/groups/{group}/players', function (Group $group) {
-        abort_unless($group->owner_id === Auth::id(), 403);
+        abort_unless((bool) (Auth::user()?->is_admin ?? false), 403);
+        abort_unless($group->owner_player_id === Auth::id(), 403);
 
         $groupPlayers = $group->players()
             ->with('stats')
@@ -176,7 +181,6 @@ Route::middleware('auth')->group(function () {
             })
             ->values();
         $availablePlayers = Player::query()
-            ->where('owner_id', Auth::id())
             ->whereNotIn('id', $groupPlayers->pluck('id'))
             ->orderBy('name')
             ->with('stats')
@@ -238,6 +242,18 @@ Route::middleware('auth')->group(function () {
         GroupMatchAttendanceController::class,
         'generateLink',
     ])->name('groups.matches.presence.generate-link');
+    Route::get('/groups/{group}/matches/{match}/payments', [
+        GroupMatchPaymentController::class,
+        'manage',
+    ])->name('groups.matches.payments.manage');
+    Route::post('/groups/{group}/matches/{match}/payments/sync', [
+        GroupMatchPaymentController::class,
+        'sync',
+    ])->name('groups.matches.payments.sync');
+    Route::patch('/groups/{group}/matches/{match}/payments/{player}', [
+        GroupMatchPaymentController::class,
+        'update',
+    ])->name('groups.matches.payments.update');
 
     Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
     Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');
