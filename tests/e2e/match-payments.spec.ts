@@ -55,11 +55,17 @@ test.describe("Pagamentos por partida", () => {
             page.locator('[data-component="retro-table-header-cell"]', { hasText: "STATUS" }),
         ).toBeVisible();
         await expect(
-            page.locator('[data-component="retro-table-header-cell"]', { hasText: "VALOR PAGO (R$)" }),
+            page.locator('[data-component="retro-table-header-cell"]', { hasText: "VALOR A PAGAR (R$)" }),
         ).toBeVisible();
-        await expect(
-            page.locator('[data-component="retro-table-header-cell"]', { hasText: "ISENTO MENSALIDADE" }),
-        ).toBeVisible();
+        const monthlyExemptHeader = page.locator('[data-component="retro-table-header-cell"]', {
+            hasText: "ISENTO MENSALIDADE",
+        });
+        const poolApplyButton = page.getByRole("button", { name: "APLICAR PARA TODOS" });
+        if (await poolApplyButton.isVisible().catch(() => false)) {
+            await expect(monthlyExemptHeader).toHaveCount(0);
+        } else {
+            await expect(monthlyExemptHeader).toBeVisible();
+        }
         await expect(
             page.locator('[data-component="retro-table-header-cell"]', { hasText: "AÇÃO" }),
         ).toBeVisible();

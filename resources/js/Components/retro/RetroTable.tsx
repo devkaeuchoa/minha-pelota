@@ -26,15 +26,16 @@ export function RetroTableHeaderCell({ children }: PropsWithChildren) {
 
 interface RetroTableRowProps extends PropsWithChildren {
   index?: number;
+  className?: string;
 }
 
-export function RetroTableRow({ index, children }: RetroTableRowProps) {
+export function RetroTableRow({ index, className = '', children }: RetroTableRowProps) {
   const isStriped = typeof index === 'number' && index % 2 === 1;
   const base = 'bg-[#0b1340] hover:bg-[#2540a0]';
   const zebra = isStriped ? ' bg-opacity-90' : '';
 
   return (
-    <tr data-component="retro-table-row" className={base + zebra}>
+    <tr data-component="retro-table-row" className={`${base}${zebra} ${className}`}>
       {children}
     </tr>
   );

@@ -20,13 +20,13 @@ class NavigationTest extends TestCase
             ->assertRedirect(route('player.home'));
     }
 
-    public function test_root_redirects_authenticated_admin_to_groups_index(): void
+    public function test_root_redirects_authenticated_admin_to_admin_home(): void
     {
         $admin = Player::factory()->create(['is_admin' => true]);
         Group::factory()->create(['owner_player_id' => $admin->id]);
 
         $this->actingAs($admin)
             ->get(route('home'))
-            ->assertRedirect(route('groups.index'));
+            ->assertRedirect(route('admin.home'));
     }
 }

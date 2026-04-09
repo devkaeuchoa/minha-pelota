@@ -98,6 +98,8 @@ class GroupMatchPaymentController extends Controller
             'group' => [
                 'id' => $group->id,
                 'name' => $group->name,
+                'has_monthly_fee' => (float) ($group->settings?->monthly_fee ?? 0) > 0,
+                'monthly_fee' => (float) ($group->settings?->monthly_fee ?? 0),
             ],
             'match' => [
                 'id' => $match->id,
@@ -131,7 +133,14 @@ class GroupMatchPaymentController extends Controller
             ->where('status', 'going')
             ->exists();
         abort_unless($confirmedAttendanceExists, 422, 'Player is not confirmed for this match.');
-        abort_unless($match->status === 'finished', 422, 'Match must be finished before payment updates.');
+        if ($match->status !== 'finished') {
+            return redirect()
+                ->route('groups.matches.payments.manage', [
+                    'group' => $group->id,
+                    'match' => $match->id,
+                ])
+                ->with('status', 'Partida deve estar finalizada antes de atualizar pagamentos.');
+        }
 
         $data = $request->validated();
         $isMonthlyExempt = (bool) $data['is_monthly_exempt'];

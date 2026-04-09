@@ -31,7 +31,7 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('player.home', absolute: false));
     }
 
-    public function test_admin_users_are_redirected_to_groups_after_login(): void
+    public function test_admin_users_are_redirected_to_admin_home_after_login(): void
     {
         $admin = Player::factory()->create([
             'is_admin' => true,
@@ -46,10 +46,10 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('groups.index', absolute: false));
+        $response->assertRedirect(route('admin.home', absolute: false));
     }
 
-    public function test_platform_admin_without_owned_group_is_redirected_to_groups(): void
+    public function test_platform_admin_without_owned_group_is_redirected_to_admin_home(): void
     {
         $admin = Player::factory()->create([
             'is_admin' => true,
@@ -61,10 +61,10 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('groups.index', absolute: false));
+        $response->assertRedirect(route('admin.home', absolute: false));
     }
 
-    public function test_platform_admin_with_owned_group_is_redirected_to_groups(): void
+    public function test_platform_admin_with_owned_group_is_redirected_to_admin_home(): void
     {
         $admin = Player::factory()->create([
             'is_admin' => true,
@@ -79,7 +79,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('groups.index', absolute: false));
+        $response->assertRedirect(route('admin.home', absolute: false));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
