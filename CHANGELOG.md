@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.0 — Localization foundation and generic retro components
+
+### Added
+
+- **Frontend localization foundation**:
+  - Locale dictionary structure under `resources/js/locales` with translation lookup and placeholder replacements.
+  - `LocaleProvider` and `useLocale` hook to make translated strings available across the React/Inertia app.
+  - Initial PT-BR keys covering navigation, auth/profile flows, home pages, and reusable retro component labels.
+- **Expanded E2E coverage alignment**:
+  - Updated Playwright scenarios to follow current login redirects and UI navigation states.
+  - Improved selector robustness for dynamic presence/status assertions.
+
+### Changed
+
+- **Retro components made generic (label-driven)**:
+  - `RetroPhysicalConditionScale` no longer owns fixed options/labels and now receives scale options through props.
+  - `RetroPhysicalConditionEmoji` is now presentation-only and receives `emoji` and `ariaLabel` via props.
+  - `RetroMobileNavbar` now receives all UI labels and aria labels through props.
+  - `RetroPlayerList` now receives empty-state text via prop.
+  - `RetroTeamCard` now receives formation label via prop.
+  - `RetroFileInput` now receives browse and empty-file labels via props.
+- **App integration updated for the new generic APIs**:
+  - Screens and layout now pass labels through locale keys instead of relying on component-level hardcoded strings.
+  - Player and match presence pages now map physical condition values outside reusable components.
+
 ## v0.0.3 — Players view, phone auth and match management
 
 ### Added
