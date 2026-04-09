@@ -11,17 +11,18 @@ class GenerateGroupMatchesAction
 {
     public function execute(Group $group, CarbonImmutable $from, CarbonImmutable $until): Collection
     {
-        if ($group->recurrence === 'none') {
+        $settings = $group->settings;
+        if (! $settings || $settings->recurrence === 'none') {
             return collect();
         }
 
         $created = collect();
         $timezone = config('app.timezone');
 
-        $current = $this->alignToWeekday($from, (int) $group->weekday);
+        $current = $this->alignToWeekday($from, (int) $settings->default_weekday);
 
         while ($current->lessThanOrEqualTo($until)) {
-            $dateTimeString = $current->toDateString().' '.$group->time;
+            $dateTimeString = $current->toDateString().' '.substr((string) $settings->default_time, 0, 5);
             $scheduledAt = CarbonImmutable::createFromFormat('Y-m-d H:i', $dateTimeString, $timezone);
 
             if (! Game::where('group_id', $group->id)->where('scheduled_at', $scheduledAt)->exists()) {
@@ -36,7 +37,7 @@ class GenerateGroupMatchesAction
                 );
             }
 
-            $current = $this->nextOccurrence($current, $group->recurrence);
+            $current = $this->nextOccurrence($current, $settings->recurrence);
         }
 
         return $created;

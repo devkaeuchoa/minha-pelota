@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Player;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,13 +39,13 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'nickname' => 'nullable|string|max:120',
-            'phone' => 'required|string|max:20|unique:' . User::class,
+            'phone' => 'required|string|max:20|unique:' . Player::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        $user = Player::create([
             'name' => $request->name,
-            'nickname' => $request->nickname,
+            'nick' => $request->nickname ?? $request->name,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
@@ -68,7 +68,7 @@ class RegisteredUserController extends Controller
             ], 422);
         }
 
-        $isAvailable = ! User::query()->where('phone', $phone)->exists();
+        $isAvailable = ! Player::query()->where('phone', $phone)->exists();
 
         return response()->json([
             'available' => $isAvailable,

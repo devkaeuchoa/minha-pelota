@@ -5,17 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class MatchAttendanceLink extends Model
+class MatchPayment extends Model
 {
     protected $fillable = [
         'match_id',
-        'token',
-        'expires_at',
-        'created_by',
+        'player_id',
+        'payment_status',
+        'paid_amount',
+        'is_monthly_exempt',
     ];
 
     protected $casts = [
-        'expires_at' => 'datetime',
+        'is_monthly_exempt' => 'boolean',
+        'paid_amount' => 'float',
     ];
 
     public function match(): BelongsTo
@@ -23,8 +25,8 @@ class MatchAttendanceLink extends Model
         return $this->belongsTo(Game::class, 'match_id');
     }
 
-    public function creator(): BelongsTo
+    public function player(): BelongsTo
     {
-        return $this->belongsTo(Player::class, 'created_by');
+        return $this->belongsTo(Player::class, 'player_id');
     }
 }

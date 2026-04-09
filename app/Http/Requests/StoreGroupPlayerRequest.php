@@ -9,10 +9,6 @@ class StoreGroupPlayerRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if (app()->environment('local')) {
-            return true;
-        }
-
         return $this->user() !== null;
     }
 
@@ -24,7 +20,7 @@ class StoreGroupPlayerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'player_id' => ['required', 'integer', 'exists:players,id'],
             'is_admin' => ['sometimes', 'boolean'],
         ];
     }

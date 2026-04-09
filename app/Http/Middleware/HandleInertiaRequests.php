@@ -29,10 +29,25 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $canAccessPlayerAdminArea = false;
+
+        if ($user !== null) {
+            $canAccessPlayerAdminArea = (bool) ($user->is_admin ?? false);
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user
+                    ? [
+                        ...$user->toArray(),
+                        'can_access_player_admin_area' => $canAccessPlayerAdminArea,
+                        'home_route' => $canAccessPlayerAdminArea
+                            ? route('groups.index')
+                            : route('player.home'),
+                    ]
+                    : null,
             ],
         ];
     }

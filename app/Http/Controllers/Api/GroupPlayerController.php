@@ -7,7 +7,7 @@ use App\Http\Requests\StoreGroupPlayerRequest;
 use App\Http\Requests\UpdateGroupPlayerRequest;
 use App\Enums\PhysicalCondition;
 use App\Models\Group;
-use App\Models\User;
+use App\Models\Player;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,15 +21,15 @@ class GroupPlayerController extends Controller
         $players = $group->players()
             ->with('groups') // ensure relations available if needed
             ->get()
-            ->map(function (User $user) {
+            ->map(function (Player $player) {
                 return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
+                    'id' => $player->id,
+                    'name' => $player->name,
+                    'phone' => $player->phone,
                     'physical_condition' => PhysicalCondition::normalize(
-                        $user->physical_condition,
+                        $player->physical_condition,
                     )->value,
-                    'is_admin' => (bool) $user->pivot->is_admin,
+                    'is_admin' => (bool) $player->pivot->is_admin,
                 ];
             });
 
@@ -43,89 +43,85 @@ class GroupPlayerController extends Controller
         $data = $request->validated();
 
         abort_if(
-            $group->players()->where('user_id', $data['user_id'])->exists(),
+            $group->players()->where('player_id', $data['player_id'])->exists(),
             Response::HTTP_UNPROCESSABLE_ENTITY,
-            'User is already a member of this group.'
+            'Player is already a member of this group.'
         );
 
-        $group->players()->attach($data['user_id'], [
+        $group->players()->attach($data['player_id'], [
             'is_admin' => $data['is_admin'] ?? false,
         ]);
 
-        $user = User::findOrFail($data['user_id']);
+        $player = Player::findOrFail($data['player_id']);
 
         return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
+            'id' => $player->id,
+            'name' => $player->name,
+            'phone' => $player->phone,
             'physical_condition' => PhysicalCondition::normalize(
-                $user->physical_condition,
+                $player->physical_condition,
             )->value,
             'is_admin' => (bool) ($data['is_admin'] ?? false),
         ], Response::HTTP_CREATED);
     }
 
-    public function update(UpdateGroupPlayerRequest $request, Group $group, User $user): JsonResponse
+    public function update(UpdateGroupPlayerRequest $request, Group $group, Player $player): JsonResponse
     {
         $this->authorizeOwner($request, $group);
 
         abort_unless(
-            $group->players()->where('user_id', $user->id)->exists(),
+            $group->players()->where('player_id', $player->id)->exists(),
             Response::HTTP_NOT_FOUND,
-            'User is not a member of this group.'
+            'Player is not a member of this group.'
         );
 
         $data = $request->validated();
 
         if (array_key_exists('is_admin', $data)) {
-            $group->players()->updateExistingPivot($user->id, [
+            $group->players()->updateExistingPivot($player->id, [
                 'is_admin' => $data['is_admin'],
             ]);
         }
 
         if (array_key_exists('physical_condition', $data)) {
-            $user->physical_condition = PhysicalCondition::normalize(
+            $player->physical_condition = PhysicalCondition::normalize(
                 $data['physical_condition'],
             )->value;
-            $user->save();
+            $player->save();
         }
 
-        $pivot = $group->players()->where('user_id', $user->id)->firstOrFail()->pivot;
+        $pivot = $group->players()->where('player_id', $player->id)->firstOrFail()->pivot;
 
         return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
+            'id' => $player->id,
+            'name' => $player->name,
+            'phone' => $player->phone,
             'physical_condition' => PhysicalCondition::normalize(
-                $user->physical_condition,
+                $player->physical_condition,
             )->value,
             'is_admin' => (bool) $pivot->is_admin,
         ]);
     }
 
-    public function destroy(Request $request, Group $group, User $user): Response
+    public function destroy(Request $request, Group $group, Player $player): Response
     {
         $this->authorizeOwner($request, $group);
 
         abort_unless(
-            $group->players()->where('user_id', $user->id)->exists(),
+            $group->players()->where('player_id', $player->id)->exists(),
             Response::HTTP_NOT_FOUND,
-            'User is not a member of this group.'
+            'Player is not a member of this group.'
         );
 
-        $group->players()->detach($user->id);
+        $group->players()->detach($player->id);
 
         return response()->noContent();
     }
 
     private function authorizeOwner(Request $request, Group $group): void
     {
-        if (app()->environment('local')) {
-            return;
-        }
-
         abort_unless(
-            $group->owner_id === $request->user()->id,
+            (bool) ($request->user()?->is_admin ?? false) && $group->owner_player_id === $request->user()->id,
             Response::HTTP_FORBIDDEN,
             'You are not allowed to manage players for this group.'
         );

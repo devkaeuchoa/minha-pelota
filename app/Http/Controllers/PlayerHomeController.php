@@ -21,10 +21,10 @@ class PlayerHomeController extends Controller
 {
     public function index(Request $request): Response
     {
-        $user = $request->user();
-        abort_unless($user, 401);
+        $player = $request->user();
+        abort_unless($player instanceof Player, 401);
 
-        $group = $user->groups()->orderBy('groups.name')->first();
+        $group = $player->groups()->orderBy('groups.name')->first();
         if (! $group) {
             return Inertia::render('Home/Player', [
                 'hasGroup' => false,
@@ -101,12 +101,6 @@ class PlayerHomeController extends Controller
 
     public function updatePresence(Request $request, Game $match): RedirectResponse
     {
-        $user = $request->user();
-        abort_unless($user, 401);
-
-        $isMember = $user->groups()->where('groups.id', $match->group_id)->exists();
-        abort_unless($isMember, 403);
-
         if ($match->scheduled_at && $match->scheduled_at->isPast()) {
             return redirect()
                 ->route('player.home')
@@ -114,11 +108,7 @@ class PlayerHomeController extends Controller
         }
 
         $player = $this->resolvePlayerForUserInGroup($request, (int) $match->group_id);
-        if (! $player) {
-            return redirect()
-                ->route('player.home')
-                ->with('status', 'Não foi possível identificar seu jogador neste grupo.');
-        }
+        abort_unless($player, 403, 'Não foi possível identificar seu jogador neste grupo.');
 
         $validated = $request->validate([
             'status' => ['required', 'string', 'in:going,not_going,maybe'],
@@ -147,12 +137,6 @@ class PlayerHomeController extends Controller
 
     public function updatePhysicalCondition(Request $request, Group $group): RedirectResponse
     {
-        $user = $request->user();
-        abort_unless($user, 401);
-
-        $isMember = $user->groups()->where('groups.id', $group->id)->exists();
-        abort_unless($isMember, 403);
-
         $validated = $request->validate([
             'physical_condition' => ['required', 'string', 'in:otimo,regular,ruim,machucado,unknown'],
         ]);
@@ -195,12 +179,6 @@ class PlayerHomeController extends Controller
 
     public function showGroup(Request $request, Group $group): Response
     {
-        $user = $request->user();
-        abort_unless($user, 401);
-
-        $isMember = $user->groups()->where('groups.id', $group->id)->exists();
-        abort_unless($isMember, 403);
-
         $player = $this->resolvePlayerForUserInGroup($request, (int) $group->id);
         abort_unless($player, 403, 'Não foi possível identificar seu jogador neste grupo.');
 
@@ -229,17 +207,34 @@ class PlayerHomeController extends Controller
         ]);
     }
 
+    public function leaveGroup(Request $request, Group $group): RedirectResponse
+    {
+        $player = $this->resolvePlayerForUserInGroup($request, (int) $group->id);
+        abort_unless($player, 403);
+
+        if ((int) $group->owner_player_id === (int) $player->id) {
+            return redirect()
+                ->route('player.home')
+                ->with('status', 'Você é dono do grupo. Transfira a gestão antes de sair.');
+        }
+
+        $group->players()->detach($player->id);
+
+        return redirect()
+            ->route('player.home')
+            ->with('status', 'Você saiu do grupo com sucesso.');
+    }
+
     private function resolvePlayerForUserInGroup(Request $request, int $groupId): ?Player
     {
-        $phone = preg_replace('/\D/', '', (string) ($request->user()?->phone ?? ''));
-        if (! $phone) {
+        $authPlayer = $request->user();
+        if (! $authPlayer instanceof Player) {
             return null;
         }
 
-        return Player::query()
-            ->where('phone', $phone)
-            ->whereHas('groups', fn($query) => $query->where('groups.id', $groupId))
-            ->first();
+        $belongsToGroup = $authPlayer->groups()->where('groups.id', $groupId)->exists();
+
+        return $belongsToGroup ? $authPlayer : null;
     }
 
     private function buildTopScorerRanking(

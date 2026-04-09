@@ -9,10 +9,6 @@ class UpdateGroupRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        if (app()->environment('local')) {
-            return true;
-        }
-
         return $this->user() !== null;
     }
 
@@ -28,28 +24,36 @@ class UpdateGroupRequest extends FormRequest
                 'max:150',
                 Rule::unique('groups', 'slug')->ignore($groupId),
             ],
-            'weekday' => ['sometimes', 'integer', 'min:0', 'max:6'],
-            'time' => ['sometimes', 'date_format:H:i'],
             'location_name' => ['sometimes', 'string', 'max:150'],
             'status' => ['sometimes', 'string', 'max:20'],
+            'weekday' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:6'],
+            'time' => ['sometimes', 'nullable', 'date_format:H:i'],
             'recurrence' => ['sometimes', 'string', 'in:none,weekly,biweekly,monthly'],
             'max_players' => ['nullable', 'integer', 'min:0', 'max:255'],
             'max_guests' => ['nullable', 'integer', 'min:0', 'max:255'],
             'allow_guests' => ['boolean'],
             'default_match_duration_minutes' => ['nullable', 'integer', 'min:0', 'max:65535'],
             'join_mode' => ['sometimes', 'string', 'max:20'],
-            'invite_code' => [
-                'nullable',
-                'string',
-                'max:50',
-                Rule::unique('groups', 'invite_code')->ignore($groupId),
-            ],
             'join_approval_required' => ['boolean'],
-            'has_monthly_fee' => ['boolean'],
-            'monthly_fee_cents' => ['nullable', 'integer', 'min:0'],
+            'monthly_fee' => ['nullable', 'numeric', 'min:0'],
+            'drop_in_fee' => ['nullable', 'numeric', 'min:0'],
             'payment_day' => ['nullable', 'integer', 'min:1', 'max:31'],
             'currency' => ['sometimes', 'string', 'size:3'],
         ];
     }
-}
 
+    protected function prepareForValidation(): void
+    {
+        $payload = [];
+        if (! $this->has('weekday') && $this->has('default_weekday')) {
+            $payload['weekday'] = $this->input('default_weekday');
+        }
+        if (! $this->has('time') && $this->has('default_time')) {
+            $payload['time'] = $this->input('default_time');
+        }
+
+        if ($payload !== []) {
+            $this->merge($payload);
+        }
+    }
+}

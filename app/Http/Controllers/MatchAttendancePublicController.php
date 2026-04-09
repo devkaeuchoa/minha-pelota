@@ -13,7 +13,7 @@ use Inertia\Response;
 
 class MatchAttendancePublicController extends Controller
 {
-    public function show(string $token): Response
+    public function show(Request $request, string $token): Response
     {
         $link = MatchAttendanceLink::query()->where('token', $token)->first();
         abort_unless($link, 404);
@@ -24,6 +24,7 @@ class MatchAttendancePublicController extends Controller
         return Inertia::render('Presence/Mark', [
             'token' => $token,
             'expired' => $expired,
+            'status' => $request->session()->get('status'),
             'group' => [
                 'id' => $match->group_id,
                 'name' => $match->group->name,
@@ -80,4 +81,3 @@ class MatchAttendancePublicController extends Controller
             ->with('status', 'Presença atualizada.');
     }
 }
-

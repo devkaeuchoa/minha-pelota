@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
+use App\Models\Player;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -23,7 +23,7 @@ class ProfileUpdateRequest extends FormRequest
                 'required',
                 'string',
                 'max:20',
-                Rule::unique(User::class, 'phone')->ignore($this->user()->id),
+                Rule::unique(Player::class, 'phone')->ignore($this->user()->id),
             ],
         ];
     }

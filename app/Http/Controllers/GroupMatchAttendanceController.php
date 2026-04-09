@@ -95,7 +95,7 @@ class GroupMatchAttendanceController extends Controller
             'match_id' => $match->id,
             'token' => $token,
             'expires_at' => $match->scheduled_at,
-            'created_by' => $request->user()?->id,
+            'created_by' => null,
         ]);
 
         return redirect()
@@ -108,12 +108,8 @@ class GroupMatchAttendanceController extends Controller
 
     private function authorizeOwner(Request $request, Group $group): void
     {
-        if (app()->environment('local')) {
-            return;
-        }
-
         abort_unless(
-            $group->owner_id === $request->user()->id,
+            (bool) ($request->user()?->is_admin ?? false) && $group->owner_player_id === $request->user()->id,
             403,
             'You are not allowed to manage this group.'
         );

@@ -7,7 +7,6 @@ use App\Http\Requests\StoreGroupRequest;
 use App\Http\Requests\UpdateGroupRequest;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -18,9 +17,7 @@ class GroupController extends Controller
     {
         $query = Group::query()->orderByDesc('created_at');
 
-        if (! app()->environment('local')) {
-            $query->where('owner_id', $request->user()->id);
-        }
+        $query->where('owner_player_id', $request->user()->id);
 
         $groups = $query->paginate(
             perPage: (int) $request->integer('per_page', 15),
@@ -32,18 +29,33 @@ class GroupController extends Controller
 
     public function store(StoreGroupRequest $request): JsonResponse
     {
+        abort_unless((bool) ($request->user()?->is_admin ?? false), Response::HTTP_FORBIDDEN, 'Only admins can own groups.');
+
         $data = $request->validated();
+        $weekday = (int) ($data['weekday'] ?? 0);
+        $time = (string) ($data['time'] ?? '20:00');
+        $recurrence = (string) ($data['recurrence'] ?? 'weekly');
+        $settingsData = [
+            'monthly_fee' => (float) ($data['monthly_fee'] ?? 0),
+            'drop_in_fee' => (float) ($data['drop_in_fee'] ?? 0),
+            'default_weekday' => $weekday,
+            'default_time' => $time,
+            'recurrence' => $recurrence,
+        ];
 
-        if (app()->environment('local')) {
-            $data['owner_id'] = $request->user()?->id ?? User::firstOrCreate(
-                ['email' => 'dev@localhost.dev'],
-                ['name' => 'Dev User', 'password' => bcrypt('password')]
-            )->id;
-        } else {
-            $data['owner_id'] = $request->user()->id;
-        }
+        unset(
+            $data['monthly_fee'],
+            $data['drop_in_fee'],
+            $data['recurrence']
+        );
+        $data['weekday'] = $weekday;
+        $data['time'] = $time;
+        $data['recurrence'] = $recurrence;
 
+        $data['owner_player_id'] = $request->user()->id;
         $group = Group::create($data);
+        $group->players()->syncWithoutDetaching([$request->user()->id]);
+        $group->settings()->updateOrCreate([], $settingsData);
 
         return (new GroupResource($group))
             ->response()
@@ -61,7 +73,36 @@ class GroupController extends Controller
     {
         $this->authorizeOwner($request, $group);
 
-        $group->update($request->validated());
+        $data = $request->validated();
+        $settingsData = [];
+
+        foreach (['monthly_fee', 'drop_in_fee', 'weekday', 'time', 'recurrence'] as $key) {
+            if (array_key_exists($key, $data)) {
+                $settingsData[$key] = $data[$key];
+                unset($data[$key]);
+            }
+        }
+        if (array_key_exists('weekday', $settingsData)) {
+            $data['weekday'] = (int) $settingsData['weekday'];
+            $settingsData['default_weekday'] = (int) $settingsData['weekday'];
+            unset($settingsData['weekday']);
+        }
+        if (array_key_exists('time', $settingsData)) {
+            $data['time'] = (string) $settingsData['time'];
+            $settingsData['default_time'] = (string) $settingsData['time'];
+            unset($settingsData['time']);
+        }
+        if (array_key_exists('recurrence', $settingsData)) {
+            $data['recurrence'] = (string) $settingsData['recurrence'];
+        }
+
+        if ($data !== []) {
+            $group->update($data);
+        }
+
+        if ($settingsData !== []) {
+            $group->settings()->updateOrCreate([], $settingsData);
+        }
 
         return response()->json(new GroupResource($group));
     }
@@ -77,15 +118,10 @@ class GroupController extends Controller
 
     private function authorizeOwner(Request $request, Group $group): void
     {
-        if (app()->environment('local')) {
-            return;
-        }
-
         abort_unless(
-            $group->owner_id === $request->user()->id,
+            (bool) ($request->user()?->is_admin ?? false) && $group->owner_player_id === $request->user()->id,
             Response::HTTP_FORBIDDEN,
             'You are not allowed to access this group.'
         );
     }
 }
-

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\MatchAttendance;
 use App\Models\MatchPlayerStat;
-use App\Models\Player;
 use App\Models\PlayerStat;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
@@ -25,10 +24,7 @@ class ProfileController extends Controller
         $user = $request->user();
         abort_unless($user, 401);
 
-        $phone = preg_replace('/\D/', '', (string) $user->phone);
-        $player = $phone
-            ? Player::query()->where('phone', $phone)->first()
-            : null;
+        $player = $user;
 
         $monthStart = CarbonImmutable::now()->startOfMonth();
         $monthEnd = CarbonImmutable::now()->endOfMonth();
@@ -96,7 +92,7 @@ class ProfileController extends Controller
             'status' => session('status'),
             'profileData' => [
                 'name' => $user->name,
-                'nickname' => $user->nickname,
+                'nickname' => $user->nick,
                 'phone' => $user->phone,
             ],
             'groups' => $groups,
@@ -113,7 +109,13 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $payload = $request->validated();
+        if (array_key_exists('nickname', $payload)) {
+            $payload['nick'] = $payload['nickname'];
+            unset($payload['nickname']);
+        }
+
+        $request->user()->fill($payload);
         $request->user()->save();
 
         return Redirect::route('profile.edit');

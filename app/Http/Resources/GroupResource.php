@@ -14,25 +14,29 @@ class GroupResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $settings = $this->settings;
+
         return [
             'id' => $this->id,
-            'owner_id' => $this->owner_id,
+            'owner_player_id' => $this->owner_player_id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'weekday' => $this->weekday,
-            'time' => $this->time,
+            'weekday' => $settings?->default_weekday,
+            'time' => $settings?->default_time,
             'location_name' => $this->location_name,
-            'recurrence' => $this->recurrence,
+            'recurrence' => $settings?->recurrence,
             'status' => $this->status,
             'max_players' => $this->max_players,
             'max_guests' => $this->max_guests,
             'allow_guests' => (bool) $this->allow_guests,
             'default_match_duration_minutes' => $this->default_match_duration_minutes,
             'join_mode' => $this->join_mode,
-            'invite_code' => $this->invite_code,
+            'invite_code' => $settings?->invite_token,
             'join_approval_required' => (bool) $this->join_approval_required,
-            'has_monthly_fee' => (bool) $this->has_monthly_fee,
-            'monthly_fee_cents' => $this->monthly_fee_cents,
+            'has_monthly_fee' => (float) ($settings?->monthly_fee ?? 0) > 0,
+            'monthly_fee' => $settings?->monthly_fee ?? 0,
+            'drop_in_fee' => $settings?->drop_in_fee ?? 0,
+            'invite_expires_at' => $settings?->invite_expires_at,
             'payment_day' => $this->payment_day,
             'currency' => $this->currency,
             'created_at' => $this->created_at,
@@ -41,4 +45,3 @@ class GroupResource extends JsonResource
         ];
     }
 }
-

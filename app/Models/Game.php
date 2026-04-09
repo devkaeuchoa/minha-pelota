@@ -45,6 +45,11 @@ class Game extends Model
         return $this->hasMany(MatchAttendance::class, 'match_id');
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(MatchPayment::class, 'match_id');
+    }
+
     public function matchStats(): HasMany
     {
         return $this->hasMany(MatchPlayerStat::class, 'match_id');

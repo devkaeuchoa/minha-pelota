@@ -87,12 +87,8 @@ class PlayerController extends Controller
 
     private function authorizeOwner(Request $request, Group $group): void
     {
-        if (app()->environment('local')) {
-            return;
-        }
-
         abort_unless(
-            $group->owner_id === $request->user()->id,
+            (bool) ($request->user()?->is_admin ?? false) && $group->owner_player_id === $request->user()->id,
             403,
             'You are not allowed to manage players for this group.'
         );

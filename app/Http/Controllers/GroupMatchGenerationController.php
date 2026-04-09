@@ -59,19 +59,12 @@ class GroupMatchGenerationController extends Controller
 
     private function authorizeOwner(Request $request, Group $group): void
     {
-        if (app()->environment('local')) {
-            return;
-        }
-
         $user = $request->user();
-        $isOwner = $group->owner_id === $user->id;
-        $isAdminInGroup = $user->groups()
-            ->where('groups.id', $group->id)
-            ->wherePivot('is_admin', true)
-            ->exists();
+        $isAdmin = (bool) ($user->is_admin ?? false);
+        $isOwner = $group->owner_player_id === $user->id;
 
         abort_unless(
-            $isOwner || $isAdminInGroup,
+            $isAdmin && $isOwner,
             403,
             'You are not allowed to access this group.'
         );

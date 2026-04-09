@@ -6,7 +6,6 @@ use App\Http\Requests\InvitePlayerRequest;
 use App\Models\Group;
 use App\Models\Player;
 use App\Models\PlayerStat;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,14 +16,18 @@ class InviteController extends Controller
 {
     public function show(string $inviteCode): Response
     {
-        $group = Group::where('invite_code', $inviteCode)->firstOrFail();
+        $group = Group::query()
+            ->whereHas('settings', fn($query) => $query->where('invite_token', $inviteCode)->where('invite_expires_at', '>', now()))
+            ->with('settings')
+            ->firstOrFail();
+        $settings = $group->settings;
 
         return Inertia::render('Invite/Accept', [
             'group' => [
                 'id' => $group->id,
                 'name' => $group->name,
-                'weekday' => $group->weekday,
-                'time' => $group->time,
+                'weekday' => $settings?->default_weekday,
+                'time' => $settings?->default_time,
                 'location_name' => $group->location_name,
             ],
             'inviteCode' => $inviteCode,
@@ -33,7 +36,9 @@ class InviteController extends Controller
 
     public function store(InvitePlayerRequest $request, string $inviteCode): RedirectResponse
     {
-        $group = Group::where('invite_code', $inviteCode)->firstOrFail();
+        $group = Group::query()
+            ->whereHas('settings', fn($query) => $query->where('invite_token', $inviteCode)->where('invite_expires_at', '>', now()))
+            ->firstOrFail();
 
         $data = $request->validated();
 
@@ -49,14 +54,7 @@ class InviteController extends Controller
         PlayerStat::ensureForPlayer((int) $player->id);
 
         if (! $group->players()->where('player_id', $player->id)->exists()) {
-            $group->players()->attach($player->id);
-        }
-
-        $user = User::query()->where('phone', $data['phone'])->first();
-        if ($user && ! $user->groups()->where('groups.id', $group->id)->exists()) {
-            $user->groups()->attach($group->id, [
-                'is_admin' => false,
-            ]);
+            $group->players()->attach($player->id, ['is_admin' => false]);
         }
 
         return redirect()->route('invite.success', $inviteCode);
@@ -64,7 +62,9 @@ class InviteController extends Controller
 
     public function phoneAvailability(Request $request, string $inviteCode): JsonResponse
     {
-        $group = Group::where('invite_code', $inviteCode)->firstOrFail();
+        $group = Group::query()
+            ->whereHas('settings', fn($query) => $query->where('invite_token', $inviteCode)->where('invite_expires_at', '>', now()))
+            ->firstOrFail();
         $phone = preg_replace('/\D/', '', (string) $request->query('phone', ''));
 
         if ($phone === '' || strlen($phone) < 10) {
@@ -94,7 +94,9 @@ class InviteController extends Controller
 
     public function success(string $inviteCode): Response
     {
-        $group = Group::where('invite_code', $inviteCode)->firstOrFail();
+        $group = Group::query()
+            ->whereHas('settings', fn($query) => $query->where('invite_token', $inviteCode))
+            ->firstOrFail();
 
         return Inertia::render('Invite/Success', [
             'group' => [
