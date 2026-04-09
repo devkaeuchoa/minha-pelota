@@ -30,6 +30,11 @@ export function RetroAppShell({
     id: item.id,
     label: t(item.labelKey),
     onClick: () => router.visit(item.href),
+    children: item.children?.map((child) => ({
+      id: child.id,
+      label: t(child.labelKey),
+      onClick: () => router.visit(child.href),
+    })),
   }));
   const handleLogout = () => {
     router.post(route('logout'));

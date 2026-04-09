@@ -6,6 +6,7 @@ interface RetroNavItem {
   id: string;
   label: string;
   onClick?: () => void;
+  children?: RetroNavItem[];
 }
 
 interface RetroMobileNavbarProps {
@@ -104,37 +105,84 @@ export function RetroMobileNavbar({
 
         <nav className="relative z-20 flex flex-1 flex-col gap-4 overflow-y-auto p-4">
           {items.map((item) => {
-            const isActive = item.id === activeId;
+            const hasChildren = Boolean(item.children && item.children.length > 0);
+            const hasActiveChild = Boolean(item.children?.some((child) => child.id === activeId));
+            const isActive = item.id === activeId || hasActiveChild;
 
             if (isActive) {
               return (
-                <div key={item.id} className="relative flex w-full items-center">
-                  <span className="pointer-events-none absolute left-2 text-3xl text-[#ffd700] retro-text-shadow animate-[pulse_1s_ease-in-out_infinite]">
-                    ▶
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleItemClick(item)}
-                    className="w-full border-highlight-green bg-[#1e348c] py-4 text-3xl font-bold tracking-widest text-[#ffd700] retro-text-shadow focus:outline-none"
-                  >
-                    {item.label}
-                  </button>
-                  <span className="pointer-events-none absolute right-2 text-3xl text-[#ffd700] retro-text-shadow animate-[pulse_1s_ease-in-out_infinite]">
-                    ◀
-                  </span>
+                <div key={item.id} className="flex w-full flex-col gap-2">
+                  <div className="relative flex w-full items-center">
+                    <span className="pointer-events-none absolute left-2 text-3xl text-[#ffd700] retro-text-shadow animate-[pulse_1s_ease-in-out_infinite]">
+                      ▶
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleItemClick(item)}
+                      className="w-full border-highlight-green bg-[#1e348c] py-4 text-3xl font-bold tracking-widest text-[#ffd700] retro-text-shadow focus:outline-none"
+                    >
+                      {item.label}
+                    </button>
+                    <span className="pointer-events-none absolute right-2 text-3xl text-[#ffd700] retro-text-shadow animate-[pulse_1s_ease-in-out_infinite]">
+                      ◀
+                    </span>
+                  </div>
+                  {hasChildren ? (
+                    <div className="ml-4 flex flex-col gap-2 border-l-2 border-[#4060c0] pl-3">
+                      {item.children?.map((child) => {
+                        const isChildActive = child.id === activeId;
+                        return (
+                          <button
+                            key={child.id}
+                            type="button"
+                            onClick={() => handleItemClick(child)}
+                            className={`w-full border-2 border-[#4060c0] py-2 text-left text-xl tracking-widest retro-text-shadow ${
+                              isChildActive
+                                ? 'bg-[#1e348c] text-[#ffd700]'
+                                : 'bg-[#1e348c] text-[#a0b0ff] hover:bg-[#2540a0] hover:text-white'
+                            }`}
+                          >
+                            {child.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
                 </div>
               );
             }
 
             return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleItemClick(item)}
-                className="w-full border-2 border-[#4060c0] bg-[#1e348c] py-3 text-2xl tracking-widest text-white shadow-[2px_2px_0_#000] retro-text-shadow transition-colors focus:outline-none focus:border-[#ffd700] hover:bg-[#2540a0] hover:border-[#5a7add]"
-              >
-                {item.label}
-              </button>
+              <div key={item.id} className="flex w-full flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleItemClick(item)}
+                  className="w-full border-2 border-[#4060c0] bg-[#1e348c] py-3 text-2xl tracking-widest text-white shadow-[2px_2px_0_#000] retro-text-shadow transition-colors focus:outline-none focus:border-[#ffd700] hover:bg-[#2540a0] hover:border-[#5a7add]"
+                >
+                  {item.label}
+                </button>
+                {hasChildren ? (
+                  <div className="ml-4 flex flex-col gap-2 border-l-2 border-[#4060c0] pl-3">
+                    {item.children?.map((child) => {
+                      const isChildActive = child.id === activeId;
+                      return (
+                        <button
+                          key={child.id}
+                          type="button"
+                          onClick={() => handleItemClick(child)}
+                          className={`w-full border-2 border-[#4060c0] py-2 text-left text-xl tracking-widest retro-text-shadow ${
+                            isChildActive
+                              ? 'bg-[#1e348c] text-[#ffd700]'
+                              : 'bg-[#1e348c] text-[#a0b0ff] hover:bg-[#2540a0] hover:text-white'
+                          }`}
+                        >
+                          {child.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
             );
           })}
         </nav>

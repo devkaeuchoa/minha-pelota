@@ -6,11 +6,21 @@ export type AppNavItem = {
   id: string;
   labelKey: string;
   href: string;
+  children?: AppNavItem[];
 };
 
 export const PLAYER_ADMIN_NAV_ITEMS: AppNavItem[] = [
   { id: 'home', labelKey: 'common.home', href: route('home') },
-  { id: 'groups', labelKey: 'common.groups', href: route('groups.index') },
+  {
+    id: 'groups',
+    labelKey: 'common.groups',
+    href: route('groups.index'),
+    children: [
+      { id: 'groups.index', labelKey: 'groups.viewAll', href: route('groups.index') },
+      { id: 'groups.create', labelKey: 'groups.newGroup', href: route('groups.create') },
+      { id: 'dates', labelKey: 'common.dates', href: route('dates.index') },
+    ],
+  },
   { id: 'profile', labelKey: 'common.profile', href: route('profile.edit') },
 ];
 

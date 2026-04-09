@@ -1,6 +1,7 @@
 const ptBR = {
   'common.home': 'HOME',
   'common.groups': 'GRUPOS',
+  'common.dates': 'DATAS',
   'common.profile': 'PERFIL',
   'common.logout': 'LOG OUT',
   'common.guest': 'Visitante',
@@ -38,6 +39,7 @@ const ptBR = {
   'profile.deleteAccountConfirmButton': 'Excluir conta',
   'groups.selection': 'SELEÇÃO',
   'groups.selected': 'SELECIONADOS',
+  'groups.viewAll': 'VER TODOS',
   'groups.removeSelected': 'REMOVER SELECIONADOS',
   'groups.newGroup': 'NOVO GRUPO',
   'groups.lastMatchPayments': 'PAGAMENTOS ÚLTIMA PARTIDA',

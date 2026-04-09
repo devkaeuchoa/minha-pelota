@@ -1,9 +1,11 @@
 import { useLocale } from '@/hooks/useLocale';
+import { useState } from 'react';
 
 interface RetroNavItem {
   id: string;
   label: string;
   onClick?: () => void;
+  children?: RetroNavItem[];
 }
 
 interface RetroDesktopNavbarProps {
@@ -22,6 +24,7 @@ export function RetroDesktopNavbar({
   onLogout,
 }: RetroDesktopNavbarProps) {
   const { t } = useLocale();
+  const [openSubmenuId, setOpenSubmenuId] = useState<string | null>(null);
   return (
     <header data-component="retro-desktop-navbar" className="relative z-40 w-full">
       <div className="retro-bg-metallic retro-border-emboss flex items-center justify-between px-3 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.7)]">
@@ -50,31 +53,97 @@ export function RetroDesktopNavbar({
 
           <ul className="flex h-fit w-full flex-row gap-4 lg:gap-6">
             {items.map((item) => {
-              const isActive = item.id === activeId;
+              const hasChildren = Boolean(item.children && item.children.length > 0);
+              const hasActiveChild = Boolean(item.children?.some((child) => child.id === activeId));
+              const isActive = item.id === activeId || hasActiveChild;
 
               if (isActive) {
                 return (
-                  <li key={item.id} className="flex flex-1">
+                  <li key={item.id} className="relative flex flex-1">
                     <button
                       type="button"
-                      onClick={item.onClick}
+                      onClick={() => {
+                        if (hasChildren) {
+                          setOpenSubmenuId((current) => (current === item.id ? null : item.id));
+                          return;
+                        }
+                        item.onClick?.();
+                      }}
                       className="flex w-full h-10 cursor-default items-center border-2 border-[#4060c0] justify-center bg-[#1e348c] text-lg font-bold tracking-wider text-[#ffd700] retro-text-shadow shadow-[4px_4px_0_#000]"
+                      aria-expanded={hasChildren ? openSubmenuId === item.id : undefined}
                     >
-                      {item.label}
+                      <span>{item.label}</span>
+                      {hasChildren ? (
+                        <span className="ml-2 text-sm">
+                          {openSubmenuId === item.id ? '▴' : '▾'}
+                        </span>
+                      ) : null}
                     </button>
+                    {hasChildren && openSubmenuId === item.id ? (
+                      <div className="absolute left-0 top-full z-50 mt-1 flex min-w-full flex-col gap-1 border-2 border-[#4060c0] bg-[#0b1340] p-2 shadow-[4px_4px_0_#000]">
+                        {item.children?.map((child) => {
+                          const isChildActive = child.id === activeId;
+                          return (
+                            <button
+                              key={child.id}
+                              type="button"
+                              onClick={child.onClick}
+                              className={`w-full border-2 border-[#4060c0] px-3 py-2 text-left text-base tracking-wider retro-text-shadow transition-colors ${
+                                isChildActive
+                                  ? 'bg-[#1e348c] text-[#ffd700]'
+                                  : 'bg-[#1e348c] text-[#a0b0ff] hover:bg-[#2540a0] hover:text-white'
+                              }`}
+                            >
+                              {child.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </li>
                 );
               }
 
               return (
-                <li key={item.id} className="flex flex-1">
+                <li key={item.id} className="relative flex flex-1">
                   <button
                     type="button"
-                    onClick={item.onClick}
+                    onClick={() => {
+                      if (hasChildren) {
+                        setOpenSubmenuId((current) => (current === item.id ? null : item.id));
+                        return;
+                      }
+                      item.onClick?.();
+                    }}
                     className="flex w-full h-10 items-center justify-center border-2 border-[#4060c0] bg-[#1e348c] text-lg text-[#a0b0ff] retro-text-shadow shadow-[4px_4px_0_#000] transition-all duration-100 hover:bg-[#2540a0] hover:text-white focus:outline-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-[1px_1px_0_#000]"
+                    aria-expanded={hasChildren ? openSubmenuId === item.id : undefined}
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    {hasChildren ? (
+                      <span className="ml-2 text-sm">{openSubmenuId === item.id ? '▴' : '▾'}</span>
+                    ) : null}
                   </button>
+                  {hasChildren && openSubmenuId === item.id ? (
+                    <div className="absolute left-0 top-full z-50 mt-1 flex min-w-full flex-col gap-1 border-2 border-[#4060c0] bg-[#0b1340] p-2 shadow-[4px_4px_0_#000]">
+                      {item.children?.map((child) => {
+                        const isChildActive = child.id === activeId;
+                        return (
+                          <button
+                            key={child.id}
+                            type="button"
+                            onClick={child.onClick}
+                            className={`w-full border-2 border-[#4060c0] px-3 py-2 text-left text-base tracking-wider retro-text-shadow transition-colors ${
+                              isChildActive
+                                ? 'bg-[#1e348c] text-[#ffd700]'
+                                : 'bg-[#1e348c] text-[#a0b0ff] hover:bg-[#2540a0] hover:text-white'
+                            }`}
+                          >
+                            {child.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
                 </li>
               );
             })}
