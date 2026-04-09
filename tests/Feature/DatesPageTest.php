@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
-use App\Models\User;
+use App\Models\Player;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -12,20 +12,14 @@ class DatesPageTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_dates_page_lists_owner_and_admin_groups(): void
+    public function test_dates_page_lists_only_owned_groups(): void
     {
-        $user = User::factory()->create();
+        /** @var Player $user */
+        $user = Player::factory()->create(['is_admin' => true]);
         $ownedGroup = Group::factory()->create([
-            'owner_id' => $user->id,
+            'owner_player_id' => $user->id,
             'name' => 'Owned Group',
         ]);
-
-        $ownerOfAdminGroup = User::factory()->create();
-        $adminGroup = Group::factory()->create([
-            'owner_id' => $ownerOfAdminGroup->id,
-            'name' => 'Admin Group',
-        ]);
-        $user->groups()->attach($adminGroup->id, ['is_admin' => true]);
 
         Group::factory()->create(['name' => 'Unrelated Group']);
 
@@ -33,23 +27,23 @@ class DatesPageTest extends TestCase
             ->get(route('dates.index'))
             ->assertInertia(fn(Assert $page) => $page
                 ->component('Groups/Dates')
-                ->has('groups', 2)
-                ->where('groups.0.name', 'Admin Group')
-                ->where('groups.1.name', 'Owned Group')
-                ->where('selectedGroupId', $adminGroup->id));
+                ->has('groups', 1)
+                ->where('groups.0.name', 'Owned Group')
+                ->where('selectedGroupId', $ownedGroup->id));
 
         $this->assertDatabaseHas('groups', ['id' => $ownedGroup->id]);
     }
 
     public function test_dates_page_respects_selected_group_query_when_group_is_accessible(): void
     {
-        $user = User::factory()->create();
+        /** @var Player $user */
+        $user = Player::factory()->create(['is_admin' => true]);
         $firstGroup = Group::factory()->create([
-            'owner_id' => $user->id,
+            'owner_player_id' => $user->id,
             'name' => 'A Group',
         ]);
         $secondGroup = Group::factory()->create([
-            'owner_id' => $user->id,
+            'owner_player_id' => $user->id,
             'name' => 'B Group',
         ]);
 

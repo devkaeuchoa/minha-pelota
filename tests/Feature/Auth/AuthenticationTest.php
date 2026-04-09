@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Models\User;
+use App\Models\Player;
 use App\Models\Group;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
+        $user = Player::factory()->create();
 
         $response = $this->post('/login', [
             'phone' => $user->phone,
@@ -31,11 +31,46 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('player.home', absolute: false));
     }
 
-    public function test_admin_users_are_redirected_to_dashboard_after_login(): void
+    public function test_admin_users_are_redirected_to_groups_after_login(): void
     {
-        $admin = User::factory()->create();
+        $admin = Player::factory()->create([
+            'is_admin' => true,
+        ]);
         Group::factory()->create([
-            'owner_id' => $admin->id,
+            'owner_player_id' => $admin->id,
+        ]);
+
+        $response = $this->post('/login', [
+            'phone' => $admin->phone,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('groups.index', absolute: false));
+    }
+
+    public function test_platform_admin_without_owned_group_is_redirected_to_groups(): void
+    {
+        $admin = Player::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $response = $this->post('/login', [
+            'phone' => $admin->phone,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('groups.index', absolute: false));
+    }
+
+    public function test_platform_admin_with_owned_group_is_redirected_to_groups(): void
+    {
+        $admin = Player::factory()->create([
+            'is_admin' => true,
+        ]);
+        Group::factory()->create([
+            'owner_player_id' => $admin->id,
         ]);
 
         $response = $this->post('/login', [
@@ -49,7 +84,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        $user = Player::factory()->create();
 
         $this->post('/login', [
             'phone' => $user->phone,
@@ -61,7 +96,8 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_logout(): void
     {
-        $user = User::factory()->create();
+        /** @var Player $user */
+        $user = Player::factory()->create();
 
         $response = $this->actingAs($user)->post('/logout');
 

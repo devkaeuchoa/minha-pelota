@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Group;
 use App\Models\Player;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,8 +13,11 @@ class PlayersTest extends TestCase
 
     private function createOwnerWithGroup(): array
     {
-        $owner = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        $group = Group::factory()->create([
+            'owner_player_id' => $owner->id,
+        ]);
 
         return [$owner, $group];
     }
@@ -97,9 +99,10 @@ class PlayersTest extends TestCase
 
     public function test_player_can_be_in_multiple_groups(): void
     {
-        $owner = User::factory()->create();
-        $group1 = Group::factory()->create(['owner_id' => $owner->id]);
-        $group2 = Group::factory()->create(['owner_id' => $owner->id]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        $group1 = Group::factory()->create(['owner_player_id' => $owner->id]);
+        $group2 = Group::factory()->create(['owner_player_id' => $owner->id]);
 
         $this->actingAs($owner)
             ->post(route('groups.players.store', $group1), [

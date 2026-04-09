@@ -4,7 +4,13 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite",
+        "dev": "php artisan serve & vite",
+        "e2e:server": "concurrently -k \"php artisan serve --host=127.0.0.1 --port=8010\" \"LARAVEL_BYPASS_ENV_CHECK=1 vite --host 127.0.0.1 --port 5180\"",
+        "e2e:install": "PLAYWRIGHT_BROWSERS_PATH=.playwright playwright install chromium",
+        "e2e": "PLAYWRIGHT_BROWSERS_PATH=.playwright playwright test",
+        "e2e:ui": "PLAYWRIGHT_BROWSERS_PATH=.playwright playwright test --ui",
+        "e2e:headed": "PLAYWRIGHT_BROWSERS_PATH=.playwright playwright test --headed",
+        "e2e:report": "PLAYWRIGHT_BROWSERS_PATH=.playwright playwright show-report",
         "lint": "eslint \"resources/js/**/*.{js,jsx,ts,tsx}\"",
         "lint:fix": "eslint \"resources/js/**/*.{js,jsx,ts,tsx}\" --fix",
         "format": "prettier \"resources/js/**/*.{js,jsx,ts,tsx}\" --write",
@@ -13,6 +19,7 @@
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
         "@inertiajs/react": "^2.0.0",
+        "@playwright/test": "^1.58.2",
         "@tailwindcss/forms": "^0.5.3",
         "@tailwindcss/vite": "^4.0.0",
         "@types/node": "^25.5.0",

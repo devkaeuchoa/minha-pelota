@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
+use App\Models\Player;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,7 +12,8 @@ class ProfileTest extends TestCase
 
     public function test_profile_page_is_displayed(): void
     {
-        $user = User::factory()->create();
+        /** @var Player $user */
+        $user = Player::factory()->create();
 
         $response = $this
             ->actingAs($user)
@@ -23,7 +24,8 @@ class ProfileTest extends TestCase
 
     public function test_profile_information_can_be_updated(): void
     {
-        $user = User::factory()->create();
+        /** @var Player $user */
+        $user = Player::factory()->create();
 
         $response = $this
             ->actingAs($user)
@@ -40,34 +42,16 @@ class ProfileTest extends TestCase
         $user->refresh();
 
         $this->assertSame('Test User', $user->name);
-        $this->assertSame('tester', $user->nickname);
+        $this->assertSame('tester', $user->nick);
         $this->assertSame('11999998888', $user->phone);
-    }
-
-    public function test_profile_update_keeps_existing_email_unchanged(): void
-    {
-        $user = User::factory()->create([
-            'email' => 'same-email@example.com',
-        ]);
-
-        $response = $this
-            ->actingAs($user)
-            ->patch('/profile', [
-                'name' => 'Test User',
-                'phone' => $user->phone,
-            ]);
-
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
-
-        $this->assertSame('same-email@example.com', $user->refresh()->email);
     }
 
     public function test_phone_must_be_unique_when_updating_profile(): void
     {
-        $user = User::factory()->create(['phone' => '11999998888']);
-        $otherUser = User::factory()->create(['phone' => '11911112222']);
+        /** @var Player $user */
+        $user = Player::factory()->create(['phone' => '11999998888']);
+        /** @var Player $otherUser */
+        $otherUser = Player::factory()->create(['phone' => '11911112222']);
 
         $response = $this
             ->actingAs($user)
@@ -84,7 +68,8 @@ class ProfileTest extends TestCase
 
     public function test_user_can_delete_their_account(): void
     {
-        $user = User::factory()->create();
+        /** @var Player $user */
+        $user = Player::factory()->create();
 
         $response = $this
             ->actingAs($user)
@@ -102,7 +87,8 @@ class ProfileTest extends TestCase
 
     public function test_correct_password_must_be_provided_to_delete_account(): void
     {
-        $user = User::factory()->create();
+        /** @var Player $user */
+        $user = Player::factory()->create();
 
         $response = $this
             ->actingAs($user)

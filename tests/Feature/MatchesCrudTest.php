@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Game;
 use App\Models\Group;
-use App\Models\User;
+use App\Models\Player;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
@@ -15,9 +15,10 @@ class MatchesCrudTest extends TestCase
 
     public function test_owner_can_create_match(): void
     {
-        $owner = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
             'location_name' => 'Arena Central',
             'default_match_duration_minutes' => 90,
         ]);
@@ -40,9 +41,11 @@ class MatchesCrudTest extends TestCase
 
     public function test_non_owner_cannot_create_match(): void
     {
-        $owner = User::factory()->create();
-        $other = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        /** @var Player $other */
+        $other = Player::factory()->create();
+        $group = Group::factory()->create(['owner_player_id' => $owner->id]);
 
         $response = $this->actingAs($other)->post(route('groups.matches.store', $group), [
             'scheduled_at' => '2026-04-02T19:30',
@@ -54,12 +57,14 @@ class MatchesCrudTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_admin_in_group_can_create_match(): void
+    public function test_non_owner_member_cannot_create_match(): void
     {
-        $owner = User::factory()->create();
-        $admin = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
-        $admin->groups()->attach($group->id, ['is_admin' => true]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        /** @var Player $admin */
+        $admin = Player::factory()->create();
+        $group = Group::factory()->create(['owner_player_id' => $owner->id]);
+        $group->players()->attach($admin->id);
 
         $response = $this->actingAs($admin)->post(route('groups.matches.store', $group), [
             'scheduled_at' => '2026-04-02T19:30',
@@ -68,17 +73,14 @@ class MatchesCrudTest extends TestCase
             'status' => 'scheduled',
         ]);
 
-        $response->assertRedirect(route('groups.show', $group));
-        $this->assertDatabaseHas('matches', [
-            'group_id' => $group->id,
-            'location_name' => 'Arena Norte',
-        ]);
+        $response->assertStatus(403);
     }
 
     public function test_owner_can_update_match(): void
     {
-        $owner = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        $group = Group::factory()->create(['owner_player_id' => $owner->id]);
         $match = Game::query()->create([
             'group_id' => $group->id,
             'scheduled_at' => '2026-04-02 19:30:00',
@@ -108,8 +110,9 @@ class MatchesCrudTest extends TestCase
 
     public function test_owner_can_soft_delete_match_and_it_disappears_from_group_show(): void
     {
-        $owner = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        $group = Group::factory()->create(['owner_player_id' => $owner->id]);
         $match = Game::query()->create([
             'group_id' => $group->id,
             'scheduled_at' => '2026-04-02 19:30:00',
@@ -135,8 +138,9 @@ class MatchesCrudTest extends TestCase
 
     public function test_cannot_create_duplicate_match_datetime_for_same_group(): void
     {
-        $owner = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        $group = Group::factory()->create(['owner_player_id' => $owner->id]);
         Game::query()->create([
             'group_id' => $group->id,
             'scheduled_at' => '2026-04-02 19:30:00',
@@ -160,8 +164,9 @@ class MatchesCrudTest extends TestCase
 
     public function test_can_reuse_datetime_when_previous_match_is_soft_deleted(): void
     {
-        $owner = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        $group = Group::factory()->create(['owner_player_id' => $owner->id]);
         $match = Game::query()->create([
             'group_id' => $group->id,
             'scheduled_at' => '2026-04-02 19:30:00',
@@ -184,9 +189,10 @@ class MatchesCrudTest extends TestCase
 
     public function test_create_match_can_redirect_to_dates_page(): void
     {
-        $owner = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
             'location_name' => 'Arena Central',
             'default_match_duration_minutes' => 90,
         ]);

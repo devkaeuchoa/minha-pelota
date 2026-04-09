@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Group;
 use App\Models\Player;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,11 +11,17 @@ class InviteTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function inviteTokenFor(Group $group): string
+    {
+        return (string) $group->settings()->firstOrFail()->invite_token;
+    }
+
     public function test_invite_page_renders_for_valid_code(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
 
-        $response = $this->get(route('invite.show', $group->invite_code));
+        $response = $this->get(route('invite.show', $token));
 
         $response->assertOk();
     }
@@ -31,15 +36,16 @@ class InviteTest extends TestCase
     public function test_player_can_register_via_invite_link(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
 
-        $response = $this->post(route('invite.store', $group->invite_code), [
+        $response = $this->post(route('invite.store', $token), [
             'name' => 'Carlos',
             'nick' => 'carlao',
             'phone' => '21988776655',
             'rating' => 2,
         ]);
 
-        $response->assertRedirect(route('invite.success', $group->invite_code));
+        $response->assertRedirect(route('invite.success', $token));
 
         $this->assertDatabaseHas('players', [
             'name' => 'Carlos',
@@ -65,8 +71,9 @@ class InviteTest extends TestCase
     public function test_invite_normalizes_phone(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
 
-        $this->post(route('invite.store', $group->invite_code), [
+        $this->post(route('invite.store', $token), [
             'name' => 'Teste',
             'nick' => 'teste',
             'phone' => '(21) 98877-6655',
@@ -80,9 +87,10 @@ class InviteTest extends TestCase
     public function test_invite_reuses_existing_player_by_phone(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
         $existing = Player::factory()->create(['phone' => '21988776655']);
 
-        $this->post(route('invite.store', $group->invite_code), [
+        $this->post(route('invite.store', $token), [
             'name' => 'Outro nome',
             'nick' => 'outro',
             'phone' => '21988776655',
@@ -98,9 +106,10 @@ class InviteTest extends TestCase
     public function test_invite_phone_availability_returns_unavailable_for_existing_phone(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
         Player::factory()->create(['phone' => '21988776655']);
 
-        $response = $this->get(route('invite.phone-availability', $group->invite_code) . '?phone=21988776655');
+        $response = $this->get(route('invite.phone-availability', $token) . '?phone=21988776655');
 
         $response->assertOk();
         $response->assertJson([
@@ -111,8 +120,9 @@ class InviteTest extends TestCase
     public function test_invite_phone_availability_returns_available_for_new_phone(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
 
-        $response = $this->get(route('invite.phone-availability', $group->invite_code) . '?phone=21900000000');
+        $response = $this->get(route('invite.phone-availability', $token) . '?phone=21900000000');
 
         $response->assertOk();
         $response->assertJson([
@@ -123,14 +133,15 @@ class InviteTest extends TestCase
     public function test_duplicate_player_in_same_group_does_not_fail(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
 
-        $this->post(route('invite.store', $group->invite_code), [
+        $this->post(route('invite.store', $token), [
             'name' => 'Carlos',
             'nick' => 'carlao',
             'phone' => '21988776655',
         ]);
 
-        $response = $this->post(route('invite.store', $group->invite_code), [
+        $response = $this->post(route('invite.store', $token), [
             'name' => 'Carlos',
             'nick' => 'carlao',
             'phone' => '21988776655',
@@ -144,8 +155,9 @@ class InviteTest extends TestCase
     public function test_invite_rejects_rating_outside_one_to_five(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
 
-        $response = $this->post(route('invite.store', $group->invite_code), [
+        $response = $this->post(route('invite.store', $token), [
             'name' => 'Carlos',
             'nick' => 'carlao',
             'phone' => '21988776655',
@@ -160,18 +172,18 @@ class InviteTest extends TestCase
 
     public function test_group_gets_invite_code_on_creation(): void
     {
-        $owner = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
-
-        $this->assertNotNull($group->invite_code);
-        $this->assertGreaterThanOrEqual(12, strlen($group->invite_code));
+        $group = Group::factory()->create();
+        $group->load('settings');
+        $this->assertNotNull($group->settings?->invite_token);
+        $this->assertGreaterThanOrEqual(12, strlen((string) $group->settings?->invite_token));
     }
 
     public function test_success_page_renders(): void
     {
         $group = Group::factory()->create();
+        $token = $this->inviteTokenFor($group);
 
-        $response = $this->get(route('invite.success', $group->invite_code));
+        $response = $this->get(route('invite.success', $token));
 
         $response->assertOk();
     }

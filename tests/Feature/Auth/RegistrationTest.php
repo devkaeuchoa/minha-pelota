@@ -16,7 +16,7 @@ class RegistrationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_new_users_can_register(): void
+    public function test_new_players_can_register(): void
     {
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -29,10 +29,12 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('player.home', absolute: false));
 
-        $this->assertDatabaseHas('users', [
+        $this->assertDatabaseHas('players', [
             'name' => 'Test User',
-            'nickname' => 'testinho',
+            'nick' => 'testinho',
             'phone' => '11999999999',
         ]);
+
+        $this->assertAuthenticated();
     }
 }

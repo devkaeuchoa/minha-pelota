@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Group;
-use App\Models\User;
+use App\Models\Player;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,9 +16,10 @@ class MatchesGenerationTest extends TestCase
     {
         CarbonImmutable::setTestNow('2026-03-20 10:00:00');
 
-        $owner = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
             'weekday' => 5, // sexta
             'time' => '20:00',
             'recurrence' => 'weekly',
@@ -36,10 +37,12 @@ class MatchesGenerationTest extends TestCase
 
     public function test_non_owner_cannot_generate_matches(): void
     {
-        $owner = User::factory()->create();
-        $other = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        /** @var Player $other */
+        $other = Player::factory()->create();
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
         ]);
 
         $response = $this->actingAs($other)
@@ -48,34 +51,36 @@ class MatchesGenerationTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_admin_in_group_can_generate_matches(): void
+    public function test_non_owner_member_cannot_generate_matches(): void
     {
-        $owner = User::factory()->create();
-        $admin = User::factory()->create();
+        CarbonImmutable::setTestNow('2026-03-20 10:00:00');
+
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        /** @var Player $member */
+        $member = Player::factory()->create();
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
             'weekday' => 5,
             'time' => '20:00',
             'recurrence' => 'weekly',
         ]);
-        $admin->groups()->attach($group->id, ['is_admin' => true]);
+        $group->players()->syncWithoutDetaching([$member->id]);
 
-        $response = $this->actingAs($admin)
+        $response = $this->actingAs($member)
             ->post(route('groups.matches.generate-current-month', $group));
 
-        $response->assertRedirect(route('groups.show', $group));
-        $this->assertDatabaseHas('matches', [
-            'group_id' => $group->id,
-        ]);
+        $response->assertStatus(403);
     }
 
     public function test_owner_can_generate_matches_for_multiple_months(): void
     {
         CarbonImmutable::setTestNow('2026-03-20 10:00:00');
 
-        $owner = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
             'weekday' => 5,
             'time' => '20:00',
             'recurrence' => 'weekly',
@@ -95,10 +100,12 @@ class MatchesGenerationTest extends TestCase
 
     public function test_non_owner_cannot_generate_matches_for_multiple_months(): void
     {
-        $owner = User::factory()->create();
-        $other = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
+        /** @var Player $other */
+        $other = Player::factory()->create();
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
         ]);
 
         $response = $this->actingAs($other)
@@ -111,9 +118,10 @@ class MatchesGenerationTest extends TestCase
 
     public function test_generate_months_validates_months_range(): void
     {
-        $owner = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
             'weekday' => 5,
             'time' => '20:00',
             'recurrence' => 'weekly',
@@ -133,9 +141,10 @@ class MatchesGenerationTest extends TestCase
     {
         CarbonImmutable::setTestNow('2026-03-20 10:00:00');
 
-        $owner = User::factory()->create();
+        /** @var Player $owner */
+        $owner = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
             'weekday' => 5,
             'time' => '20:00',
             'recurrence' => 'weekly',

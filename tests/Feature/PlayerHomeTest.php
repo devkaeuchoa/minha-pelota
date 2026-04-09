@@ -8,7 +8,6 @@ use App\Models\MatchAttendance;
 use App\Models\MatchPlayerStat;
 use App\Models\Player;
 use App\Models\PlayerConditionHistory;
-use App\Models\User;
 use Carbon\CarbonImmutable;
 use Inertia\Testing\AssertableInertia as Assert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,9 +19,9 @@ class PlayerHomeTest extends TestCase
 
     public function test_player_home_shows_empty_state_when_user_has_no_group(): void
     {
-        $user = User::factory()->create();
+        $player = Player::factory()->create();
 
-        $response = $this->actingAs($user)->get(route('player.home'));
+        $response = $this->actingAs($player)->get(route('player.home'));
 
         $response->assertOk();
         $response->assertInertia(
@@ -87,6 +86,28 @@ class PlayerHomeTest extends TestCase
             'match_id' => $match->id,
             'player_id' => $player->id,
             'status' => 'going',
+        ]);
+    }
+
+    public function test_player_cannot_update_presence_for_past_match(): void
+    {
+        [$user, $group, $player] = $this->createPlayerMemberContext();
+        $match = Game::query()->create([
+            'group_id' => $group->id,
+            'scheduled_at' => now()->subDay(),
+            'location_name' => 'Arena Passada',
+            'status' => 'scheduled',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('player.home.presence.update', $match), [
+            'status' => 'going',
+        ]);
+
+        $response->assertRedirect(route('player.home'));
+        $response->assertSessionHas('status', 'A partida já aconteceu e não aceita novas confirmações.');
+        $this->assertDatabaseMissing('match_attendance', [
+            'match_id' => $match->id,
+            'player_id' => $player->id,
         ]);
     }
 
@@ -157,10 +178,8 @@ class PlayerHomeTest extends TestCase
     {
         CarbonImmutable::setTestNow('2026-04-10 10:00:00');
 
-        $owner = User::factory()->create();
-        $group = Group::factory()->create(['owner_id' => $owner->id]);
-        $user = User::factory()->create(['phone' => '11999999999']);
-        $user->groups()->attach($group->id, ['is_admin' => false]);
+        $owner = Player::factory()->create();
+        $group = Group::factory()->create(['owner_player_id' => $owner->id]);
 
         $playerMain = Player::factory()->create([
             'phone' => '11999999999',
@@ -257,7 +276,7 @@ class PlayerHomeTest extends TestCase
             'ended_at' => '2026-04-03 00:00:00',
         ]);
 
-        $response = $this->actingAs($user)->get(route('player.groups.show', $group));
+        $response = $this->actingAs($playerMain)->get(route('player.groups.show', $group));
 
         $response->assertOk();
         $response->assertInertia(
@@ -310,23 +329,49 @@ class PlayerHomeTest extends TestCase
         ]);
     }
 
+    public function test_player_can_leave_group(): void
+    {
+        [$user, $group, $player] = $this->createPlayerMemberContext();
+
+        $response = $this->actingAs($user)->delete(route('api.player.groups.leave', $group));
+
+        $response->assertRedirect(route('player.home'));
+        $this->assertDatabaseMissing('group_player', [
+            'group_id' => $group->id,
+            'player_id' => $player->id,
+        ]);
+    }
+
+    public function test_group_owner_cannot_leave_own_group(): void
+    {
+        $ownerPlayer = Player::factory()->create();
+        $group = Group::factory()->create([
+            'owner_player_id' => $ownerPlayer->id,
+        ]);
+        $group->players()->syncWithoutDetaching([$ownerPlayer->id]);
+
+        $response = $this->actingAs($ownerPlayer)->delete(route('api.player.groups.leave', $group));
+
+        $response->assertRedirect(route('player.home'));
+        $response->assertSessionHas('status');
+        $this->assertDatabaseHas('group_player', [
+            'group_id' => $group->id,
+            'player_id' => $ownerPlayer->id,
+        ]);
+    }
+
     private function createPlayerMemberContext(): array
     {
-        $owner = User::factory()->create();
+        $owner = Player::factory()->create();
         $group = Group::factory()->create([
-            'owner_id' => $owner->id,
+            'owner_player_id' => $owner->id,
         ]);
-
-        $user = User::factory()->create([
-            'phone' => '11999999999',
-        ]);
-        $user->groups()->attach($group->id, ['is_admin' => false]);
 
         $player = Player::factory()->create([
             'phone' => '11999999999',
         ]);
         $group->players()->attach($player->id);
 
-        return [$user, $group, $player];
+        return [$player, $group, $player];
     }
 }
