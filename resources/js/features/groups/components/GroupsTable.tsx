@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { Group } from '@/types';
-import { getWeekdayLabel } from '@/utils/datetime';
+import { formatTimeHHMM, getWeekdayLabel } from '@/utils/datetime';
 import { resolveGroupPermissions, resolveGroupSettings } from '@/utils/groups';
 import {
   RetroTable,
@@ -50,7 +50,9 @@ export function GroupsTable({ groups, selectedIds, onToggleSelected }: GroupsTab
                   resolveGroupSettings(group).default_weekday ??
                   '-'}
               </RetroTableCell>
-              <RetroTableCell variant="muted">{resolveGroupSettings(group).default_time ?? '-'}</RetroTableCell>
+              <RetroTableCell variant="muted">
+                {formatTimeHHMM(resolveGroupSettings(group).default_time)}
+              </RetroTableCell>
               <RetroTableCell variant="soft">{group.location_name}</RetroTableCell>
               <RetroTableCell className="flex gap-2">
                 <Link

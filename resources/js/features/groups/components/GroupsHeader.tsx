@@ -71,8 +71,6 @@ export function GroupsHeader({
         </div>
       </div>
 
-      <RetroInlineInfo message={t('groups.manageGroupsAndMatches')} />
-
       <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-1 justify-end gap-3">
           {lastFinishedMatchForPayments && canManagePayments ? (

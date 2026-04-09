@@ -128,6 +128,15 @@ export default function PlayerHome({
 
       <RetroSectionHeader title={t('home.player.header')} />
       <RetroInfoCard>
+        <RetroValueDisplay label={t('home.player.group')} value={group?.name ?? '-'} />
+        <RetroValueDisplay
+          label={t('home.player.nextMatch')}
+          value={
+            nextMatch
+              ? formatDateTimePtBr(nextMatch.scheduled_at)
+              : t('home.player.noScheduledMatch')
+          }
+        />
         {status && <RetroInlineInfo message={status} />}
 
         {!hasGroup ? (
@@ -160,43 +169,32 @@ export default function PlayerHome({
               value={physicalCondition}
               onChange={handlePhysicalConditionUpdate}
             />
-            <RetroValueDisplay label={t('home.player.group')} value={group?.name ?? '-'} />
-            <RetroValueDisplay
-              label={t('home.player.nextMatch')}
-              value={
-                nextMatch
-                  ? formatDateTimePtBr(nextMatch.scheduled_at)
-                  : t('home.player.noScheduledMatch')
-              }
-            />
             <RetroValueDisplay
               label={t('home.player.location')}
               value={nextMatch?.location_name ?? '-'}
             />
-            <RetroValueDisplay
-              label={t('home.player.yourPresence')}
-              value={getPresenceLabel(presenceStatus, t)}
-            />
-            <RetroValueDisplay
-              label={t('home.player.yourRating')}
-              value={playerSummary?.rating ? `${playerSummary.rating}/5` : '-'}
-            />
-            <RetroValueDisplay
-              label={t('home.player.goals')}
-              value={String(playerSummary?.stats.goals ?? 0)}
-            />
-            <RetroValueDisplay
-              label={t('home.player.assists')}
-              value={String(playerSummary?.stats.assists ?? 0)}
-            />
-            <RetroValueDisplay
-              label={t('home.player.gamesPlayed')}
-              value={String(playerSummary?.stats.games_played ?? 0)}
-            />
-            <RetroValueDisplay
-              label={t('home.player.gamesMissed')}
-              value={String(playerSummary?.stats.games_missed ?? 0)}
-            />
+            <div className="flex flex-col gap-2 md:flex-row">
+              <RetroValueDisplay
+                label={t('home.player.yourRating')}
+                value={playerSummary?.rating ? `${playerSummary.rating}/5` : '-'}
+              />
+              <RetroValueDisplay
+                label={t('home.player.goals')}
+                value={String(playerSummary?.stats.goals ?? 0)}
+              />
+              <RetroValueDisplay
+                label={t('home.player.assists')}
+                value={String(playerSummary?.stats.assists ?? 0)}
+              />
+              <RetroValueDisplay
+                label={t('home.player.gamesPlayed')}
+                value={String(playerSummary?.stats.games_played ?? 0)}
+              />
+              <RetroValueDisplay
+                label={t('home.player.gamesMissed')}
+                value={String(playerSummary?.stats.games_missed ?? 0)}
+              />
+            </div>
             {group && (
               <div className="flex flex-wrap gap-2">
                 <RetroButton

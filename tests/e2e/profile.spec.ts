@@ -67,8 +67,8 @@ test.describe("Perfil do jogador", () => {
         await pwdInputs.nth(2).fill(NEW_PASSWORD);
         await page.getByRole("button", { name: "ATUALIZAR SENHA" }).click();
 
-        await expect(page.getByRole("button", { name: "SAIR" })).toBeVisible();
-        await page.getByRole("button", { name: "SAIR" }).click();
+        await expect(page.getByRole("button", { name: "LOG OUT" })).toBeVisible();
+        await page.getByRole("button", { name: "LOG OUT" }).click();
         await expect(page).toHaveURL(/\/login$/);
 
         await login(page, PROFILE_PASSWORD_PHONE, "senha-errada");

@@ -81,3 +81,16 @@ export function formatDateTimeLocalInputPtBr(isoDateTime: string): string {
   if (Number.isNaN(date.getTime())) return '';
   return dateTimeInputFormatter.format(date).replace(' ', 'T');
 }
+
+export function formatTimeHHMM(value: string | null | undefined): string {
+  if (!value) return '-';
+
+  const normalized = value.trim();
+  const matched = normalized.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (!matched) return normalized;
+
+  const hours = matched[1].padStart(2, '0');
+  const minutes = matched[2];
+
+  return `${hours}:${minutes}`;
+}

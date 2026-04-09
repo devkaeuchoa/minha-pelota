@@ -1,7 +1,13 @@
-import { Head } from '@inertiajs/react';
+/* global confirm, route */
+import { Head, router } from '@inertiajs/react';
 import { GroupRankingEntry, PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
-import { RetroInfoCard, RetroSectionHeader, RetroValueDisplay } from '@/Components/retro';
+import {
+  RetroButton,
+  RetroInfoCard,
+  RetroSectionHeader,
+  RetroValueDisplay,
+} from '@/Components/retro';
 import { useLocale } from '@/hooks/useLocale';
 
 interface PlayerGroupShowProps extends PageProps {
@@ -25,6 +31,15 @@ interface PlayerGroupShowProps extends PageProps {
 
 export default function PlayerGroupShow({ group, period, rankings }: PlayerGroupShowProps) {
   const { t } = useLocale();
+
+  const handleLeaveGroup = () => {
+    if (!confirm(t('home.player.leaveGroupConfirm'))) return;
+
+    router.delete(route('api.player.groups.leave', { group: group.id }), {
+      preserveScroll: true,
+    });
+  };
+
   return (
     <RetroAppShell activeId="home">
       <Head title={t('home.playerGroupShow.title', { name: group.name })} />
@@ -57,6 +72,11 @@ export default function PlayerGroupShow({ group, period, rankings }: PlayerGroup
             label={t('home.playerGroupShow.neymar')}
             value={formatRankingValue(rankings.neymar, t)}
           />
+          <div className="flex flex-wrap gap-2">
+            <RetroButton type="button" variant="danger" size="sm" onClick={handleLeaveGroup}>
+              {t('home.player.leaveGroup')}
+            </RetroButton>
+          </div>
         </div>
       </RetroInfoCard>
     </RetroAppShell>

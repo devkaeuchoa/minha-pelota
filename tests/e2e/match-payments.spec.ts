@@ -19,7 +19,7 @@ async function loginOwner(page: Page): Promise<void> {
 }
 
 async function logout(page: Page): Promise<void> {
-    await page.getByRole("button", { name: "SAIR" }).click();
+    await page.getByRole("button", { name: "LOG OUT" }).click();
     await expect(page).toHaveURL(/\/login$/);
 }
 

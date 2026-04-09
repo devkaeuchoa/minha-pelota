@@ -1,3 +1,5 @@
+import { useLocale } from '@/hooks/useLocale';
+
 interface RetroNavItem {
   id: string;
   label: string;
@@ -19,6 +21,7 @@ export function RetroDesktopNavbar({
   activeId,
   onLogout,
 }: RetroDesktopNavbarProps) {
+  const { t } = useLocale();
   return (
     <header data-component="retro-desktop-navbar" className="relative z-40 w-full">
       <div className="retro-bg-metallic retro-border-emboss flex items-center justify-between px-3 py-3 shadow-[0_6px_20px_rgba(0,0,0,0.7)]">
@@ -82,7 +85,7 @@ export function RetroDesktopNavbar({
               onClick={onLogout}
               className="mt-1 h-10 w-full border-2 border-[#4060c0] bg-[#1e348c] text-lg font-bold tracking-wider text-[#ff7a7a] retro-text-shadow shadow-[4px_4px_0_#000] transition-all duration-100 hover:bg-[#2540a0] hover:text-white focus:outline-none active:translate-x-[3px] active:translate-y-[3px] active:shadow-[1px_1px_0_#000]"
             >
-              SAIR
+              {t('common.logout')}
             </button>
           ) : null}
         </div>

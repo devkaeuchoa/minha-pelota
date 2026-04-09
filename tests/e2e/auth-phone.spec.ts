@@ -30,7 +30,7 @@ async function login(page: Page, phone: string, password: string): Promise<void>
 }
 
 async function logout(page: Page): Promise<void> {
-    await page.getByRole("button", { name: "SAIR" }).click();
+    await page.getByRole("button", { name: "LOG OUT" }).click();
     await expect(page).toHaveURL(/\/login$/);
 }
 

@@ -33,7 +33,7 @@ test.describe("Registro de jogador", () => {
         await submitRegistration(page);
         await expect(page).toHaveURL(/(\/home\/player|\/groups)$/);
 
-        await page.getByRole("button", { name: "SAIR" }).click();
+        await page.getByRole("button", { name: "LOG OUT" }).click();
         await expect(page).toHaveURL(/\/login$/);
 
         await fillBaseRegistrationForm(page, phone);

@@ -21,6 +21,6 @@ Baseado no cenario manual em `docs/manual-test-scenarios.md` (secao 1).
 ### 4) Logout
 
 - Logar com usuario valido.
-- Acionar `SAIR`.
+- Acionar `LOG OUT`.
 - Tentar acessar uma rota protegida (ex.: `/profile`).
 - Esperado: sessao encerrada e redirecionamento para `/login`.
