@@ -1,8 +1,7 @@
-/* global route */
+/* global confirm, route */
 import { Head, router } from '@inertiajs/react';
 import { PageProps, PhysicalCondition } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
-import { PLAYER_NAV_ITEMS } from '@/config/navigation';
 import { formatDateTimePtBr } from '@/utils/datetime';
 import {
   RetroButton,
@@ -85,6 +84,15 @@ export default function PlayerHome({
     );
   };
 
+  const handleLeaveGroup = () => {
+    if (!group) return;
+    if (!confirm('Tem certeza que deseja sair deste grupo?')) return;
+
+    router.delete(route('api.player.groups.leave', { group: group.id }), {
+      preserveScroll: true,
+    });
+  };
+
   const presenceActions: Array<{ id: Exclude<PresenceStatus, 'pending'>; label: string }> = [
     { id: 'going', label: 'CONFIRMAR' },
     { id: 'maybe', label: 'TALVEZ' },
@@ -97,12 +105,12 @@ export default function PlayerHome({
   );
 
   return (
-    <RetroAppShell activeId="home" items={PLAYER_NAV_ITEMS}>
+    <RetroAppShell activeId="home">
       <Head title="Home do jogador" />
 
       <RetroSectionHeader title="HOME DO JOGADOR" />
       <RetroInfoCard>
-        {status ? <RetroInlineInfo message={status} /> : null}
+        {status && <RetroInlineInfo message={status} />}
 
         {!hasGroup ? (
           <div className="retro-text-shadow text-base text-[#e5e7eb]">
@@ -110,7 +118,7 @@ export default function PlayerHome({
           </div>
         ) : (
           <div className="flex flex-col gap-3">
-            {nextMatch ? (
+            {nextMatch && (
               <div className="flex flex-wrap gap-2">
                 {presenceActions.map((action) => {
                   const isActive = presenceStatus === action.id;
@@ -127,8 +135,11 @@ export default function PlayerHome({
                   );
                 })}
               </div>
-            ) : null}
-
+            )}
+            <RetroPhysicalConditionScale
+              value={physicalCondition}
+              onChange={handlePhysicalConditionUpdate}
+            />
             <RetroValueDisplay label="GRUPO" value={group?.name ?? '-'} />
             <RetroValueDisplay
               label="PRÓXIMA PARTIDA"
@@ -155,20 +166,27 @@ export default function PlayerHome({
               label="JOGOS PERDIDOS"
               value={String(playerSummary?.stats.games_missed ?? 0)}
             />
-            {group ? (
-              <RetroButton
-                type="button"
-                variant="neutral"
-                size="sm"
-                onClick={() => router.visit(route('player.groups.show', { group: group.id }))}
-              >
-                VER DETALHES DO GRUPO
-              </RetroButton>
-            ) : null}
+            {group && (
+              <div className="flex flex-wrap gap-2">
+                <RetroButton
+                  type="button"
+                  variant="neutral"
+                  size="sm"
+                  onClick={() => router.visit(route('player.groups.show', { group: group.id }))}
+                >
+                  VER DETALHES DO GRUPO
+                </RetroButton>
+                <RetroButton type="button" variant="danger" size="sm" onClick={handleLeaveGroup}>
+                  SAIR DO GRUPO
+                </RetroButton>
+              </div>
+            )}
 
             <div className="mt-2 flex flex-col gap-2">
               <span className="retro-text-shadow text-base text-[#a0b0ff]">ESCALAÇÃO</span>
-              <RetroPitch maxPlayers={12} positions={pitchPositions} />
+              <div className="max-w-[500px] w-full mx-auto">
+                <RetroPitch maxPlayers={12} positions={pitchPositions} />
+              </div>
               <div className="flex flex-col gap-1 rounded border-2 border-[#4060c0] bg-[#1e348c] p-2">
                 <span className="retro-text-shadow text-sm text-[#a0b0ff]">
                   CONFIRMADOS ({confirmedPlayers.length})
@@ -186,11 +204,6 @@ export default function PlayerHome({
                 )}
               </div>
             </div>
-
-            <RetroPhysicalConditionScale
-              value={physicalCondition}
-              onChange={handlePhysicalConditionUpdate}
-            />
           </div>
         )}
       </RetroInfoCard>

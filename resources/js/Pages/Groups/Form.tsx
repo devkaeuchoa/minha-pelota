@@ -4,6 +4,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import { Group, PageProps } from '@/types';
 import { slugifyKebab } from '@/utils/slug';
+import { resolveGroupSettings } from '@/utils/groups';
 import {
   RetroButton,
   RetroFormField,
@@ -40,12 +41,13 @@ interface FormProps extends PageProps {
 }
 
 export default function Form({ group, submitUrl, method, title }: FormProps) {
+  const settings = group ? resolveGroupSettings(group) : null;
   const { data, setData, post, put, processing, errors } = useForm({
     name: group?.name ?? '',
     slug: group?.slug ?? '',
-    weekday: group?.weekday?.toString() ?? '',
-    recurrence: group?.recurrence ?? 'weekly',
-    time: group?.time ?? '',
+    weekday: settings?.default_weekday?.toString() ?? '',
+    recurrence: settings?.recurrence ?? 'weekly',
+    time: settings?.default_time ?? '',
     location_name: group?.location_name ?? '',
   });
 

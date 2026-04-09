@@ -1,9 +1,10 @@
 /* global route */
 
 import { PropsWithChildren } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { RetroDesktopNavbar, RetroLayout, RetroMobileNavbar } from '@/Components/retro';
-import { APP_NAV_ITEMS, AppNavItem } from '@/config/navigation';
+import { AppNavItem, getDefaultNavItemsForUser } from '@/config/navigation';
+import { PageProps } from '@/types';
 
 interface RetroAppShellProps extends PropsWithChildren {
   title?: string;
@@ -19,7 +20,9 @@ export function RetroAppShell({
   items,
   children,
 }: RetroAppShellProps) {
-  const navItems = (items ?? APP_NAV_ITEMS).map((item) => ({
+  const page = usePage<PageProps>();
+  const defaultItems = getDefaultNavItemsForUser(page.props.auth?.user);
+  const navItems = (items ?? defaultItems).map((item) => ({
     id: item.id,
     label: item.label,
     onClick: () => router.visit(item.href),

@@ -14,6 +14,7 @@ import {
   RetroSectionHeader,
 } from '@/Components/retro';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
+import { resolveGroupPermissions, resolveGroupSettings } from '@/utils/groups';
 
 interface ShowProps extends PageProps {
   group: Group;
@@ -23,6 +24,8 @@ interface ShowProps extends PageProps {
 
 export default function Show({ group, players, matches }: ShowProps) {
   const { invite, playersSection, settings } = useGroupShowController(group, players, matches);
+  const permissions = resolveGroupPermissions(group, true);
+  const groupSettings = resolveGroupSettings(group);
   const nextMatch =
     matches.find(
       (match) => match.status === 'scheduled' && new Date(match.scheduled_at) >= new Date(),
@@ -40,8 +43,9 @@ export default function Show({ group, players, matches }: ShowProps) {
             groupId={settings.groupId}
             deleteProcessing={settings.deleteProcessing}
             onDeleteGroup={settings.onDeleteGroup}
+            canManageGroup={permissions.can_manage_group}
           />
-          {nextMatch && (
+          {nextMatch && permissions.can_manage_attendance ? (
             <RetroButton
               variant="neutral"
               size="sm"
@@ -54,11 +58,11 @@ export default function Show({ group, players, matches }: ShowProps) {
             >
               VER ESCALAÇÃO
             </RetroButton>
-          )}
+          ) : null}
         </div>
       </RetroInfoCard>
 
-      {group.recurrence !== 'none' && (
+      {groupSettings.recurrence !== 'none' && permissions.can_manage_matches && (
         <RetroAccordion title="3. GERAR DATAS" defaultOpen={false}>
           <GroupMatchesQuickActionsSection
             matches={matches}
@@ -75,23 +79,27 @@ export default function Show({ group, players, matches }: ShowProps) {
         </RetroAccordion>
       )}
 
-      <RetroAccordion title="4. CONVITE" defaultOpen={false}>
-        <GroupInviteSection
-          inviteUrl={invite.inviteUrl}
-          processing={invite.processing}
-          onGenerateInvite={invite.onGenerate}
-        />
-      </RetroAccordion>
+      {permissions.can_manage_invites ? (
+        <RetroAccordion title="4. CONVITE" defaultOpen={false}>
+          <GroupInviteSection
+            inviteUrl={invite.inviteUrl}
+            processing={invite.processing}
+            onGenerateInvite={invite.onGenerate}
+          />
+        </RetroAccordion>
+      ) : null}
 
       <RetroAccordion title={`5. JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
-        <RetroButton
-          type="button"
-          variant="success"
-          size="md"
-          onClick={() => router.visit(route('groups.players', { group: group.id }))}
-        >
-          GERENCIAR JOGADORES
-        </RetroButton>
+        {permissions.can_manage_players ? (
+          <RetroButton
+            type="button"
+            variant="success"
+            size="md"
+            onClick={() => router.visit(route('groups.players', { group: group.id }))}
+          >
+            GERENCIAR JOGADORES
+          </RetroButton>
+        ) : null}
         <RetroRosterGrid players={playersSection.players} />
       </RetroAccordion>
     </RetroAppShell>

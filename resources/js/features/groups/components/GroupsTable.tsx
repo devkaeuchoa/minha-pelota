@@ -1,5 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Group } from '@/types';
+import { getWeekdayLabel } from '@/utils/datetime';
+import { resolveGroupPermissions, resolveGroupSettings } from '@/utils/groups';
 import {
   RetroTable,
   RetroTableHeaderCell,
@@ -32,15 +34,23 @@ export function GroupsTable({ groups, selectedIds, onToggleSelected }: GroupsTab
           {groups.map((group, index) => (
             <RetroTableRow key={group.id} index={index}>
               <RetroTableCell>
-                <input
-                  type="checkbox"
-                  checked={selectedIds.has(group.id)}
-                  onChange={() => onToggleSelected(group.id)}
-                />
+                {resolveGroupPermissions(group, true).can_manage_group ? (
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(group.id)}
+                    onChange={() => onToggleSelected(group.id)}
+                  />
+                ) : (
+                  '-'
+                )}
               </RetroTableCell>
               <RetroTableCell variant="strong">{group.name}</RetroTableCell>
-              <RetroTableCell variant="muted">{group.weekday}</RetroTableCell>
-              <RetroTableCell variant="muted">{group.time}</RetroTableCell>
+              <RetroTableCell variant="muted">
+                {getWeekdayLabel(resolveGroupSettings(group).default_weekday) ??
+                  resolveGroupSettings(group).default_weekday ??
+                  '-'}
+              </RetroTableCell>
+              <RetroTableCell variant="muted">{resolveGroupSettings(group).default_time ?? '-'}</RetroTableCell>
               <RetroTableCell variant="soft">{group.location_name}</RetroTableCell>
               <RetroTableCell className="flex gap-2">
                 <Link
@@ -49,12 +59,14 @@ export function GroupsTable({ groups, selectedIds, onToggleSelected }: GroupsTab
                 >
                   Ver
                 </Link>{' '}
-                <Link
-                  href={`/groups/${group.id}/edit`}
-                  className="text-[#ffd700] hover:underline underline-offset-2 px-4"
-                >
-                  Editar
-                </Link>
+                {resolveGroupPermissions(group, true).can_manage_group ? (
+                  <Link
+                    href={`/groups/${group.id}/edit`}
+                    className="text-[#ffd700] hover:underline underline-offset-2 px-4"
+                  >
+                    Editar
+                  </Link>
+                ) : null}
               </RetroTableCell>
             </RetroTableRow>
           ))}

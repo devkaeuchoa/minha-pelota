@@ -5,13 +5,19 @@ interface GroupSettingsSectionProps {
   groupId: number;
   deleteProcessing: boolean;
   onDeleteGroup: () => void;
+  canManageGroup?: boolean;
 }
 
 export function GroupSettingsSection({
   groupId,
   deleteProcessing,
   onDeleteGroup,
+  canManageGroup = true,
 }: GroupSettingsSectionProps) {
+  if (!canManageGroup) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <p className="retro-text-shadow text-sm text-[#a0b0ff]">

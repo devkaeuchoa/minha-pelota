@@ -35,11 +35,15 @@ interface GroupMatchesGenerationSectionProps {
   onGenerateCurrentMonth: () => void;
   onGenerateForMonths: (months: number) => void;
   onOpenMatchPresence: (matchId: number) => void;
+  onOpenMatchPayments: (matchId: number) => void;
   onCreateMatch: (e: FormEvent) => void;
   onSaveEditedMatch: (e: FormEvent) => void;
   onStartEditMatch: (match: Match) => void;
   onCancelEditMatch: () => void;
   onDeleteMatch: (match: Match) => void;
+  canManageMatches?: boolean;
+  canManageAttendance?: boolean;
+  canManagePayments?: boolean;
 }
 
 export function GroupMatchesGenerationSection({
@@ -51,11 +55,15 @@ export function GroupMatchesGenerationSection({
   onGenerateCurrentMonth,
   onGenerateForMonths,
   onOpenMatchPresence,
+  onOpenMatchPayments,
   onCreateMatch,
   onSaveEditedMatch,
   onStartEditMatch,
   onCancelEditMatch,
   onDeleteMatch,
+  canManageMatches = true,
+  canManageAttendance = true,
+  canManagePayments = true,
 }: GroupMatchesGenerationSectionProps) {
   const [customMonths, setCustomMonths] = useState(3);
   const presets = [3, 6, 12];
@@ -63,15 +71,19 @@ export function GroupMatchesGenerationSection({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="retro-text-shadow text-sm text-[#a0b0ff]">
-        ESCOLHA O PERIODO PARA GERAR AS DATAS DAS PARTIDAS.
-      </p>
+      {canManageMatches ? (
+        <p className="retro-text-shadow text-sm text-[#a0b0ff]">
+          ESCOLHA O PERIODO PARA GERAR AS DATAS DAS PARTIDAS.
+        </p>
+      ) : null}
       <DatesRow
         dates={currentMonthDates}
         nextUpcomingId={nextUpcomingId}
         onOpenMatchPresence={onOpenMatchPresence}
+        canOpenPresence={canManageAttendance}
       />
 
+      {canManageMatches ? (
       <div className="grid grid-cols-3 gap-2">
         <RetroButton
           size="sm"
@@ -95,7 +107,9 @@ export function GroupMatchesGenerationSection({
           </RetroButton>
         ))}
       </div>
+      ) : null}
 
+      {canManageMatches ? (
       <div className="flex items-center gap-2">
         <label
           htmlFor="generate_matches_months"
@@ -127,7 +141,9 @@ export function GroupMatchesGenerationSection({
           GERAR
         </RetroButton>
       </div>
+      ) : null}
 
+      {canManageMatches ? (
       <form
         onSubmit={editingMatchId ? onSaveEditedMatch : onCreateMatch}
         className="mt-2 flex flex-col gap-2 rounded border-2 border-[#4060c0] bg-[#1e348c] p-3"
@@ -230,6 +246,7 @@ export function GroupMatchesGenerationSection({
           ) : null}
         </div>
       </form>
+      ) : null}
 
       <div className="mt-2">
         <span className="retro-text-shadow text-base text-[#a0b0ff]">TODAS AS PARTIDAS</span>
@@ -251,31 +268,47 @@ export function GroupMatchesGenerationSection({
                   <RetroTableCell>{toStatusLabel(match.status)}</RetroTableCell>
                   <RetroTableCell className="align-middle">
                     <div className="flex flex-wrap gap-2">
-                      <RetroButton
-                        type="button"
-                        size="sm"
-                        variant="neutral"
-                        onClick={() => onOpenMatchPresence(match.id)}
-                      >
-                        PRESENÇA
-                      </RetroButton>
-                      <RetroButton
-                        type="button"
-                        size="sm"
-                        variant="neutral"
-                        onClick={() => onStartEditMatch(match)}
-                      >
-                        EDITAR
-                      </RetroButton>
-                      <RetroButton
-                        type="button"
-                        size="sm"
-                        variant="danger"
-                        onClick={() => onDeleteMatch(match)}
-                        disabled={deleteProcessingId === match.id}
-                      >
-                        {deleteProcessingId === match.id ? 'REMOVENDO...' : 'REMOVER'}
-                      </RetroButton>
+                      {canManageAttendance ? (
+                        <RetroButton
+                          type="button"
+                          size="sm"
+                          variant="neutral"
+                          onClick={() => onOpenMatchPresence(match.id)}
+                        >
+                          PRESENÇA
+                        </RetroButton>
+                      ) : null}
+                      {canManagePayments ? (
+                        <RetroButton
+                          type="button"
+                          size="sm"
+                          variant="neutral"
+                          onClick={() => onOpenMatchPayments(match.id)}
+                        >
+                          PAGAMENTOS
+                        </RetroButton>
+                      ) : null}
+                      {canManageMatches ? (
+                        <>
+                          <RetroButton
+                            type="button"
+                            size="sm"
+                            variant="neutral"
+                            onClick={() => onStartEditMatch(match)}
+                          >
+                            EDITAR
+                          </RetroButton>
+                          <RetroButton
+                            type="button"
+                            size="sm"
+                            variant="danger"
+                            onClick={() => onDeleteMatch(match)}
+                            disabled={deleteProcessingId === match.id}
+                          >
+                            {deleteProcessingId === match.id ? 'REMOVENDO...' : 'REMOVER'}
+                          </RetroButton>
+                        </>
+                      ) : null}
                     </div>
                   </RetroTableCell>
                 </RetroTableRow>
@@ -333,9 +366,10 @@ interface DatesRowProps {
   dates: MatchDateItem[];
   nextUpcomingId: number | null;
   onOpenMatchPresence: (matchId: number) => void;
+  canOpenPresence: boolean;
 }
 
-function DatesRow({ dates, nextUpcomingId, onOpenMatchPresence }: DatesRowProps) {
+function DatesRow({ dates, nextUpcomingId, onOpenMatchPresence, canOpenPresence }: DatesRowProps) {
   if (dates.length === 0) {
     return (
       <p className="retro-text-shadow text-sm text-[#e5e7eb]">DATAS: Nenhuma partida neste mês</p>
@@ -349,14 +383,15 @@ function DatesRow({ dates, nextUpcomingId, onOpenMatchPresence }: DatesRowProps)
         <div className="flex flex-1 divide-x-2 divide-[#4060c0]">
           {dates.map((item) => {
             const isNext = item.id === nextUpcomingId;
+            const canOpen = isNext && canOpenPresence;
             return (
               <button
                 key={item.id}
                 type="button"
-                onClick={isNext ? () => onOpenMatchPresence(item.id) : undefined}
-                disabled={!isNext}
+                onClick={canOpen ? () => onOpenMatchPresence(item.id) : undefined}
+                disabled={!canOpen}
                 className={
-                  isNext
+                  canOpen
                     ? 'z-10 -mx-[1px] -my-[1px] flex flex-1 items-center justify-center border-2 border-[#39ff14] bg-[#2540a0] text-sm text-[#ffd700] shadow-[0_0_4px_#39ff14] cursor-pointer hover:brightness-110'
                     : 'flex flex-1 items-center justify-center text-sm text-[#e5e7eb] cursor-default'
                 }

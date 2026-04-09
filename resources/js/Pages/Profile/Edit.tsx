@@ -2,7 +2,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { FormEvent, useMemo, useState } from 'react';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
-import { PLAYER_NAV_ITEMS } from '@/config/navigation';
 import {
   RetroAccordion,
   RetroButton,
@@ -47,6 +46,10 @@ export default function Edit({ status, profileData, groups, stats }: ProfileEdit
     password: '',
     password_confirmation: '',
   });
+  const deleteAccountForm = useForm({
+    password: '',
+  });
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
   const phoneChanged = useMemo(
     () => normalizePhone(profileForm.data.phone) !== normalizePhone(profileData.phone ?? ''),
@@ -81,6 +84,16 @@ export default function Edit({ status, profileData, groups, stats }: ProfileEdit
     });
   };
 
+  const confirmDeleteAccount = () => {
+    deleteAccountForm.delete(route('profile.destroy'), {
+      preserveScroll: true,
+      onSuccess: () => {
+        deleteAccountForm.reset();
+        setShowDeleteAccountModal(false);
+      },
+    });
+  };
+
   const cancelEditingProfile = () => {
     setIsEditingProfile(false);
     profileForm.reset();
@@ -88,7 +101,7 @@ export default function Edit({ status, profileData, groups, stats }: ProfileEdit
   };
 
   return (
-    <RetroAppShell activeId="profile" items={PLAYER_NAV_ITEMS}>
+    <RetroAppShell activeId="profile">
       <Head title="Perfil" />
 
       <div className="retro-bg-metallic-dark retro-border-emboss flex items-center justify-between py-0.5 px-2">
@@ -271,6 +284,23 @@ export default function Edit({ status, profileData, groups, stats }: ProfileEdit
             </div>
           </form>
         </RetroAccordion>
+
+        <RetroAccordion title="EXCLUIR CONTA" defaultOpen={false}>
+          <p className="retro-text-shadow text-sm text-[#a0b0ff]">
+            A exclusão é permanente. Você precisará informar sua senha para confirmar.
+          </p>
+          <RetroButton
+            type="button"
+            variant="danger"
+            onClick={() => {
+              deleteAccountForm.clearErrors();
+              deleteAccountForm.reset();
+              setShowDeleteAccountModal(true);
+            }}
+          >
+            EXCLUIR MINHA CONTA
+          </RetroButton>
+        </RetroAccordion>
       </RetroInfoCard>
 
       <RetroModal
@@ -288,6 +318,39 @@ export default function Edit({ status, profileData, groups, stats }: ProfileEdit
         confirmText="SIM, ALTERAR"
         cancelText="NÃO"
         processing={profileForm.processing}
+      />
+
+      <RetroModal
+        open={showDeleteAccountModal}
+        title="CONFIRMAR EXCLUSÃO DA CONTA"
+        message={
+          <div className="flex flex-col gap-3">
+            <span className="retro-text-shadow text-sm text-[#a0b0ff]">
+              Esta ação não pode ser desfeita. Digite sua senha para confirmar.
+            </span>
+            <RetroPasswordInput
+              id="delete_account_password"
+              label="SENHA ATUAL"
+              value={deleteAccountForm.data.password}
+              onChange={(e) => deleteAccountForm.setData('password', e.target.value)}
+              autoComplete="current-password"
+            />
+            {deleteAccountForm.errors.password ? (
+              <p className="retro-text-shadow text-sm text-[#ff0055]">
+                {deleteAccountForm.errors.password}
+              </p>
+            ) : null}
+          </div>
+        }
+        onCancel={() => {
+          setShowDeleteAccountModal(false);
+          deleteAccountForm.reset();
+          deleteAccountForm.clearErrors();
+        }}
+        onConfirm={confirmDeleteAccount}
+        confirmText="CONFIRMAR EXCLUSÃO"
+        cancelText="CANCELAR"
+        processing={deleteAccountForm.processing}
       />
     </RetroAppShell>
   );

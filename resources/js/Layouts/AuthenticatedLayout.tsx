@@ -113,7 +113,7 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
               {user && (
                 <>
                   <div className="text-base font-medium text-gray-800">{user.name}</div>
-                  <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                  <div className="text-sm font-medium text-gray-500">{user.phone}</div>
                 </>
               )}
             </div>

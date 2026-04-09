@@ -1,6 +1,6 @@
 import { Group, Match } from '@/types';
 import { formatDateTimePtBr, getWeekdayLabel } from '@/utils/datetime';
-import { getRecurrenceLabel, RecurrenceValue } from '@/utils/groups';
+import { getRecurrenceLabel, RecurrenceValue, resolveGroupSettings } from '@/utils/groups';
 
 interface GroupDetailsSectionProps {
   group: Group;
@@ -8,8 +8,10 @@ interface GroupDetailsSectionProps {
 }
 
 export function GroupDetailsSection({ group, nextMatch }: GroupDetailsSectionProps) {
-  const weekdayLabel = getWeekdayLabel(group.weekday) ?? group.weekday;
-  const recurrenceLabel = getRecurrenceLabel(group.recurrence as RecurrenceValue);
+  const settings = resolveGroupSettings(group);
+  const weekdayLabel =
+    getWeekdayLabel(settings.default_weekday ?? null) ?? settings.default_weekday ?? null;
+  const recurrenceLabel = getRecurrenceLabel(settings.recurrence as RecurrenceValue);
   const nextMatchLabel = formatNextMatch(nextMatch);
 
   return (
@@ -20,7 +22,7 @@ export function GroupDetailsSection({ group, nextMatch }: GroupDetailsSectionPro
 
       <div className="flex flex-col gap-1 pt-1">
         <Row label="DIA" value={weekdayLabel} />
-        <Row label="HORÁRIO" value={group.time} />
+        <Row label="HORÁRIO" value={settings.default_time ?? null} />
         <Row label="LOCAL" value={group.location_name} />
         <Row label="RECORRÊNCIA" value={recurrenceLabel} />
         <Row label="PRÓXIMA PARTIDA" value={nextMatchLabel} />

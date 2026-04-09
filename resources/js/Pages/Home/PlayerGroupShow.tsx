@@ -1,7 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { GroupRankingEntry, PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
-import { PLAYER_NAV_ITEMS } from '@/config/navigation';
 import { RetroInfoCard, RetroSectionHeader, RetroValueDisplay } from '@/Components/retro';
 
 interface PlayerGroupShowProps extends PageProps {
@@ -25,7 +24,7 @@ interface PlayerGroupShowProps extends PageProps {
 
 export default function PlayerGroupShow({ group, period, rankings }: PlayerGroupShowProps) {
   return (
-    <RetroAppShell activeId="home" items={PLAYER_NAV_ITEMS}>
+    <RetroAppShell activeId="home">
       <Head title={`Detalhes do grupo — ${group.name}`} />
 
       <RetroSectionHeader title="DETALHES DO GRUPO" />

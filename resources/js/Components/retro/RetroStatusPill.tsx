@@ -1,9 +1,10 @@
 interface RetroStatusPillProps {
   status: 'on' | 'off';
   label: string;
+  isLabelCentered?: boolean;
 }
 
-export function RetroStatusPill({ status, label }: RetroStatusPillProps) {
+export function RetroStatusPill({ status, label, isLabelCentered = false }: RetroStatusPillProps) {
   const isOn = status === 'on';
 
   return (
@@ -11,7 +12,7 @@ export function RetroStatusPill({ status, label }: RetroStatusPillProps) {
       data-component="retro-status-pill"
       className={`retro-border-panel flex items-center gap-2 bg-[#1e348c] px-2 py-1 ${
         isOn ? '' : 'opacity-50'
-      }`}
+      } ${isLabelCentered && 'justify-center'}`}
     >
       <span
         className={`h-3 w-3 rounded-full ${

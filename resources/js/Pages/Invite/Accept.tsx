@@ -8,9 +8,13 @@ interface AcceptProps {
   group: {
     id: number;
     name: string;
-    weekday: number;
-    time: string;
+    weekday?: number | null;
+    time?: string | null;
     location_name: string;
+    group_settings?: {
+      default_weekday?: number | null;
+      default_time?: string | null;
+    } | null;
   };
   inviteCode: string;
 }
@@ -29,8 +33,8 @@ export default function Accept({ group, inviteCode }: AcceptProps) {
           <RetroInfoCard>
             <InviteGroupSummary
               name={group.name}
-              weekday={group.weekday}
-              time={group.time}
+              weekday={group.group_settings?.default_weekday ?? group.weekday ?? null}
+              time={group.group_settings?.default_time ?? group.time ?? null}
               locationName={group.location_name}
             />
 

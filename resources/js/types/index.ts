@@ -2,16 +2,35 @@ export interface User {
   id: number;
   name: string;
   nickname?: string | null;
-  email?: string | null;
   phone?: string | null;
-  email_verified_at?: string | null;
+  home_route?: string | null;
+  can_access_player_admin_area?: boolean;
   created_at: string;
   updated_at: string;
 }
 
+export interface GroupSettings {
+  monthly_fee?: number | null;
+  drop_in_fee?: number | null;
+  default_weekday?: number | null;
+  default_time?: string | null;
+  recurrence?: string | null;
+  invite_token?: string | null;
+  invite_expires_at?: string | null;
+}
+
+export interface GroupPermissions {
+  can_manage_group?: boolean;
+  can_manage_players?: boolean;
+  can_manage_matches?: boolean;
+  can_manage_attendance?: boolean;
+  can_manage_payments?: boolean;
+  can_manage_invites?: boolean;
+}
+
 export interface Group {
   id: number;
-  owner_id: number;
+  owner_player_id: number;
   name: string;
   slug: string;
   weekday: number;
@@ -27,9 +46,16 @@ export interface Group {
   invite_code: string | null;
   join_approval_required: boolean;
   has_monthly_fee: boolean;
-  monthly_fee_cents: number | null;
+  monthly_fee: number | null;
   payment_day: number | null;
   currency: string;
+  group_settings?: GroupSettings | null;
+  settings?: GroupSettings | null;
+  permissions?: GroupPermissions | null;
+  membership?: {
+    is_admin?: boolean;
+    permissions?: GroupPermissions | null;
+  } | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -44,6 +70,14 @@ export interface Match {
   duration_minutes: number | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface MatchPayment {
+  status: 'paid' | 'unpaid';
+  paid_amount: number;
+  is_monthly_exempt: boolean;
+  has_previous_debt: boolean;
+  previous_debt_matches_count: number;
 }
 
 export interface Player {

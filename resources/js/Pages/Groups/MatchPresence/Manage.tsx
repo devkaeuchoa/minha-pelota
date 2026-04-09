@@ -43,6 +43,9 @@ interface MatchPresenceManageProps extends PageProps {
     pending: number;
   };
   status?: string;
+  permissions?: {
+    can_manage_attendance?: boolean;
+  };
 }
 
 export default function Manage({
@@ -54,8 +57,10 @@ export default function Manage({
   players,
   summary,
   status,
+  permissions,
 }: MatchPresenceManageProps) {
   const [copied, setCopied] = useState(false);
+  const canManageAttendance = permissions?.can_manage_attendance ?? true;
 
   const matchLabel = useMemo(() => formatDateTimePtBr(match.scheduled_at), [match.scheduled_at]);
 
@@ -118,7 +123,7 @@ export default function Manage({
             </div>
 
             <div className="flex flex-col gap-2">
-              {!hasLink ? (
+              {!hasLink && canManageAttendance ? (
                 <RetroButton size="md" type="button" variant="success" onClick={handleGenerateLink}>
                   GERAR LINK DE PRESENÇA
                 </RetroButton>
@@ -128,7 +133,9 @@ export default function Manage({
                     message={
                       expired
                         ? 'O link expirou para esta partida.'
-                        : 'Link pronto. Copie e envie aos jogadores.'
+                        : canManageAttendance
+                          ? 'Link pronto. Copie e envie aos jogadores.'
+                          : 'Link de presença disponível para visualização.'
                     }
                   />
                   {link ? (
@@ -138,15 +145,17 @@ export default function Manage({
                         value={link.linkUrl}
                         className="retro-input w-full bg-transparent font-retro text-base tracking-widest text-[#ffd700] outline-none placeholder:text-[#4060a0] retro-inset-shadow border-2 border-[#4060c0] px-3 py-2"
                       />
-                      <RetroButton
-                        size="sm"
-                        type="button"
-                        variant="neutral"
-                        className="w-auto"
-                        onClick={handleCopy}
-                      >
-                        {copied ? 'COPIADO' : 'COPIAR'}
-                      </RetroButton>
+                      {canManageAttendance ? (
+                        <RetroButton
+                          size="sm"
+                          type="button"
+                          variant="neutral"
+                          className="w-auto"
+                          onClick={handleCopy}
+                        >
+                          {copied ? 'COPIADO' : 'COPIAR'}
+                        </RetroButton>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>

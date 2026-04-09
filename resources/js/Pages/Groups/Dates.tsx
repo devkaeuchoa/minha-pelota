@@ -5,6 +5,7 @@ import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { RetroInfoCard, RetroSectionHeader } from '@/Components/retro';
 import { GroupMatchesGenerationSection } from '@/features/groups/components/GroupMatchesGenerationSection';
 import { useGroupMatchesController } from '@/features/groups/useGroupMatchesController';
+import { resolveGroupPermissions } from '@/utils/groups';
 
 interface DatesPageProps extends PageProps {
   groups: Group[];
@@ -17,6 +18,16 @@ export default function Dates({ groups, selectedGroupId, selectedGroup, matches 
   const matchesController = useGroupMatchesController(selectedGroup, matches, {
     redirectToDates: true,
   });
+  const permissions = selectedGroup
+    ? resolveGroupPermissions(selectedGroup, true)
+    : {
+        can_manage_group: false,
+        can_manage_players: false,
+        can_manage_matches: false,
+        can_manage_attendance: false,
+        can_manage_payments: false,
+        can_manage_invites: false,
+      };
 
   return (
     <RetroAppShell activeId="dates">
@@ -72,6 +83,17 @@ export default function Dates({ groups, selectedGroupId, selectedGroup, matches 
                   }),
                 )
               }
+              onOpenMatchPayments={(matchId) =>
+                router.visit(
+                  route('groups.matches.payments.manage', {
+                    group: selectedGroup.id,
+                    match: matchId,
+                  }),
+                )
+              }
+              canManageMatches={permissions.can_manage_matches}
+              canManageAttendance={permissions.can_manage_attendance}
+              canManagePayments={permissions.can_manage_payments}
             />
           ) : null}
         </div>

@@ -11,6 +11,8 @@ import {
   RetroSectionHeader,
   RetroTextInput,
 } from '@/Components/retro';
+import { RetroInlineAlert } from '@/Components/retro/RetroInlineAlert';
+import { validatePhone } from '@/utils/formValidation';
 
 export default function Register() {
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
@@ -26,9 +28,10 @@ export default function Register() {
   });
 
   const isFormValid = useMemo(() => {
+    const phoneResult = validatePhone(data.phone);
     const requiredFilled =
       data.name.trim().length > 0 &&
-      data.phone.replace(/\D/g, '').length >= 10 &&
+      phoneResult.valid &&
       data.password.length > 0 &&
       data.password_confirmation.length > 0;
     const passwordsMatch = data.password === data.password_confirmation;
@@ -37,10 +40,10 @@ export default function Register() {
   }, [data, phoneAvailable]);
 
   const checkPhoneAvailability = async () => {
-    const normalizedPhone = data.phone.replace(/\D/g, '');
-    if (normalizedPhone.length < 10) {
+    const { valid, normalized, errorMessage } = validatePhone(data.phone);
+    if (!valid) {
       setPhoneAvailable(false);
-      setPhoneCheckMessage('Informe um telefone válido.');
+      setPhoneCheckMessage(errorMessage ?? 'Informe um telefone válido.');
       return;
     }
 
@@ -49,7 +52,7 @@ export default function Register() {
 
     try {
       const response = await axios.get(route('register.phone-availability'), {
-        params: { phone: normalizedPhone },
+        params: { phone: normalized },
       });
 
       setPhoneAvailable(Boolean(response.data?.available));
@@ -79,7 +82,13 @@ export default function Register() {
         <div className="mt-4">
           <RetroInfoCard>
             <form onSubmit={submit} className="flex flex-col gap-4">
-              {phoneCheckMessage ? <RetroInlineInfo message={phoneCheckMessage} /> : null}
+              {phoneAvailable && phoneCheckMessage && (
+                <RetroInlineInfo message={phoneCheckMessage} />
+              )}
+
+              {!phoneAvailable && phoneCheckMessage && (
+                <RetroInlineAlert message={phoneCheckMessage} />
+              )}
 
               <RetroTextInput
                 id="name"

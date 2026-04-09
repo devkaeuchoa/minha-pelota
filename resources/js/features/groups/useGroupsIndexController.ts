@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Group } from '@/types';
 
@@ -25,18 +25,8 @@ export function useGroupsIndexController(groups: Group[]) {
     });
   };
 
-  const handleBatchDelete = (e: FormEvent) => {
-    e.preventDefault();
-
+  const handleBatchDelete = () => {
     if (!data.ids.length) {
-      return;
-    }
-
-    if (
-      !confirm(
-        'Tem certeza que deseja remover os grupos selecionados? Essa ação não pode ser desfeita.',
-      )
-    ) {
       return;
     }
 
