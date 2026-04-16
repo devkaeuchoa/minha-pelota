@@ -1,4 +1,4 @@
-/* global confirm, route */
+/* global route */
 import { FormEvent, useState } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import { Group, Match, Player } from '@/types';
@@ -27,9 +27,6 @@ export function useGroupShowController(group: Group, players: Player[], matches:
   };
 
   const handleRemovePlayer = (player: Player) => {
-    if (!confirm(`Remover ${player.nick} do grupo?`)) {
-      return;
-    }
     setRemoveProcessingId(player.id);
     router.delete(route('groups.players.destroy', { group: group.id, player: player.id }), {
       onFinish: () => setRemoveProcessingId(null),
@@ -41,9 +38,6 @@ export function useGroupShowController(group: Group, players: Player[], matches:
   };
 
   const handleDeleteGroup = () => {
-    if (!confirm('Tem certeza que deseja remover este grupo? Essa ação não pode ser desfeita.')) {
-      return;
-    }
     deleteForm.delete(route('groups.destroy', group));
   };
 

@@ -1,4 +1,4 @@
-/* global confirm, route */
+/* global route */
 import { FormEvent, useState } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import { Group, Match } from '@/types';
@@ -36,13 +36,6 @@ export function useGroupMatchesController(
 
   const handleGenerateCurrentMonth = () => {
     if (!group) return;
-    if (
-      !confirm(
-        'Deseja gerar as partidas para o mês atual? Partidas já existentes neste período podem ser mantidas ou recriadas conforme a lógica do sistema.',
-      )
-    ) {
-      return;
-    }
 
     setGenerateProcessing(true);
     router.post(
@@ -57,13 +50,6 @@ export function useGroupMatchesController(
 
   const handleGenerateForMonths = (months: number) => {
     if (!group) return;
-    if (
-      !confirm(
-        `Deseja gerar as partidas para os próximos ${months} ${months === 1 ? 'mês' : 'meses'}?`,
-      )
-    ) {
-      return;
-    }
 
     setGenerateProcessing(true);
     router.post(
@@ -115,7 +101,6 @@ export function useGroupMatchesController(
 
   const handleDeleteMatch = (match: Match) => {
     if (!group) return;
-    if (!confirm('Tem certeza que deseja remover esta partida?')) return;
 
     setDeleteMatchProcessingId(match.id);
     router.delete(route('groups.matches.destroy', { group: group.id, match: match.id }), {

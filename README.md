@@ -32,7 +32,7 @@ Aplicação web para organizar **peladas e grupos de futebol amador**, substitui
 - **Listagem (`Groups/Index`)**
   - Lista grupos do admin autenticado.
   - Seleção múltipla com **remoção em batch** (confirmação antes de excluir).
-- **Criação e edição (`Groups/Create`, `Groups/Edit`, `Groups/Form`)**
+- **Criação e configuração (`Groups/Create`, `Groups/Edit`, `Groups/Form`)**
   - Formulário compartilhado com validação server-side.
   - Campo **Nome** edita o **Slug** automaticamente (apenas leitura).
   - Dia da semana via checkboxes (0–6).

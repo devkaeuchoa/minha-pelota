@@ -15,7 +15,7 @@ export default defineConfig({
     webServer: {
         command: "npm run e2e:server",
         url: "http://127.0.0.1:8010/login",
-        reuseExistingServer: false,
+        reuseExistingServer: true,
         timeout: 120_000,
     },
     projects: [

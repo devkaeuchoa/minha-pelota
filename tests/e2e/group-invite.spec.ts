@@ -32,7 +32,7 @@ async function getInviteTokenFromGroupShow(page: Page, groupName: string): Promi
     await loginOwner(page);
     await openGroupShow(page, groupName);
 
-    await page.getByRole("button", { name: /4\. convite/i }).click();
+    await page.getByRole("button", { name: "CONVITE", exact: true }).click();
 
     const generateBtn = page.getByRole("button", { name: "GERAR LINK DE CONVITE" });
     if (await generateBtn.isVisible().catch(() => false)) {

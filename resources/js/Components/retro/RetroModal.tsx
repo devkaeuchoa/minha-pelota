@@ -3,6 +3,7 @@ import { RetroButton } from './RetroButton';
 import styles from './RetroModal.module.css';
 
 type RetroModalVariant = 'hug' | 'full-width';
+type RetroModalConfirmVariant = 'danger' | 'success' | 'neutral';
 
 interface RetroModalProps {
   open: boolean;
@@ -14,6 +15,7 @@ interface RetroModalProps {
   cancelText?: string;
   processing?: boolean;
   variant?: RetroModalVariant;
+  confirmVariant?: RetroModalConfirmVariant;
 }
 
 export function RetroModal({
@@ -26,6 +28,7 @@ export function RetroModal({
   cancelText = 'CANCELAR',
   processing = false,
   variant = 'hug',
+  confirmVariant = 'danger',
 }: RetroModalProps) {
   if (!open) {
     return null;
@@ -51,7 +54,12 @@ export function RetroModal({
           <RetroButton type="button" variant="neutral" onClick={onCancel} disabled={processing}>
             {cancelText}
           </RetroButton>
-          <RetroButton type="button" variant="danger" onClick={onConfirm} disabled={processing}>
+          <RetroButton
+            type="button"
+            variant={confirmVariant}
+            onClick={onConfirm}
+            disabled={processing}
+          >
             {confirmText}
           </RetroButton>
         </div>

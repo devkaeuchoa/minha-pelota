@@ -35,7 +35,7 @@ export default function Show({ group, players, matches }: ShowProps) {
     <RetroAppShell activeId="groups">
       <Head title={group.name} />
 
-      <RetroSectionHeader title="2. DETALHES DO GRUPO" />
+      <RetroSectionHeader title="DETALHES DO GRUPO" />
       <RetroInfoCard>
         <GroupDetailsSection group={group} nextMatch={nextMatch} />
         <div className="mt-3 flex flex-col gap-3">
@@ -56,31 +56,25 @@ export default function Show({ group, players, matches }: ShowProps) {
                 )
               }
             >
-              VER ESCALAÇÃO
+              VER PRESENÇA DA PRÓXIMA PARTIDA
             </RetroButton>
           ) : null}
         </div>
       </RetroInfoCard>
 
       {groupSettings.recurrence !== 'none' && permissions.can_manage_matches && (
-        <RetroAccordion title="3. GERAR DATAS" defaultOpen={false}>
+        <RetroAccordion title="GERAR DATAS" defaultOpen={false}>
           <GroupMatchesQuickActionsSection
-            matches={matches}
             generateProcessing={settings.generateProcessing}
             onGenerateCurrentMonth={settings.onGenerateCurrentMonth}
             onGenerateForMonths={settings.onGenerateForMonths}
-            onOpenMatchPresence={(matchId) =>
-              router.visit(
-                route('groups.matches.presence.manage', { group: group.id, match: matchId }),
-              )
-            }
             onOpenDatesPage={() => router.visit(route('dates.index', { group: group.id }))}
           />
         </RetroAccordion>
       )}
 
       {permissions.can_manage_invites ? (
-        <RetroAccordion title="4. CONVITE" defaultOpen={false}>
+        <RetroAccordion title="CONVITE" defaultOpen={false}>
           <GroupInviteSection
             inviteUrl={invite.inviteUrl}
             processing={invite.processing}
@@ -89,7 +83,7 @@ export default function Show({ group, players, matches }: ShowProps) {
         </RetroAccordion>
       ) : null}
 
-      <RetroAccordion title={`5. JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
+      <RetroAccordion title={`JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
         {permissions.can_manage_players ? (
           <RetroButton
             type="button"

@@ -12,7 +12,7 @@ export default function Edit({ group, ...props }: EditProps) {
       group={group}
       submitUrl={route('groups.update', group)}
       method="put"
-      title="Editar grupo"
+      title="Config do grupo"
     />
   );
 }

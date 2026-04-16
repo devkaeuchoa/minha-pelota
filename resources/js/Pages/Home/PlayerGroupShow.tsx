@@ -1,13 +1,15 @@
-/* global confirm, route */
+/* global route */
 import { Head, router } from '@inertiajs/react';
 import { GroupRankingEntry, PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import {
   RetroButton,
   RetroInfoCard,
+  RetroModal,
   RetroSectionHeader,
   RetroValueDisplay,
 } from '@/Components/retro';
+import { useState } from 'react';
 import { useLocale } from '@/hooks/useLocale';
 
 interface PlayerGroupShowProps extends PageProps {
@@ -31,12 +33,21 @@ interface PlayerGroupShowProps extends PageProps {
 
 export default function PlayerGroupShow({ group, period, rankings }: PlayerGroupShowProps) {
   const { t } = useLocale();
+  const [showLeaveGroupModal, setShowLeaveGroupModal] = useState(false);
+  const [leavingGroup, setLeavingGroup] = useState(false);
 
   const handleLeaveGroup = () => {
-    if (!confirm(t('home.player.leaveGroupConfirm'))) return;
+    setShowLeaveGroupModal(true);
+  };
 
+  const handleConfirmLeaveGroup = () => {
+    setLeavingGroup(true);
     router.delete(route('api.player.groups.leave', { group: group.id }), {
       preserveScroll: true,
+      onFinish: () => {
+        setLeavingGroup(false);
+        setShowLeaveGroupModal(false);
+      },
     });
   };
 
@@ -79,6 +90,17 @@ export default function PlayerGroupShow({ group, period, rankings }: PlayerGroup
           </div>
         </div>
       </RetroInfoCard>
+
+      <RetroModal
+        open={showLeaveGroupModal}
+        title={t('home.player.leaveGroupTitle')}
+        message={<span>{t('home.player.leaveGroupConfirm')}</span>}
+        onCancel={() => setShowLeaveGroupModal(false)}
+        onConfirm={handleConfirmLeaveGroup}
+        confirmText={t('home.player.leaveGroupConfirmButton')}
+        cancelText={t('home.player.leaveGroupCancelButton')}
+        processing={leavingGroup}
+      />
     </RetroAppShell>
   );
 }

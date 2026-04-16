@@ -1,4 +1,4 @@
-/* global confirm, route, navigator, window */
+/* global route, navigator, window */
 import { Head, router } from '@inertiajs/react';
 import { Group, PageProps, PhysicalCondition } from '@/types';
 import {
@@ -6,6 +6,7 @@ import {
   RetroButton,
   RetroInfoCard,
   RetroInlineInfo,
+  RetroModal,
   RetroSectionHeader,
   RetroPlayerList,
   RetroValueDisplay,
@@ -62,6 +63,8 @@ export default function Manage({
 }: MatchPresenceManageProps) {
   const { t } = useLocale();
   const [copied, setCopied] = useState(false);
+  const [showGenerateLinkModal, setShowGenerateLinkModal] = useState(false);
+  const [generatingLink, setGeneratingLink] = useState(false);
   const canManageAttendance = permissions?.can_manage_attendance ?? true;
 
   const matchLabel = useMemo(() => formatDateTimePtBr(match.scheduled_at), [match.scheduled_at]);
@@ -93,9 +96,20 @@ export default function Manage({
   );
 
   const handleGenerateLink = () => {
-    if (!confirm('Deseja gerar o link de presença para esta partida?')) return;
+    setShowGenerateLinkModal(true);
+  };
+
+  const handleConfirmGenerateLink = () => {
+    setGeneratingLink(true);
     router.post(
       route('groups.matches.presence.generate-link', { group: group.id, match: match.id }),
+      {},
+      {
+        onFinish: () => {
+          setGeneratingLink(false);
+          setShowGenerateLinkModal(false);
+        },
+      },
     );
   };
 
@@ -197,6 +211,18 @@ export default function Manage({
           </div>
         </div>
       </RetroInfoCard>
+
+      <RetroModal
+        open={showGenerateLinkModal}
+        title="GERAR LINK DE PRESENÇA"
+        message={<span>Deseja gerar o link de presença para esta partida?</span>}
+        onCancel={() => setShowGenerateLinkModal(false)}
+        onConfirm={handleConfirmGenerateLink}
+        confirmText="SIM, GERAR"
+        cancelText="NÃO"
+        processing={generatingLink}
+        confirmVariant="success"
+      />
     </RetroAppShell>
   );
 }

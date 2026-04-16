@@ -32,7 +32,7 @@ async function openGroupPlayers(page: Page, groupName: string): Promise<number> 
         throw new Error("Unable to parse group id from URL");
     }
 
-    await page.getByRole("button", { name: /5\. jogadores/i }).click();
+    await page.getByRole("button", { name: /^JOGADORES \(\d+\)/i }).click();
     await page.getByRole("button", { name: "GERENCIAR JOGADORES" }).click();
     await expect(page).toHaveURL(new RegExp(`/groups/${match[1]}/players$`));
 

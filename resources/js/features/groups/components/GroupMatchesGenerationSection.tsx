@@ -1,5 +1,6 @@
 import {
   RetroButton,
+  RetroModal,
   RetroTable,
   RetroTableCell,
   RetroTableHeaderCell,
@@ -8,7 +9,9 @@ import {
 } from '@/Components/retro';
 import { FormEvent, useState } from 'react';
 import { Match } from '@/types';
-import { formatDatePtBr, formatDateTimePtBr, getBrazilYearMonthKey } from '@/utils/datetime';
+import { formatDateTimePtBr } from '@/utils/datetime';
+
+type PendingGenerate = { kind: 'current-month' } | { kind: 'months'; months: number };
 
 interface GroupMatchesGenerationSectionProps {
   matches: Match[];
@@ -65,187 +68,149 @@ export function GroupMatchesGenerationSection({
   canManageAttendance = true,
   canManagePayments = true,
 }: GroupMatchesGenerationSectionProps) {
-  const [customMonths, setCustomMonths] = useState(3);
   const presets = [3, 6, 12];
-  const { currentMonthDates, nextUpcomingId } = getCurrentMonthMatchDates(matches);
+  const [pendingGenerate, setPendingGenerate] = useState<PendingGenerate | null>(null);
+  const [pendingDeleteMatch, setPendingDeleteMatch] = useState<Match | null>(null);
+
+  const handleConfirmGenerate = () => {
+    if (!pendingGenerate) return;
+    if (pendingGenerate.kind === 'current-month') {
+      onGenerateCurrentMonth();
+    } else {
+      onGenerateForMonths(pendingGenerate.months);
+    }
+    setPendingGenerate(null);
+  };
+
+  const handleConfirmDeleteMatch = () => {
+    if (!pendingDeleteMatch) return;
+    onDeleteMatch(pendingDeleteMatch);
+    setPendingDeleteMatch(null);
+  };
 
   return (
     <div className="flex flex-col gap-2">
       {canManageMatches ? (
-        <p className="retro-text-shadow text-sm text-[#a0b0ff]">
-          ESCOLHA O PERIODO PARA GERAR AS DATAS DAS PARTIDAS.
-        </p>
+        <form
+          onSubmit={editingMatchId ? onSaveEditedMatch : onCreateMatch}
+          className="mt-2 flex flex-col gap-2 rounded border-2 border-[#4060c0] bg-[#1e348c] p-3"
+        >
+          <span className="retro-text-shadow text-sm text-[#a0b0ff]">
+            {editingMatchId ? 'EDITAR PARTIDA' : 'NOVA PARTIDA'}
+          </span>
+
+          <div className="grid gap-2 md:grid-cols-2">
+            <div className="flex flex-col gap-1">
+              <label
+                className="retro-text-shadow text-xs text-[#a0b0ff]"
+                htmlFor="match_scheduled_at"
+              >
+                DATA E HORA
+              </label>
+              <input
+                id="match_scheduled_at"
+                type="datetime-local"
+                value={form.values.scheduled_at}
+                onChange={(e) => form.onChange('scheduled_at', e.target.value)}
+                disabled={form.processing}
+                className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
+                required
+              />
+              {form.errors.scheduled_at ? (
+                <span className="text-xs text-red-400">{form.errors.scheduled_at}</span>
+              ) : null}
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label
+                className="retro-text-shadow text-xs text-[#a0b0ff]"
+                htmlFor="match_location_name"
+              >
+                LOCAL
+              </label>
+              <input
+                id="match_location_name"
+                type="text"
+                value={form.values.location_name}
+                onChange={(e) => form.onChange('location_name', e.target.value)}
+                disabled={form.processing}
+                className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label
+                className="retro-text-shadow text-xs text-[#a0b0ff]"
+                htmlFor="match_duration_minutes"
+              >
+                DURAÇÃO
+              </label>
+              <select
+                id="match_duration_minutes"
+                value={form.values.duration_minutes}
+                onChange={(e) => form.onChange('duration_minutes', e.target.value)}
+                disabled={form.processing}
+                className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
+              >
+                <option value="">—</option>
+                {getDurationMinutesOptions(form.values.duration_minutes).map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <RetroButton type="submit" size="sm" variant="success" disabled={form.processing}>
+              {editingMatchId ? 'SALVAR' : 'CRIAR PARTIDA'}
+            </RetroButton>
+            {editingMatchId ? (
+              <RetroButton
+                type="button"
+                size="sm"
+                variant="neutral"
+                onClick={onCancelEditMatch}
+                disabled={form.processing}
+              >
+                CANCELAR EDIÇÃO
+              </RetroButton>
+            ) : null}
+          </div>
+        </form>
       ) : null}
-      <DatesRow
-        dates={currentMonthDates}
-        nextUpcomingId={nextUpcomingId}
-        onOpenMatchPresence={onOpenMatchPresence}
-        canOpenPresence={canManageAttendance}
-      />
 
       {canManageMatches ? (
-      <div className="grid grid-cols-3 gap-2">
-        <RetroButton
-          size="sm"
-          type="button"
-          variant="neutral"
-          disabled={generateProcessing}
-          onClick={onGenerateCurrentMonth}
-        >
-          MÊS ATUAL
-        </RetroButton>
-        {presets.map((months) => (
+        <p className="retro-text-shadow text-sm text-[#a0b0ff]">
+          OU ESCOLHA O PERIODO PARA GERAR AS DATAS DAS PARTIDAS.
+        </p>
+      ) : null}
+
+      {canManageMatches ? (
+        <div className="grid grid-cols-3 gap-2">
           <RetroButton
-            key={months}
             size="sm"
             type="button"
             variant="neutral"
             disabled={generateProcessing}
-            onClick={() => onGenerateForMonths(months)}
+            onClick={() => setPendingGenerate({ kind: 'current-month' })}
           >
-            {months} MESES
+            MÊS ATUAL
           </RetroButton>
-        ))}
-      </div>
-      ) : null}
-
-      {canManageMatches ? (
-      <div className="flex items-center gap-2">
-        <label
-          htmlFor="generate_matches_months"
-          className="retro-text-shadow text-xs uppercase tracking-wider text-[#a0b0ff]"
-        >
-          PERSONALIZADO
-        </label>
-        <input
-          id="generate_matches_months"
-          type="number"
-          min={1}
-          max={12}
-          value={customMonths}
-          onChange={(e) => {
-            const parsed = Number(e.target.value);
-            if (Number.isNaN(parsed)) return;
-            const normalized = Math.max(1, Math.min(12, Math.trunc(parsed)));
-            setCustomMonths(normalized);
-          }}
-          className="retro-input w-20 border-2 border-[#4060c0] bg-[#0b1340] px-2 py-1 text-center text-[#ffd700] outline-none"
-        />
-        <RetroButton
-          size="sm"
-          type="button"
-          variant="neutral"
-          disabled={generateProcessing}
-          onClick={() => onGenerateForMonths(customMonths)}
-        >
-          GERAR
-        </RetroButton>
-      </div>
-      ) : null}
-
-      {canManageMatches ? (
-      <form
-        onSubmit={editingMatchId ? onSaveEditedMatch : onCreateMatch}
-        className="mt-2 flex flex-col gap-2 rounded border-2 border-[#4060c0] bg-[#1e348c] p-3"
-      >
-        <span className="retro-text-shadow text-sm text-[#a0b0ff]">
-          {editingMatchId ? 'EDITAR PARTIDA' : 'NOVA PARTIDA'}
-        </span>
-
-        <div className="grid gap-2 md:grid-cols-2">
-          <div className="flex flex-col gap-1">
-            <label
-              className="retro-text-shadow text-xs text-[#a0b0ff]"
-              htmlFor="match_scheduled_at"
-            >
-              DATA E HORA
-            </label>
-            <input
-              id="match_scheduled_at"
-              type="datetime-local"
-              value={form.values.scheduled_at}
-              onChange={(e) => form.onChange('scheduled_at', e.target.value)}
-              disabled={form.processing}
-              className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
-              required
-            />
-            {form.errors.scheduled_at ? (
-              <span className="text-xs text-red-400">{form.errors.scheduled_at}</span>
-            ) : null}
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label
-              className="retro-text-shadow text-xs text-[#a0b0ff]"
-              htmlFor="match_location_name"
-            >
-              LOCAL
-            </label>
-            <input
-              id="match_location_name"
-              type="text"
-              value={form.values.location_name}
-              onChange={(e) => form.onChange('location_name', e.target.value)}
-              disabled={form.processing}
-              className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label
-              className="retro-text-shadow text-xs text-[#a0b0ff]"
-              htmlFor="match_duration_minutes"
-            >
-              DURAÇÃO (MIN)
-            </label>
-            <input
-              id="match_duration_minutes"
-              type="number"
-              min={1}
-              value={form.values.duration_minutes}
-              onChange={(e) => form.onChange('duration_minutes', e.target.value)}
-              disabled={form.processing}
-              className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="retro-text-shadow text-xs text-[#a0b0ff]" htmlFor="match_status">
-              STATUS
-            </label>
-            <select
-              id="match_status"
-              value={form.values.status}
-              onChange={(e) =>
-                form.onChange('status', e.target.value as 'scheduled' | 'cancelled' | 'finished')
-              }
-              disabled={form.processing}
-              className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
-            >
-              <option value="scheduled">AGENDADA</option>
-              <option value="cancelled">CANCELADA</option>
-              <option value="finished">FINALIZADA</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          <RetroButton type="submit" size="sm" variant="success" disabled={form.processing}>
-            {editingMatchId ? 'SALVAR' : 'CRIAR PARTIDA'}
-          </RetroButton>
-          {editingMatchId ? (
+          {presets.map((months) => (
             <RetroButton
-              type="button"
+              key={months}
               size="sm"
+              type="button"
               variant="neutral"
-              onClick={onCancelEditMatch}
-              disabled={form.processing}
+              disabled={generateProcessing}
+              onClick={() => setPendingGenerate({ kind: 'months', months })}
             >
-              CANCELAR EDIÇÃO
+              {months} MESES
             </RetroButton>
-          ) : null}
+          ))}
         </div>
-      </form>
       ) : null}
 
       <div className="mt-2">
@@ -302,7 +267,7 @@ export function GroupMatchesGenerationSection({
                             type="button"
                             size="sm"
                             variant="danger"
-                            onClick={() => onDeleteMatch(match)}
+                            onClick={() => setPendingDeleteMatch(match)}
                             disabled={deleteProcessingId === match.id}
                           >
                             {deleteProcessingId === match.id ? 'REMOVENDO...' : 'REMOVER'}
@@ -326,82 +291,45 @@ export function GroupMatchesGenerationSection({
           </tbody>
         </RetroTable>
       </div>
-    </div>
-  );
-}
 
-interface MatchDateItem {
-  id: number;
-  date: Date;
-  label: string;
-}
+      <RetroModal
+        open={pendingGenerate !== null}
+        title="CONFIRMAR GERAÇÃO"
+        message={
+          <span>
+            {pendingGenerate?.kind === 'current-month'
+              ? 'Deseja gerar as partidas para o mês atual? Partidas já existentes neste período podem ser mantidas ou recriadas conforme a lógica do sistema.'
+              : pendingGenerate
+                ? `Deseja gerar as partidas para os próximos ${pendingGenerate.months} ${
+                    pendingGenerate.months === 1 ? 'mês' : 'meses'
+                  }?`
+                : ''}
+          </span>
+        }
+        onCancel={() => setPendingGenerate(null)}
+        onConfirm={handleConfirmGenerate}
+        confirmText="SIM, GERAR"
+        cancelText="NÃO"
+        processing={generateProcessing}
+        confirmVariant="success"
+      />
 
-function getCurrentMonthMatchDates(matches: Match[]): {
-  currentMonthDates: MatchDateItem[];
-  nextUpcomingId: number | null;
-} {
-  const now = new Date();
-  const currentYearMonthKey = getBrazilYearMonthKey(now);
-
-  const dates: MatchDateItem[] = matches
-    .map((match) => {
-      const date = new Date(match.scheduled_at);
-      return { id: match.id, date, label: formatDatePtBr(match.scheduled_at) };
-    })
-    .filter((item) => getBrazilYearMonthKey(item.date) === currentYearMonthKey)
-    .sort((a, b) => a.date.getTime() - b.date.getTime());
-
-  let nextUpcomingId: number | null = null;
-  for (const item of dates) {
-    if (item.date.getTime() >= now.getTime()) {
-      nextUpcomingId = item.id;
-      break;
-    }
-  }
-
-  return { currentMonthDates: dates, nextUpcomingId };
-}
-
-interface DatesRowProps {
-  dates: MatchDateItem[];
-  nextUpcomingId: number | null;
-  onOpenMatchPresence: (matchId: number) => void;
-  canOpenPresence: boolean;
-}
-
-function DatesRow({ dates, nextUpcomingId, onOpenMatchPresence, canOpenPresence }: DatesRowProps) {
-  if (dates.length === 0) {
-    return (
-      <p className="retro-text-shadow text-sm text-[#e5e7eb]">DATAS: Nenhuma partida neste mês</p>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-1 pt-1">
-      <span className="retro-text-shadow text-base text-[#a0b0ff]">DATAS:</span>
-      <div className="retro-drop-shadow flex items-stretch border-2 border-[#4060c0] bg-[#1e348c]">
-        <div className="flex flex-1 divide-x-2 divide-[#4060c0]">
-          {dates.map((item) => {
-            const isNext = item.id === nextUpcomingId;
-            const canOpen = isNext && canOpenPresence;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={canOpen ? () => onOpenMatchPresence(item.id) : undefined}
-                disabled={!canOpen}
-                className={
-                  canOpen
-                    ? 'z-10 -mx-[1px] -my-[1px] flex flex-1 items-center justify-center border-2 border-[#39ff14] bg-[#2540a0] text-sm text-[#ffd700] shadow-[0_0_4px_#39ff14] cursor-pointer hover:brightness-110'
-                    : 'flex flex-1 items-center justify-center text-sm text-[#e5e7eb] cursor-default'
-                }
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <RetroModal
+        open={pendingDeleteMatch !== null}
+        title="REMOVER PARTIDA"
+        message={
+          <span>
+            Tem certeza que deseja remover a partida de{' '}
+            {pendingDeleteMatch ? formatDateTimePtBr(pendingDeleteMatch.scheduled_at) : ''}? Essa
+            ação não pode ser desfeita.
+          </span>
+        }
+        onCancel={() => setPendingDeleteMatch(null)}
+        onConfirm={handleConfirmDeleteMatch}
+        confirmText="SIM, REMOVER"
+        cancelText="NÃO"
+        processing={pendingDeleteMatch !== null && deleteProcessingId === pendingDeleteMatch.id}
+      />
     </div>
   );
 }
@@ -410,4 +338,45 @@ function toStatusLabel(status: string): string {
   if (status === 'cancelled') return 'CANCELADA';
   if (status === 'finished') return 'FINALIZADA';
   return 'AGENDADA';
+}
+
+interface DurationOption {
+  value: string;
+  label: string;
+}
+
+function getDurationMinutesOptions(currentValue: string): DurationOption[] {
+  const presets: number[] = [];
+  for (let minutes = 30; minutes <= 180; minutes += 15) {
+    presets.push(minutes);
+  }
+
+  const options: DurationOption[] = presets.map((minutes) => ({
+    value: String(minutes),
+    label: formatDurationLabel(minutes),
+  }));
+
+  const currentParsed = Number(currentValue);
+  if (
+    currentValue !== '' &&
+    Number.isFinite(currentParsed) &&
+    currentParsed > 0 &&
+    !presets.includes(currentParsed)
+  ) {
+    options.push({
+      value: String(currentParsed),
+      label: formatDurationLabel(currentParsed),
+    });
+    options.sort((a, b) => Number(a.value) - Number(b.value));
+  }
+
+  return options;
+}
+
+function formatDurationLabel(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  if (rest === 0) return `${hours}h`;
+  return `${hours}h${String(rest).padStart(2, '0')}`;
 }

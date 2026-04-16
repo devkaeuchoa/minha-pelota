@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { RetroButton } from '@/Components/retro';
+import { useState } from 'react';
+import { RetroButton, RetroModal } from '@/Components/retro';
 
 interface GroupSettingsSectionProps {
   groupId: number;
@@ -14,32 +15,49 @@ export function GroupSettingsSection({
   onDeleteGroup,
   canManageGroup = true,
 }: GroupSettingsSectionProps) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   if (!canManageGroup) {
     return null;
   }
 
+  const handleConfirmDelete = () => {
+    onDeleteGroup();
+    setShowDeleteModal(false);
+  };
+
   return (
     <div className="flex flex-col gap-3">
-      <p className="retro-text-shadow text-sm text-[#a0b0ff]">
-        EDITE OU REMOVA AS CONFIGURAÇÕES DO GRUPO.
-      </p>
       <div className="flex gap-3">
         <RetroButton
-          size="md"
+          size="sm"
           className="flex-1"
           type="button"
           variant="danger"
           disabled={deleteProcessing}
-          onClick={onDeleteGroup}
+          onClick={() => setShowDeleteModal(true)}
         >
           REMOVER GRUPO
         </RetroButton>
         <Link href={`/groups/${groupId}/edit`} className="flex-1">
-          <RetroButton size="md" type="button" variant="success">
-            EDITAR GRUPO
+          <RetroButton size="sm" type="button" variant="success">
+            CONFIGURAR GRUPO
           </RetroButton>
         </Link>
       </div>
+
+      <RetroModal
+        open={showDeleteModal}
+        title="REMOVER GRUPO"
+        message={
+          <span>Tem certeza que deseja remover este grupo? Essa ação não pode ser desfeita.</span>
+        }
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        confirmText="SIM, REMOVER"
+        cancelText="NÃO"
+        processing={deleteProcessing}
+      />
     </div>
   );
 }

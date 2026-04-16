@@ -49,6 +49,7 @@ test.describe("Navegacao jogador vs admin", () => {
 
         await expect(page.getByRole("button", { name: "GRUPOS" })).toBeVisible();
         await page.getByRole("button", { name: "GRUPOS" }).click();
+        await page.getByRole("button", { name: "VER TODOS" }).click();
         await expect(page).toHaveURL(/\/groups$/);
         await expect(page.getByRole("heading", { name: "1. GRUPOS" })).toBeVisible();
     });

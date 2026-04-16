@@ -1,4 +1,4 @@
-/* global confirm, route */
+/* global route */
 import { Head, router } from '@inertiajs/react';
 import { PageProps, PhysicalCondition } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
@@ -7,12 +7,13 @@ import {
   RetroButton,
   RetroInfoCard,
   RetroInlineInfo,
+  RetroModal,
   RetroPhysicalConditionScale,
   RetroPitch,
   RetroSectionHeader,
   RetroValueDisplay,
 } from '@/Components/retro';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocale } from '@/hooks/useLocale';
 
 type PresenceStatus = 'going' | 'not_going' | 'maybe' | 'pending';
@@ -81,6 +82,8 @@ export default function PlayerHome({
   playerSummary,
 }: PlayerHomeProps) {
   const { t } = useLocale();
+  const [showLeaveGroupModal, setShowLeaveGroupModal] = useState(false);
+  const [leavingGroup, setLeavingGroup] = useState(false);
   const handlePresenceUpdate = (nextStatus: Exclude<PresenceStatus, 'pending'>) => {
     if (!nextMatch) return;
     router.post(route('player.home.presence.update', { match: nextMatch.id }), {
@@ -103,10 +106,18 @@ export default function PlayerHome({
 
   const handleLeaveGroup = () => {
     if (!group) return;
-    if (!confirm(t('home.player.leaveGroupConfirm'))) return;
+    setShowLeaveGroupModal(true);
+  };
 
+  const handleConfirmLeaveGroup = () => {
+    if (!group) return;
+    setLeavingGroup(true);
     router.delete(route('api.player.groups.leave', { group: group.id }), {
       preserveScroll: true,
+      onFinish: () => {
+        setLeavingGroup(false);
+        setShowLeaveGroupModal(false);
+      },
     });
   };
 
@@ -238,6 +249,17 @@ export default function PlayerHome({
           </div>
         )}
       </RetroInfoCard>
+
+      <RetroModal
+        open={showLeaveGroupModal}
+        title={t('home.player.leaveGroupTitle')}
+        message={<span>{t('home.player.leaveGroupConfirm')}</span>}
+        onCancel={() => setShowLeaveGroupModal(false)}
+        onConfirm={handleConfirmLeaveGroup}
+        confirmText={t('home.player.leaveGroupConfirmButton')}
+        cancelText={t('home.player.leaveGroupCancelButton')}
+        processing={leavingGroup}
+      />
     </RetroAppShell>
   );
 }

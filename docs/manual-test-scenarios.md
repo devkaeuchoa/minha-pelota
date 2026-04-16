@@ -65,8 +65,8 @@
     - Registro em `groups` com `weekday`, `time` obrigatórios.
     - `group_settings` criado com `default_weekday`, `default_time`, `monthly_fee` & `drop_in_fee` default, `invite_token` gerado.
 
-- **Edição de grupo**
-  - Acessar `/groups/{group}/edit`, alterar dia, horário, recorrência, local.
+- **Configuração de grupo**
+  - Na listagem, usar o link **Config** (ou acessar `/groups/{group}/edit`); alterar dia, horário, recorrência, local.
   - **Esperado**:
     - `groups.weekday`/`time` atualizados.
     - `group_settings.default_weekday/default_time/recurrence` sincronizados.

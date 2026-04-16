@@ -36,7 +36,7 @@ Baseado no cenario manual em `docs/manual-test-scenarios.md` (secao 4).
 ### 3) Edicao de grupo
 
 - Login com `Owner Player`.
-- Editar `E2E Group 2` — alterar local para "Quadra Editada".
+- Na listagem, no grupo `E2E Group 2`, clicar no link **Config** — alterar local para "Quadra Editada".
 - Esperado: redirecionamento para `/groups/{id}`, local atualizado aparece na listagem.
 
 ### 4) Remocao em lote

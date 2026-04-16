@@ -90,7 +90,6 @@ test.describe("Pagamentos por partida", () => {
 
         const row = page.locator("tbody tr").filter({ hasText: "Grouped Player" });
         await row.locator("select").selectOption("paid");
-        await row.locator('input[type="number"]').fill("25.50");
         await row.getByRole("button", { name: "SALVAR" }).click();
 
         await expect(page.getByText("Pagamento atualizado com sucesso.")).toBeVisible();

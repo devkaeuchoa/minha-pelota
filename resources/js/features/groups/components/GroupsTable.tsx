@@ -66,7 +66,7 @@ export function GroupsTable({ groups, selectedIds, onToggleSelected }: GroupsTab
                     href={`/groups/${group.id}/edit`}
                     className="text-[#ffd700] hover:underline underline-offset-2 px-4"
                   >
-                    Editar
+                    Config
                   </Link>
                 ) : null}
               </RetroTableCell>

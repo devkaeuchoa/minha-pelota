@@ -47,15 +47,15 @@ async function readConfirmedCount(page: Page): Promise<number> {
 
 async function openPresenceManageForE2eGroup(page: Page): Promise<void> {
     await openE2eGroupShow(page);
-    await page.getByRole("button", { name: "VER ESCALAÇÃO" }).click();
+    await page.getByRole("button", { name: "VER PRESENÇA DA PRÓXIMA PARTIDA" }).click();
     await expect(page.getByRole("heading", { name: "VISUALIZAR ESCALAÇÃO" })).toBeVisible();
 }
 
 async function ensurePresenceLinkVisible(page: Page): Promise<string> {
     const generateBtn = page.getByRole("button", { name: "GERAR LINK DE PRESENÇA" });
     if (await generateBtn.isVisible()) {
-        page.once("dialog", (d) => d.accept());
         await generateBtn.click();
+        await page.getByRole("button", { name: "SIM, GERAR" }).click();
         await expect(
             page.getByText(/Link de presença gerado|Link pronto|Copie e envie/i),
         ).toBeVisible({ timeout: 20_000 });

@@ -44,7 +44,7 @@ test.describe("Gestao de grupos (admin/owner)", () => {
     test("criacao de grupo redireciona para grupo criado", async ({ page }) => {
         await login(page, ADMIN_NO_GROUPS_PHONE);
         await expect(page).toHaveURL(/\/home\/admin$/);
-        await page.getByRole("button", { name: "GRUPOS", exact: true }).click();
+        await page.getByRole("button", { name: "GRUPOS" }).click();
         await page.getByRole("button", { name: "NOVO GRUPO" }).click();
         await expect(page).toHaveURL(/\/groups\/create$/);
 
@@ -76,12 +76,14 @@ test.describe("Gestao de grupos (admin/owner)", () => {
         await login(page, OWNER_PHONE);
 
         await expect(page).toHaveURL(/\/home\/admin$/);
-        await page.getByRole("button", { name: "GRUPOS", exact: true }).click();
+        await page.getByRole("button", { name: "GRUPOS" }).click();
+        await page.getByRole("button", { name: "VER TODOS" }).click();
+        await expect(page).toHaveURL(/\/groups$/);
 
         await page
             .locator("tbody tr")
             .filter({ hasText: "E2E Group 2" })
-            .getByRole("link", { name: "Editar" })
+            .getByRole("link", { name: "Config" })
             .click();
 
         await expect(page).toHaveURL(/\/groups\/\d+\/edit$/);
@@ -100,7 +102,9 @@ test.describe("Gestao de grupos (admin/owner)", () => {
         await login(page, OWNER_PHONE);
 
         await expect(page).toHaveURL(/\/home\/admin$/);
-        await page.getByRole("button", { name: "GRUPOS", exact: true }).click();
+        await page.getByRole("button", { name: "GRUPOS" }).click();
+        await page.getByRole("button", { name: "VER TODOS" }).click();
+        await expect(page).toHaveURL(/\/groups$/);
 
         await page
             .locator("tbody tr")

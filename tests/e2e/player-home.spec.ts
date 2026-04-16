@@ -25,25 +25,27 @@ test.describe("Home do jogador", () => {
 
         await expect(page.getByText("E2E Group")).toBeVisible();
         await expect(page.getByText("Arena E2E")).toBeVisible();
-        const presenceDisplay = page
-            .locator('[data-component="retro-value-display"]')
-            .filter({ has: page.getByText("SUA PRESENÇA", { exact: true }) });
-        await expect(
-            presenceDisplay.getByText(/PENDENTE|CONFIRMADA|DESCONFIRMADA|TALVEZ/, { exact: true }),
-        ).toBeVisible();
+
+        await expect(page.getByRole("button", { name: "CONFIRMAR", exact: true })).toBeVisible();
+        await expect(page.getByRole("button", { name: "TALVEZ", exact: true })).toBeVisible();
+        await expect(page.getByRole("button", { name: "DESCONFIRMAR", exact: true })).toBeVisible();
     });
 
     test("atualiza presenca rapida com confirmar, talvez e desconfirmar", async ({ page }) => {
         await login(page, PLAYER_WITH_GROUP_PHONE);
 
-        await page.getByRole("button", { name: "CONFIRMAR", exact: true }).click();
-        await expect(page.getByText("CONFIRMADA")).toBeVisible();
+        const confirmBtn = page.getByRole("button", { name: "CONFIRMAR", exact: true });
+        const maybeBtn = page.getByRole("button", { name: "TALVEZ", exact: true });
+        const unconfirmBtn = page.getByRole("button", { name: "DESCONFIRMAR", exact: true });
 
-        await page.getByRole("button", { name: "TALVEZ" }).click();
-        await expect(page.getByText("TALVEZ")).toBeVisible();
+        await confirmBtn.click();
+        await expect(confirmBtn).toHaveClass(/bg-\[#39ff14\]/);
 
-        await page.getByRole("button", { name: "DESCONFIRMAR" }).click();
-        await expect(page.getByText("DESCONFIRMADA")).toBeVisible();
+        await maybeBtn.click();
+        await expect(maybeBtn).toHaveClass(/bg-\[#39ff14\]/);
+
+        await unconfirmBtn.click();
+        await expect(unconfirmBtn).toHaveClass(/bg-\[#39ff14\]/);
     });
 
     test("atualiza condicao fisica para machucado", async ({ page }) => {
