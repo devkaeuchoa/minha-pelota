@@ -1,6 +1,6 @@
 # MVP Backlog — Minha Pelota
 
-> **Fase**: Sprint Planning (Sprint 0 → Sprint 1)  
+> **Fase**: Execução MVP (backend core de partidas + presença + pagamentos entregue; foco em Should Have e polish)  
 > **Objetivo**: Backlog priorizado e decomposto em tarefas para o MVP.
 
 ## Objective
@@ -15,7 +15,7 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 - [x] **US-2** — Como admin, quero cadastrar e convidar jogadores para que eles possam participar das peladas
 - [x] **US-3** — Como admin, quero criar e listar datas de partidas para que todos saibam quando jogar
 - [x] **US-4** — Como jogador, quero confirmar presença na partida para que o organizador saiba quem vem
-- [ ] **US-5** — Como admin, quero marcar quem pagou para que eu controle o aluguel do espaço
+- [x] **US-5** — Como admin, quero marcar quem pagou para que eu controle o aluguel do espaço _(backend: `MatchPayment`, sync com confirmados, PATCH por jogador; testes em `MatchPaymentsTest`)_
 
 ### Should Have (Sprint 3)
 
@@ -45,12 +45,12 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 
 ## Tasks (Sprint 2 — Core: Partidas + Presença + Pagamento)
 
-- [ ] CRUD de partidas (datas, local) _(PARCIAL: geração/listagem/visualização implementadas; CRUD completo ainda pendente)_
+- [x] CRUD de partidas (datas, local, status) — `GroupMatchController` + rotas `groups.matches.{store,update,destroy}`; model `Game` (`matches`, soft delete); testes `MatchesCrudTest`
 - [x] Geração automática de partidas por período e listagem das próximas partidas por grupo
 - [x] Lista de presença (confirmar / desconfirmar)
 - [x] Extensão da presença: opção "talvez", link público por partida e confirmação na área logada do jogador
-- [ ] Status de pagamento por partida (pago / pendente)
-- [ ] Dashboard admin (resumo do grupo) _(PARCIAL: gestão de presença e escalação por partida pronta; falta visão financeira/pagamentos)_
+- [x] Status de pagamento por partida (pago / pendente / valores) — `GroupMatchPaymentController`, tabela `match_payments`
+- [ ] Dashboard admin (resumo do grupo) _(PARCIAL: `/home/admin` com contagens; gestão financeira por partida na rota `groups.matches.payments.manage`; falta visão consolidada multi-partida / KPIs se desejado)_
 
 ## Tasks (Sprint 3 — Should Have)
 
@@ -59,7 +59,7 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 
 ## Acceptance Criteria (MVP)
 
-- [ ] Usuário consegue [ação principal] sem fricção _(PARCIAL: fluxos de grupo, convite, partidas e presença já operacionais)_
+- [x] Admin consegue ciclo completo grupo → jogadores → partidas (CRUD + geração) → presença → marcar pagamentos por partida _(fluxos cobertos no backend web + Feature tests)_
 - [ ] Sistema está disponível em produção (staging mínimo)
 - [ ] Feedback pode ser coletado de forma estruturada
 
@@ -72,4 +72,5 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 
 - Velocidade: ajustar conforme capacidade do time
 - Definição de Pronto: código em main, testes passando, deploy funcional
-- **Status PM (Mar/2026)**: MVP funcional para gestão de grupo + partidas + presença. Próximo foco recomendado: pagamentos (US-5) e fechamento do CRUD completo de partidas.
+- **Backend (Abr/2026)**: Autenticação e guard `web` usam model **`Player`** (sem tabela `users` legada). Rotas **web** cobrem grupos, partidas, presença, pagamentos. **API Sanctum** (`routes/api.php`): apenas `groups` + jogadores do grupo — partidas/presença/pagamentos não expostos como JSON resource.
+- **Status PM (Abr/2026)**: Must Have de backend para US-1…US-5 atendido no servidor. Próximo foco: **US-6/US-7**, consolidado admin opcional, **Policies** (hoje autorização inline nos controllers), e expansão da API se houver app cliente ou integrações.

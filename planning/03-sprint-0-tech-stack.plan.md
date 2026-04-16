@@ -69,8 +69,8 @@
 ```
 minha-pelota/
 ├── app/
-│   ├── Models/          # Grupo, Jogador, Partida, User
-│   └── Http/Controllers/
+│   ├── Models/          # Group, Player (auth), Game → tabela matches, MatchPayment, …
+│   └── Http/Controllers/ # Web (Inertia) + Api/ (Sanctum: groups, group players)
 ├── resources/
 │   └── js/
 │       ├── types/        # Model — interfaces de domínio (Group, Player, PageProps)
@@ -90,7 +90,8 @@ minha-pelota/
 │       └── Pages/        # Containers Inertia (Controller fino)
 ├── public/              # document root no HostGator
 ├── database/migrations/
-├── routes/web.php
+├── routes/web.php       # Grupos, partidas, presença, pagamentos (Inertia)
+├── routes/api.php       # Sanctum: apiResource groups + players do grupo
 ├── .env.example
 ├── planning/            # docs de planejamento
 └── README.md
@@ -123,7 +124,7 @@ O frontend segue uma separação **Model / View / Controller** adaptada para Rea
 - [x] Criar projeto Laravel — `./scripts/setup-sprint-0.sh` (local) ou `./scripts/setup-sprint-0-docker.sh` (Docker). Ver SETUP.md
 - [ ] Configurar `.env` e MySQL local
 - [x] Instalar Laravel Breeze (Inertia + React stack)
-- [x] Criar migrations: users, grupos, jogadores, partidas
+- [x] Criar migrations: autenticação em `players`, grupos, jogadores, partidas (`matches`), presença, pagamentos, etc.
 - [x] Configurar Tailwind e layout base
 - [ ] Documentar deploy HostGator (passos no README)
 
@@ -170,6 +171,7 @@ O frontend segue uma separação **Model / View / Controller** adaptada para Rea
 
 ## Next Steps
 
-1. Consolidar Sprint 2 com foco em US-5 (pagamentos por partida)
-2. Fechar pendências de CRUD completo de partidas e resumo admin financeiro
-3. Planejar Sprint 3 (divisão de times e recorrência de pagamento)
+1. ~~Backend Sprint 2: US-5 (pagamentos por partida) e CRUD de partidas~~ — entregue no app (web); ver `02-mvp-backlog.plan.md`
+2. Planejar Sprint 3 (**US-6** divisão de times, **US-7** recorrência) e visão admin financeira consolidada, se priorizada
+3. Operacional: documentar deploy HostGator, env vars, e rodar migrations em produção
+4. Hardening: Policies Laravel, transações onde há múltiplos writes, eventual API para partidas/presença/pagamentos

@@ -39,7 +39,7 @@ Definir claramente o problema que o app resolve, para quem e qual a proposta de 
 - [x] Cadastro e convite de jogadores
 - [x] Datas de partidas (criar e listar)
 - [x] Lista de presença ("quem vem?")
-- [ ] Status de pagamento (pago / pendente)
+- [x] Status de pagamento (pago / pendente) — registrado por partida no backend (`match_payments`)
 
 ### Should Have
 
@@ -67,4 +67,4 @@ Definir claramente o problema que o app resolve, para quem e qual a proposta de 
 1. ~~Validar problem statement~~ ✅ Discovery concluído
 2. ~~Refinar backlog com user stories (02-mvp-backlog.plan.md)~~ ✅ Concluído
 3. ~~Sprint 0: definir tech stack e setup inicial~~ ✅ Concluído
-4. Foco do próximo ciclo: pagamentos (US-5) + fechamento de CRUD completo de partidas
+4. Foco do próximo ciclo (pós-backend US-5): **US-6** (divisão de times), **US-7** (recorrência de cobrança), visão admin financeira consolidada (se priorizado), **Policies** Laravel e eventual **API** para partidas/presença/pagamentos

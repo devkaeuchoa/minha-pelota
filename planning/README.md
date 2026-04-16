@@ -17,8 +17,9 @@ Fluxo iterativo Agile para desenhar o MVP do app. Cada sprint refinamos o backlo
 3. **Sprint 0** → Definir MVP mínimo viável
 4. **Iterar** → Revisar e ajustar a cada ciclo
 
-## Status Atual (Mar/2026)
+## Status Atual (Abr/2026)
 
 - Discovery e Sprint 0 concluídos
-- MVP core entregue para: grupos, convites, geração/lista de partidas e presença (incluindo "talvez")
-- Próximo foco de planejamento: pagamentos por partida e fechamento do CRUD completo de partidas
+- **Backend (Laravel)**: grupos, convites, **CRUD de partidas** (`Game` / `matches`), geração em lote, presença (incluindo "talvez" e link público), **pagamentos por partida** (`MatchPayment`); identidade de login = **`Player`** (guard `web`)
+- **API Sanctum**: somente grupos + jogadores do grupo; demais domínios via rotas web/Inertia
+- Próximo foco de planejamento: US-6/US-7, melhorias de autorização (Policies), deploy/docs operacionais

@@ -20,19 +20,20 @@ Registro das principais observações de uma revisão cruzada (frontend React/In
 
 ## Backend (Laravel / PHP)
 
-| Tema           | Observação                                                                 | Direção sugerida                                                                            |
-| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| User vs Player | Alguns fluxos usam `user_id`, outros `player_id` na mesma área conceitual. | Documentar fronteira: “identidade” (User) vs “atleta no grupo” (Player); APIs consistentes. |
-| Controllers    | `PlayerHomeController` concentra rankings, condição física, histórico.     | Extrair actions/services (rankings mensais, histórico de condição, stats híbridas).         |
-| Integridade    | Partidas no mesmo grupo com mesmo `scheduled_at` possível.                 | Índice único composto ou validação explícita, conforme regra de negócio.                    |
-| Transações     | Atualização de condição + histórico em múltiplos writes.                   | `DB::transaction()` para atomicidade.                                                       |
-| Autorização    | `authorizeOwner` repetido.                                                 | Policies ou middleware de ownership onde couber.                                            |
+| Tema              | Observação                                                                                                                                 | Direção sugerida                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| Identidade        | Autenticação usa **`Player`** (`config/auth.php` → provider `users` aponta para `Player::class`); tabela `users` legada removida nas migrations. | ADR curto: um jogador = conta; revisar nomenclatura residual (`Auth::user()` vs “player”) no código e docs. |
+| Superfície HTTP   | Partidas, presença e pagamentos expostos em **`routes/web.php`** (Inertia); **`routes/api.php`** só `groups` + jogadores do grupo (Sanctum).     | Se precisar cliente mobile/terceiros: resources API ou versionamento; evitar duplicar regras sem extrair serviços. |
+| Controllers       | `PlayerHomeController` concentra rankings, condição física, histórico.                                                                     | Extrair actions/services (rankings mensais, histórico de condição, stats híbridas).                      |
+| Integridade       | Partidas no mesmo grupo com mesmo `scheduled_at` possível.                                                                               | Índice único composto ou validação explícita, conforme regra de negócio.                                  |
+| Transações        | Atualização de condição + histórico em múltiplos writes.                                                                                  | `DB::transaction()` para atomicidade.                                                                    |
+| Autorização       | `authorizeOwner` / `abort_unless` repetidos em controllers de grupo/partida/pagamento.                                                     | Policies ou middleware de ownership onde couber.                                                         |
 
 ## Documentação (lacunas úteis)
 
 - **Testes**: como rodar suíte, cobertura mínima esperada, fixtures.
 - **Operação**: env vars, jobs, filas, deploy.
-- **Arquitetura**: diagrama ou ADR curto (Inertia, domínio User/Player/Group/Match).
+- **Arquitetura**: diagrama ou ADR curto (Inertia, domínio **Player**/Group/**Game** (matches)/MatchPayment).
 - **ADRs**: decisões como stats híbridas, rankings mensais, histórico de condição física.
 
 ## Relação com outros artefatos de planning
