@@ -1,0 +1,39 @@
+# compose.override.yaml — Ambiente de desenvolvimento local (Docker)
+# Aplicado automaticamente pelo Docker Compose junto com compose.yaml.
+# Não commitar — .env já está no .gitignore.
+
+services:
+
+  # ── Init dev: cria o arquivo SQLite com ownership correto ───────────────────
+  # Volumes nomeados são criados vazios com ownership root. Este serviço roda
+  # como root para criar o arquivo e ceder posse ao www-data antes do app subir.
+  init-dev:
+    image: ${APP_IMAGE:-minha-pelota}:${APP_VERSION:-latest}
+    user: root
+    command: >
+      sh -c "mkdir -p /db &&
+             touch /db/database.sqlite &&
+             chown -R 82:82 /db"
+    volumes:
+      - dev_db:/db
+    restart: "no"
+    network_mode: none
+
+  app:
+    # .env local é carregado depois de .env.production — suas chaves têm prioridade
+    # (APP_DEBUG=true, DB_CONNECTION=sqlite, APP_KEY local, LOG_LEVEL=debug, etc.)
+    env_file:
+      - .env.production
+      - .env
+    environment:
+      DB_DATABASE: /app/storage/dev/database.sqlite
+    # Roda migrations antes de iniciar o FPM (SQLite já existe graças ao init-dev)
+    command: sh -c "php artisan migrate --force && php-fpm"
+    volumes:
+      - dev_db:/app/storage/dev
+    depends_on:
+      init-dev:
+        condition: service_completed_successfully
+
+volumes:
+  dev_db:

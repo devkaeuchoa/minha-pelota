@@ -61,7 +61,7 @@ services:
       init:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/up"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/up"]
       interval: 30s
       timeout: 5s
       retries: 3
