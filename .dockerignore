@@ -1,0 +1,64 @@
+# ── Version control ──────────────────────────────────────────────────────────
+.git
+.gitignore
+
+# ── Environment files — must NEVER enter the image ───────────────────────────
+# .env.example is intentionally allowed (non-sensitive reference template)
+.env
+.env.backup
+.env.production
+.env.staging
+
+# ── Dependencies installed during Docker build stages ────────────────────────
+node_modules/
+vendor/
+
+# ── Bootstrap cache — generated at runtime with actual env vars ───────────────
+bootstrap/cache/*.php
+
+# ── IDE / editor config ───────────────────────────────────────────────────────
+.vscode/
+.idea/
+.nova/
+.zed/
+.fleet/
+.phpactor.json
+
+# ── PHP tooling ───────────────────────────────────────────────────────────────
+.phpunit.result.cache
+.phpunit.cache/
+.phpunit/
+auth.json
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+tests/
+test-results/
+playwright-report/
+.playwright/
+playwright.config.ts
+
+# ── Vite dev server marker ─────────────────────────────────────────────────────
+# Presence of this file makes Laravel proxy to the Vite dev server
+# instead of using the compiled assets in public/build/.
+public/hot
+
+# ── Compiled assets (rebuilt in Stage 1) ──────────────────────────────────────
+public/build/
+
+# ── Documentation and planning ────────────────────────────────────────────────
+docs/
+planning/
+README.md
+CHANGELOG.md
+SETUP.md
+scripts/
+
+# ── Laravel sensitive runtime files ───────────────────────────────────────────
+storage/*.key
+storage/pail/
+
+# ── macOS / Windows artifacts ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Homestead.json
+Homestead.yaml
