@@ -1,6 +1,7 @@
 # compose.override.yaml — Ambiente de desenvolvimento local (Docker)
 # Aplicado automaticamente pelo Docker Compose junto com compose.yaml.
-# Não commitar — .env já está no .gitignore.
+# Commitado de propósito: só contém infra de dev (SQLite, ownership, migrate),
+# nenhum segredo — chaves reais ficam em .env/.env.production (no .gitignore).
 
 services:
 
