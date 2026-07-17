@@ -32,7 +32,9 @@ async function getInviteTokenFromGroupShow(page: Page, groupName: string): Promi
     await loginOwner(page);
     await openGroupShow(page, groupName);
 
-    await page.getByRole("button", { name: "CONVITE", exact: true }).click();
+    // RetroAccordion appends a "+"/"−" toggle glyph to the button's accessible name
+    // (e.g. "CONVITE +"), so it never matches an exact "CONVITE" name.
+    await page.getByRole("button", { name: "CONVITE" }).click();
 
     const generateBtn = page.getByRole("button", { name: "GERAR LINK DE CONVITE" });
     if (await generateBtn.isVisible().catch(() => false)) {

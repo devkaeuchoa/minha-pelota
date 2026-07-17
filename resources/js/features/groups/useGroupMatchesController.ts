@@ -66,10 +66,11 @@ export function useGroupMatchesController(
     e.preventDefault();
     if (!group) return;
 
+    matchForm.transform((data) => ({ ...data, redirect_to_dates: redirectToDates }));
     matchForm.post(route('groups.matches.store', group), {
       preserveScroll: true,
       onSuccess: () => matchForm.setData(INITIAL_MATCH_FORM),
-      data: { ...matchForm.data, redirect_to_dates: redirectToDates },
+      onFinish: () => matchForm.transform((data) => data),
     });
   };
 
@@ -92,10 +93,11 @@ export function useGroupMatchesController(
     e.preventDefault();
     if (!group || !matchForm.data.id) return;
 
+    matchForm.transform((data) => ({ ...data, redirect_to_dates: redirectToDates }));
     matchForm.put(route('groups.matches.update', { group: group.id, match: matchForm.data.id }), {
       preserveScroll: true,
       onSuccess: () => matchForm.setData(INITIAL_MATCH_FORM),
-      data: { ...matchForm.data, redirect_to_dates: redirectToDates },
+      onFinish: () => matchForm.transform((data) => data),
     });
   };
 

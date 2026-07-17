@@ -2,7 +2,7 @@ import { InputHTMLAttributes } from 'react';
 
 interface RetroSearchInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  'className' | 'type'
+  'className' | 'type' | 'onChange'
 > {
   value: string;
   onChange: (value: string) => void;
