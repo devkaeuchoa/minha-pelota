@@ -59,6 +59,20 @@ export default function Show({ group, players, matches }: ShowProps) {
               VER PRESENÇA DA PRÓXIMA PARTIDA
             </RetroButton>
           ) : null}
+          {nextMatch && permissions.can_manage_attendance ? (
+            <RetroButton
+              variant="neutral"
+              size="sm"
+              type="button"
+              onClick={() =>
+                router.visit(
+                  route('groups.matches.teams.manage', { group: group.id, match: nextMatch.id }),
+                )
+              }
+            >
+              GERAR TIMES DA PRÓXIMA PARTIDA
+            </RetroButton>
+          ) : null}
         </div>
       </RetroInfoCard>
 

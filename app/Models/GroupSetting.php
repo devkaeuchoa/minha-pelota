@@ -14,6 +14,7 @@ class GroupSetting extends Model
         'default_weekday',
         'default_time',
         'recurrence',
+        'default_team_size',
         'invite_token',
         'invite_expires_at',
     ];

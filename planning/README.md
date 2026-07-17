@@ -23,4 +23,5 @@ Fluxo iterativo Agile para desenhar o MVP do app. Cada sprint refinamos o backlo
 - **Backend (Laravel)**: grupos, convites, **CRUD de partidas** (`Game` / `matches`), geração em lote, presença (incluindo "talvez" e link público), **pagamentos por partida** (`MatchPayment`); identidade de login = **`Player`** (guard `web`)
 - **API Sanctum**: somente grupos + jogadores do grupo; demais domínios via rotas web/Inertia
 - **Containerização**: build multi-stage (Docker) + `compose.yaml` para deploy em VPS e `compose.override.yaml` para dev local (SQLite) — ver README raiz, seção "Docker / Deploy"
-- Próximo foco de planejamento: US-6 (divisão de times A/B), US-7 (recorrência de pagamento), melhorias de autorização (Policies)
+- **US-6 concluído**: divisão automática balanceada de times A/B por partida, com ajuste manual e tamanho de time configurável por grupo (override por partida)
+- Próximo foco de planejamento: US-7 (recorrência de pagamento), melhorias de autorização (Policies)

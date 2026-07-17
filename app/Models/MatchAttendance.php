@@ -13,6 +13,7 @@ class MatchAttendance extends Model
         'match_id',
         'player_id',
         'status',
+        'team',
     ];
 
     protected static function booted(): void

@@ -5,6 +5,8 @@ use App\Http\Controllers\GroupMatchController;
 use App\Http\Controllers\GroupMatchGenerationController;
 use App\Http\Controllers\GroupMatchAttendanceController;
 use App\Http\Controllers\GroupMatchPaymentController;
+use App\Http\Controllers\GroupMatchTeamsController;
+use App\Http\Controllers\GroupSettingsController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\PlayerHomeController;
@@ -260,6 +262,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
 
+    Route::get('/groups/{group}/settings', [GroupSettingsController::class, 'edit'])->name('groups.settings.edit');
+    Route::put('/groups/{group}/settings', [GroupSettingsController::class, 'update'])->name('groups.settings.update');
+
     Route::post('/groups/{group}/matches/generate/current-month', [
         GroupMatchGenerationController::class,
         'generateCurrentMonth',
@@ -296,6 +301,19 @@ Route::middleware('auth')->group(function () {
         GroupMatchPaymentController::class,
         'update',
     ])->name('groups.matches.payments.update');
+
+    Route::get('/groups/{group}/matches/{match}/teams', [
+        GroupMatchTeamsController::class,
+        'manage',
+    ])->name('groups.matches.teams.manage');
+    Route::post('/groups/{group}/matches/{match}/teams/generate', [
+        GroupMatchTeamsController::class,
+        'generate',
+    ])->name('groups.matches.teams.generate');
+    Route::patch('/groups/{group}/matches/{match}/teams/{player}', [
+        GroupMatchTeamsController::class,
+        'update',
+    ])->name('groups.matches.teams.update');
 
     Route::post('/groups/{group}/players', [PlayerController::class, 'store'])->name('groups.players.store');
     Route::post('/groups/{group}/players/attach', [PlayerController::class, 'attachExisting'])->name('groups.players.attach');

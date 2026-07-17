@@ -46,6 +46,12 @@ export function GroupSettingsSection({
         </Link>
       </div>
 
+      <Link href={`/groups/${groupId}/settings`} className="flex-1">
+        <RetroButton size="sm" type="button" variant="neutral" className="w-full">
+          CONFIGURAÇÕES AVANÇADAS
+        </RetroButton>
+      </Link>
+
       <RetroModal
         open={showDeleteModal}
         title="REMOVER GRUPO"

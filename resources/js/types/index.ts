@@ -15,6 +15,7 @@ export interface GroupSettings {
   default_weekday?: number | null;
   default_time?: string | null;
   recurrence?: string | null;
+  default_team_size?: number | null;
   invite_token?: string | null;
   invite_expires_at?: string | null;
 }
@@ -78,6 +79,15 @@ export interface MatchPayment {
   is_monthly_exempt: boolean;
   has_previous_debt: boolean;
   previous_debt_matches_count: number;
+}
+
+export interface MatchTeamPlayer {
+  id: number;
+  name: string;
+  nick: string;
+  rating: number | null;
+  physicalCondition: PhysicalCondition;
+  team: 'a' | 'b' | null;
 }
 
 export interface Player {

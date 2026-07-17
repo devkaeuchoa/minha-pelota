@@ -19,7 +19,7 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 
 ### Should Have (Sprint 3)
 
-- [ ] **US-6** — Como admin, quero dividir os jogadores em times para facilitar a escalação _(PARCIAL: visualização de escalação/campinho pronta; falta divisão efetiva de times A/B)_
+- [x] **US-6** — Como admin, quero dividir os jogadores em times para facilitar a escalação _(backend: coluna `team` em `match_attendance`, `BalanceMatchTeamsAction` para geração automática balanceada, `GroupMatchTeamsController` com manage/generate/update, tamanho de time configurável por grupo (`group_settings.default_team_size`) com override por partida (`matches.team_size`); frontend: `Groups/MatchTeams/Manage.tsx` com ajuste manual por clique; testes em `MatchTeamsTest`/`BalanceMatchTeamsActionTest`/`GroupSettingsTest`)_
 - [ ] **US-7** — Como admin, quero definir recorrência de pagamento (mensal/semanal) para automatizar cobranças
 
 ### Could Have (Backlog)
@@ -54,7 +54,7 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 
 ## Tasks (Sprint 3 — Should Have)
 
-- [ ] Divisão de times (manual ou automática)
+- [x] Divisão de times (manual ou automática)
 - [ ] Configuração de recorrência de pagamento
 
 ## Acceptance Criteria (MVP)

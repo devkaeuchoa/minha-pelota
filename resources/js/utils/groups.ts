@@ -26,6 +26,7 @@ export function resolveGroupSettings(group: Group): GroupSettings {
     default_weekday: modern.default_weekday ?? group.weekday ?? null,
     default_time: modern.default_time ?? group.time ?? null,
     recurrence: modern.recurrence ?? group.recurrence ?? null,
+    default_team_size: modern.default_team_size ?? null,
     invite_token: modern.invite_token ?? group.invite_code ?? null,
     invite_expires_at: modern.invite_expires_at ?? null,
   };

@@ -158,5 +158,42 @@ class DatabaseSeeder extends Seeder
             'player_id' => $playerWithGroup->id,
             'status' => 'going',
         ]);
+
+        // Scheduled match with 5 confirmed players — E2E divisão de times.
+        $teamsGroup = Group::factory()->create([
+            'owner_player_id' => $owner->id,
+            'name' => 'E2E Match Teams',
+            'slug' => 'e2e-match-teams',
+            'location_name' => 'Arena Times E2E',
+        ]);
+        $teamsGroup->players()->syncWithoutDetaching([
+            $owner->id => ['is_admin' => true],
+        ]);
+
+        $teamsPlayers = collect([
+            ['name' => 'Teams Player 1', 'nick' => 'teams-player-1', 'phone' => '11900000001', 'rating' => 5],
+            ['name' => 'Teams Player 2', 'nick' => 'teams-player-2', 'phone' => '11900000002', 'rating' => 4],
+            ['name' => 'Teams Player 3', 'nick' => 'teams-player-3', 'phone' => '11900000003', 'rating' => 3],
+            ['name' => 'Teams Player 4', 'nick' => 'teams-player-4', 'phone' => '11900000004', 'rating' => 2],
+            ['name' => 'Teams Player 5', 'nick' => 'teams-player-5', 'phone' => '11900000005', 'rating' => 1],
+        ])->map(fn(array $attributes) => Player::factory()->create($attributes));
+
+        $teamsGroup->players()->attach($teamsPlayers->pluck('id'));
+
+        $teamsMatch = Game::query()->create([
+            'group_id' => $teamsGroup->id,
+            'scheduled_at' => now()->addDays(2),
+            'status' => 'scheduled',
+            'location_name' => 'Arena Times E2E',
+            'duration_minutes' => 90,
+        ]);
+
+        foreach ($teamsPlayers as $player) {
+            MatchAttendance::query()->create([
+                'match_id' => $teamsMatch->id,
+                'player_id' => $player->id,
+                'status' => 'going',
+            ]);
+        }
     }
 }

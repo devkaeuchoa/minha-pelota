@@ -3,8 +3,8 @@ import { ReactNode } from 'react';
 interface RetroTeamCardProps {
   teamName: string;
   playerLabel: string;
-  formationLabel: string;
-  formation: string;
+  formationLabel?: string;
+  formation?: string;
   flag?: ReactNode;
 }
 
@@ -39,10 +39,12 @@ export function RetroTeamCard({
           <span className="retro-text-shadow text-xl text-[#ffd700]">{playerLabel}</span>
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="retro-text-shadow text-[#a0b0ff]">{formationLabel}</span>
-          <span className="retro-text-shadow text-xl text-white">{formation}</span>
-        </div>
+        {formationLabel || formation ? (
+          <div className="flex items-center justify-between">
+            <span className="retro-text-shadow text-[#a0b0ff]">{formationLabel}</span>
+            <span className="retro-text-shadow text-xl text-white">{formation}</span>
+          </div>
+        ) : null}
       </div>
     </div>
   );
