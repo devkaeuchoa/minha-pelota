@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased — Docker containerization for VPS deploy
+
+### Added
+
+- **Multi-stage Docker build**: Node 22 stage compiles frontend assets, Composer stage installs production PHP dependencies, final PHP 8.2-FPM Alpine stage runs the app as `www-data` with only `vendor/` and `public/build/` carried over (no dev deps, no `node_modules`).
+- **`compose.yaml`**: production orchestration with `init` (publishes compiled assets to a shared volume on every `up`), `app` (PHP-FPM, persistent `storage` volume), and `web` (Nginx 1.27-alpine reverse proxy with `/up` healthcheck).
+- **`compose.override.yaml`**: local dev override — `init-dev` fixes SQLite volume ownership, `app` runs migrations automatically on startup against an isolated SQLite volume.
+
+### Fixed
+
+- `web` healthcheck now targets `127.0.0.1` instead of `localhost` (BusyBox `wget` on Alpine does not resolve `localhost` inside the container).
+
 ## v0.3.0 — Localization foundation and generic retro components
 
 ### Added
