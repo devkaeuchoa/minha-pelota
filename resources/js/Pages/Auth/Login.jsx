@@ -13,7 +13,7 @@ import {
 } from '@/Components/retro';
 import { useLocale } from '@/hooks/useLocale';
 
-export default function Login({ status }) {
+export default function Login({ status, hasAdmin }) {
   const { t } = useLocale();
   const { data, setData, post, processing, errors, reset } = useForm({
     phone: '',
@@ -83,6 +83,14 @@ export default function Login({ status }) {
                   >
                     {t('auth.loginCreateAccount')}
                   </Link>
+                  {!hasAdmin && (
+                    <Link
+                      href={route('first-access')}
+                      className="retro-text-shadow text-sm text-[#a0b0ff] text-center w-full underline hover:text-white"
+                    >
+                      {t('auth.loginFirstAccess')}
+                    </Link>
+                  )}
                 </div>
               </div>
             </form>
@@ -95,4 +103,5 @@ export default function Login({ status }) {
 
 Login.propTypes = {
   status: PropTypes.string,
+  hasAdmin: PropTypes.bool,
 };

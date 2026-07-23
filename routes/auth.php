@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
+use App\Http\Controllers\Auth\FirstAccessController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,11 @@ Route::middleware('guest')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store']);
     Route::get('register/phone-availability', [RegisteredUserController::class, 'phoneAvailability'])
         ->name('register.phone-availability');
+
+    Route::get('primeiro-acesso', [FirstAccessController::class, 'create'])
+        ->name('first-access');
+
+    Route::post('primeiro-acesso', [FirstAccessController::class, 'store']);
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');

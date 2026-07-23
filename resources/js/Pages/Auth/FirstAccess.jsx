@@ -2,7 +2,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { maskPhone } from '@/utils/phone';
 import axios from 'axios';
-import PropTypes from 'prop-types';
 import { useMemo, useState } from 'react';
 import {
   RetroButton,
@@ -16,7 +15,7 @@ import { RetroInlineAlert } from '@/Components/retro/RetroInlineAlert';
 import { validatePhone } from '@/utils/formValidation';
 import { useLocale } from '@/hooks/useLocale';
 
-export default function Register({ status }) {
+export default function FirstAccess() {
   const { t } = useLocale();
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const [phoneAvailable, setPhoneAvailable] = useState(false);
@@ -71,21 +70,21 @@ export default function Register({ status }) {
   const submit = (e) => {
     e.preventDefault();
 
-    post(route('register'), {
+    post(route('first-access'), {
       onFinish: () => reset('password', 'password_confirmation'),
     });
   };
 
   return (
     <div className="retro-body-bg retro-scanlines flex min-h-screen flex-col items-center pt-6">
-      <Head title={t('auth.registerPageTitle')} />
+      <Head title={t('auth.firstAccessPageTitle')} />
 
       <div className="w-full max-w-xl px-3">
-        <RetroSectionHeader title="CADASTRO" />
+        <RetroSectionHeader title={t('auth.firstAccessHeader')} />
         <div className="mt-4">
           <RetroInfoCard>
             <form onSubmit={submit} className="flex flex-col gap-4">
-              {status && <RetroInlineInfo message={status} />}
+              <RetroInlineInfo message={t('auth.firstAccessExplanation')} />
 
               {phoneAvailable && phoneCheckMessage && (
                 <RetroInlineInfo message={phoneCheckMessage} />
@@ -174,7 +173,7 @@ export default function Register({ status }) {
                   variant="success"
                   disabled={processing || isCheckingPhone || !isFormValid}
                 >
-                  CADASTRAR
+                  {t('auth.firstAccessSubmit')}
                 </RetroButton>
                 <Link
                   href={route('login')}
@@ -190,7 +189,3 @@ export default function Register({ status }) {
     </div>
   );
 }
-
-Register.propTypes = {
-  status: PropTypes.string,
-};

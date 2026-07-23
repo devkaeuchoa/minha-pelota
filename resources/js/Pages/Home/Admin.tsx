@@ -1,7 +1,9 @@
-import { Head } from '@inertiajs/react';
+/* global route */
+import { Head, Link } from '@inertiajs/react';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { formatDateTimePtBr } from '@/utils/datetime';
 import {
+  RetroButton,
   RetroInfoCard,
   RetroInlineInfo,
   RetroSectionHeader,
@@ -34,6 +36,30 @@ export default function AdminHome({
       <RetroInfoCard>
         <div className="flex flex-col gap-3">
           <RetroInlineInfo message={t('home.admin.welcome')} />
+
+          {ownerGroupsCount === 0 && (
+            <div className="rounded border-2 border-[#4060c0] bg-[#1e348c] p-3">
+              <span className="retro-text-shadow text-base text-[#a0b0ff]">
+                {t('home.admin.gettingStarted.header')}
+              </span>
+              <ul className="mt-2 flex flex-col gap-1">
+                <li className="retro-text-shadow text-sm text-[#e5e7eb]">
+                  {t('home.admin.gettingStarted.step1')}
+                </li>
+                <li className="retro-text-shadow text-sm text-[#e5e7eb]">
+                  {t('home.admin.gettingStarted.step2')}
+                </li>
+                <li className="retro-text-shadow text-sm text-[#e5e7eb]">
+                  {t('home.admin.gettingStarted.step3')}
+                </li>
+              </ul>
+              <Link href={route('groups.create')} className="mt-3 inline-block">
+                <RetroButton size="sm" type="button" variant="success">
+                  {t('home.admin.gettingStarted.createGroupCta')}
+                </RetroButton>
+              </Link>
+            </div>
+          )}
 
           <RetroValueDisplay label={t('home.admin.ownerGroups')} value={String(ownerGroupsCount)} />
 
