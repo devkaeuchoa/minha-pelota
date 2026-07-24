@@ -20,6 +20,7 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 ### Should Have (Sprint 3)
 
 - [x] **US-6** — Como admin, quero dividir os jogadores em times para facilitar a escalação _(backend: coluna `team` em `match_attendance`, `BalanceMatchTeamsAction` para geração automática balanceada, `GroupMatchTeamsController` com manage/generate/update, tamanho de time configurável por grupo (`group_settings.default_team_size`) com override por partida (`matches.team_size`); frontend: `Groups/MatchTeams/Manage.tsx` com ajuste manual por clique; testes em `MatchTeamsTest`/`BalanceMatchTeamsActionTest`/`GroupSettingsTest`)_
+- [x] **US-10** — Como admin, quero um fluxo de primeiro acesso para configurar minha conta como administrador sem depender de seed manual _(não estava no backlog original; surgiu como necessidade de onboarding. Backend: rota `GET/POST /primeiro-acesso`, `FirstAccessController` — o primeiro cadastro concluído vira admin via transação com `lockForUpdate` contra corrida; tentativas seguintes caem no `register` normal com aviso. Link "Primeiro acesso" no login some assim que existe algum admin (`hasAdmin` prop). Frontend: `Auth/FirstAccess.jsx`, checklist "PRIMEIROS PASSOS" em `Home/Admin.tsx` quando o admin não tem grupos; testes em `FirstAccessTest`)_
 - [ ] **US-7** — Como admin, quero definir recorrência de pagamento (mensal/semanal) para automatizar cobranças
 
 ### Could Have (Backlog)
@@ -55,6 +56,7 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 ## Tasks (Sprint 3 — Should Have)
 
 - [x] Divisão de times (manual ou automática)
+- [x] Fluxo de primeiro acesso / bootstrap de admin (US-10)
 - [ ] Configuração de recorrência de pagamento
 
 ## Acceptance Criteria (MVP)
@@ -74,3 +76,4 @@ Entregar o menor conjunto de funcionalidades que valide a proposta de valor e pe
 - Definição de Pronto: código em main, testes passando, deploy funcional
 - **Backend (Abr/2026)**: Autenticação e guard `web` usam model **`Player`** (sem tabela `users` legada). Rotas **web** cobrem grupos, partidas, presença, pagamentos. **API Sanctum** (`routes/api.php`): apenas `groups` + jogadores do grupo — partidas/presença/pagamentos não expostos como JSON resource.
 - **Status PM (Abr/2026)**: Must Have de backend para US-1…US-5 atendido no servidor. Próximo foco: **US-6/US-7**, consolidado admin opcional, **Policies** (hoje autorização inline nos controllers), e expansão da API se houver app cliente ou integrações.
+- **Status PM (Jul/2026)**: **US-6** (divisão de times) e **US-10** (primeiro acesso/bootstrap de admin) concluídos e mergeados na `main`. Próximo foco: **US-7** (recorrência de pagamento), dashboard admin consolidado (visão multi-partida/KPIs), e preparar staging para coleta de feedback.
