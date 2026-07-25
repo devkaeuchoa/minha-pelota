@@ -53,6 +53,11 @@ class Player extends Authenticatable
         return $this->hasMany(MatchPayment::class, 'player_id');
     }
 
+    public function monthlyCharges(): HasMany
+    {
+        return $this->hasMany(MonthlyCharge::class, 'player_id');
+    }
+
     public function stats(): HasOne
     {
         return $this->hasOne(PlayerStat::class, 'player_id');
