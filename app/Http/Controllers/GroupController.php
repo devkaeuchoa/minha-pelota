@@ -27,12 +27,14 @@ class GroupController extends Controller
             'default_weekday' => $weekday,
             'default_time' => $time,
             'recurrence' => $recurrence,
+            'default_team_size' => isset($data['default_team_size']) ? (int) $data['default_team_size'] : null,
         ];
 
         unset(
             $data['monthly_fee'],
             $data['drop_in_fee'],
-            $data['recurrence']
+            $data['recurrence'],
+            $data['default_team_size']
         );
         $data['weekday'] = $weekday;
         $data['time'] = $time;
@@ -54,7 +56,7 @@ class GroupController extends Controller
         $data = $request->validated();
         $settingsData = [];
 
-        foreach (['monthly_fee', 'drop_in_fee', 'weekday', 'time', 'recurrence'] as $key) {
+        foreach (['monthly_fee', 'drop_in_fee', 'weekday', 'time', 'recurrence', 'default_team_size'] as $key) {
             if (array_key_exists($key, $data)) {
                 $settingsData[$key] = $data[$key];
                 unset($data[$key]);

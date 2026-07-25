@@ -39,6 +39,7 @@ class UpdateGroupRequest extends FormRequest
             'drop_in_fee' => ['nullable', 'numeric', 'min:0'],
             'payment_day' => ['nullable', 'integer', 'min:1', 'max:31'],
             'currency' => ['sometimes', 'string', 'size:3'],
+            'default_team_size' => ['nullable', 'integer', 'min:2', 'max:50'],
         ];
     }
 
@@ -50,6 +51,9 @@ class UpdateGroupRequest extends FormRequest
         }
         if (! $this->has('time') && $this->has('default_time')) {
             $payload['time'] = $this->input('default_time');
+        }
+        if ($this->input('default_team_size') === '') {
+            $payload['default_team_size'] = null;
         }
 
         if ($payload !== []) {

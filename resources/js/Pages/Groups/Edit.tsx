@@ -3,6 +3,7 @@ import { Group, PageProps } from '@/types';
 
 interface EditProps extends PageProps {
   group: Group;
+  defaultTeamSize: number | null;
 }
 
 export default function Edit({ group, ...props }: EditProps) {

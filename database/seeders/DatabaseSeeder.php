@@ -195,5 +195,42 @@ class DatabaseSeeder extends Seeder
                 'status' => 'going',
             ]);
         }
+
+        // Group with a configured default team size — E2E divisão de times (valor pré-preenchido).
+        $defaultTeamSizeGroup = Group::factory()->create([
+            'owner_player_id' => $owner->id,
+            'name' => 'E2E Match Teams Default Size',
+            'slug' => 'e2e-match-teams-default-size',
+            'location_name' => 'Arena Times Padrão E2E',
+        ]);
+        $defaultTeamSizeGroup->settings()->update(['default_team_size' => 3]);
+        $defaultTeamSizeGroup->players()->syncWithoutDetaching([
+            $owner->id => ['is_admin' => true],
+        ]);
+
+        $defaultSizePlayers = collect([
+            ['name' => 'Default Size Player 1', 'nick' => 'default-size-player-1', 'phone' => '11900000011', 'rating' => 3],
+            ['name' => 'Default Size Player 2', 'nick' => 'default-size-player-2', 'phone' => '11900000012', 'rating' => 3],
+            ['name' => 'Default Size Player 3', 'nick' => 'default-size-player-3', 'phone' => '11900000013', 'rating' => 3],
+            ['name' => 'Default Size Player 4', 'nick' => 'default-size-player-4', 'phone' => '11900000014', 'rating' => 3],
+        ])->map(fn(array $attributes) => Player::factory()->create($attributes));
+
+        $defaultTeamSizeGroup->players()->attach($defaultSizePlayers->pluck('id'));
+
+        $defaultSizeMatch = Game::query()->create([
+            'group_id' => $defaultTeamSizeGroup->id,
+            'scheduled_at' => now()->addDays(3),
+            'status' => 'scheduled',
+            'location_name' => 'Arena Times Padrão E2E',
+            'duration_minutes' => 90,
+        ]);
+
+        foreach ($defaultSizePlayers as $player) {
+            MatchAttendance::query()->create([
+                'match_id' => $defaultSizeMatch->id,
+                'player_id' => $player->id,
+                'status' => 'going',
+            ]);
+        }
     }
 }

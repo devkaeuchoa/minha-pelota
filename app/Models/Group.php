@@ -106,4 +106,9 @@ class Group extends Model
     {
         return $this->hasMany(Game::class)->orderBy('scheduled_at');
     }
+
+    public function monthlyCharges(): HasMany
+    {
+        return $this->hasMany(MonthlyCharge::class);
+    }
 }

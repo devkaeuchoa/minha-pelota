@@ -31,6 +31,14 @@ class StoreGroupRequest extends FormRequest
             'drop_in_fee' => ['nullable', 'numeric', 'min:0'],
             'payment_day' => ['nullable', 'integer', 'min:1', 'max:31'],
             'currency' => ['sometimes', 'string', 'size:3'],
+            'default_team_size' => ['nullable', 'integer', 'min:2', 'max:50'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->input('default_team_size') === '') {
+            $this->merge(['default_team_size' => null]);
+        }
     }
 }

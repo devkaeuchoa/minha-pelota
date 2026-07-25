@@ -46,21 +46,21 @@ class GroupSettingsTest extends TestCase
         $this->assertTrue($updated->invite_expires_at->isFuture());
     }
 
-    public function test_owner_can_view_and_update_default_team_size(): void
+    public function test_owner_can_view_and_update_default_team_size_via_group_edit(): void
     {
         $owner = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create(['owner_player_id' => $owner->id]);
 
         $this->actingAs($owner)
-            ->get(route('groups.settings.edit', $group->id))
+            ->get(route('groups.edit', $group->id))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Groups/Settings/Edit')
+                ->component('Groups/Edit')
                 ->where('defaultTeamSize', null));
 
         $this->actingAs($owner)
-            ->put(route('groups.settings.update', $group->id), ['default_team_size' => 7])
-            ->assertRedirect(route('groups.settings.edit', $group->id));
+            ->put(route('groups.update', $group->id), ['default_team_size' => 7])
+            ->assertRedirect(route('groups.show', $group->id));
 
         $this->assertDatabaseHas('group_settings', [
             'group_id' => $group->id,
@@ -68,18 +68,18 @@ class GroupSettingsTest extends TestCase
         ]);
     }
 
-    public function test_non_owner_cannot_update_group_settings(): void
+    public function test_non_owner_cannot_update_default_team_size(): void
     {
         $owner = Player::factory()->create(['is_admin' => true]);
         $other = Player::factory()->create(['is_admin' => true]);
         $group = Group::factory()->create(['owner_player_id' => $owner->id]);
 
         $this->actingAs($other)
-            ->get(route('groups.settings.edit', $group->id))
+            ->get(route('groups.edit', $group->id))
             ->assertStatus(403);
 
         $this->actingAs($other)
-            ->put(route('groups.settings.update', $group->id), ['default_team_size' => 7])
+            ->put(route('groups.update', $group->id), ['default_team_size' => 7])
             ->assertStatus(403);
     }
 
@@ -89,11 +89,11 @@ class GroupSettingsTest extends TestCase
         $group = Group::factory()->create(['owner_player_id' => $owner->id]);
 
         $this->actingAs($owner)
-            ->put(route('groups.settings.update', $group->id), ['default_team_size' => 1])
+            ->put(route('groups.update', $group->id), ['default_team_size' => 1])
             ->assertSessionHasErrors('default_team_size');
 
         $this->actingAs($owner)
-            ->put(route('groups.settings.update', $group->id), ['default_team_size' => 51])
+            ->put(route('groups.update', $group->id), ['default_team_size' => 51])
             ->assertSessionHasErrors('default_team_size');
     }
 }

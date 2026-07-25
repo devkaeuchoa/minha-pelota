@@ -40,9 +40,10 @@ interface FormProps extends PageProps {
   submitUrl: string;
   method: 'post' | 'put';
   title: string;
+  defaultTeamSize?: number | null;
 }
 
-export default function Form({ group, submitUrl, method, title }: FormProps) {
+export default function Form({ group, submitUrl, method, title, defaultTeamSize }: FormProps) {
   const { t } = useLocale();
   const settings = group ? resolveGroupSettings(group) : null;
   const initialMonthlyFeeValue = settings?.monthly_fee ?? group?.monthly_fee ?? null;
@@ -50,6 +51,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
     group?.has_monthly_fee === true ||
     (typeof initialMonthlyFeeValue === 'number' && initialMonthlyFeeValue > 0);
   const [hasMonthlyFee, setHasMonthlyFee] = useState(initialHasMonthlyFee);
+  const initialDefaultTeamSize = defaultTeamSize ?? settings?.default_team_size ?? null;
   const { data, setData, transform, post, put, processing, errors } = useForm({
     name: group?.name ?? '',
     slug: group?.slug ?? '',
@@ -61,6 +63,7 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
       typeof initialMonthlyFeeValue === 'number' && initialMonthlyFeeValue > 0
         ? String(initialMonthlyFeeValue)
         : '0',
+    default_team_size: initialDefaultTeamSize !== null ? String(initialDefaultTeamSize) : '',
   });
 
   const handleSubmit = (e: FormEvent) => {
@@ -195,6 +198,20 @@ export default function Form({ group, submitUrl, method, title }: FormProps) {
               )}
             </RetroFormField>
           ) : null}
+
+          <RetroFormField label="JOGADORES POR TIME (PADRÃO)" htmlFor="group_default_team_size">
+            <RetroTextInput
+              id="group_default_team_size"
+              type="number"
+              min={2}
+              max={50}
+              value={data.default_team_size}
+              onChange={(e) => setData('default_team_size', e.target.value)}
+            />
+            {errors.default_team_size && (
+              <p className="retro-text-shadow text-sm text-[#ff0055]">{errors.default_team_size}</p>
+            )}
+          </RetroFormField>
 
           <div className="mt-2 flex gap-3">
             <Link href={route('groups.index')} className="flex-1">
