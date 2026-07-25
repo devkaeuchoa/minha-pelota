@@ -1,4 +1,4 @@
-import { RetroAccordion, RetroButton, RetroFormField, RetroTextInput } from '@/Components/retro';
+import { RetroButton, RetroFormField, RetroTextInput } from '@/Components/retro';
 import { useState } from 'react';
 
 interface GroupInviteSectionProps {

@@ -168,4 +168,10 @@
     .retro-input[type="time"]::-webkit-calendar-picker-indicator {
         display: none;
     }
+
+    .retro-input[type="number"]::-webkit-inner-spin-button,
+    .retro-input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 }

@@ -4,6 +4,7 @@ const OWNER_PHONE = "11111111111";
 const GROUPED_PLAYER_PHONE = "11977777777";
 const SEEDED_PASSWORD = "password";
 const E2E_TEAMS_GROUP_NAME = "E2E Match Teams";
+const E2E_TEAMS_DEFAULT_SIZE_GROUP_NAME = "E2E Match Teams Default Size";
 
 function escapeRegex(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -39,10 +40,14 @@ async function openGroupShowByExactName(page: Page, groupName: string): Promise<
     await expect(page).toHaveURL(/\/groups\/\d+$/);
 }
 
-async function openTeamsManageForE2eGroup(page: Page): Promise<void> {
-    await openGroupShowByExactName(page, E2E_TEAMS_GROUP_NAME);
-    await page.getByRole("button", { name: "GERAR TIMES DA PRÓXIMA PARTIDA" }).click();
+async function openTeamsManageForGroup(page: Page, groupName: string): Promise<void> {
+    await openGroupShowByExactName(page, groupName);
+    await page.getByRole("button", { name: "SORTEAR TIMES" }).click();
     await expect(page.getByRole("heading", { name: "DIVISÃO DE TIMES" })).toBeVisible();
+}
+
+async function openTeamsManageForE2eGroup(page: Page): Promise<void> {
+    await openTeamsManageForGroup(page, E2E_TEAMS_GROUP_NAME);
 }
 
 function teamPlayerList(page: Page, title: string) {
@@ -130,5 +135,56 @@ test.describe("Divisão de times por partida", () => {
 
         const response = await page.goto(teamsUrl);
         expect(response?.status()).toBe(403);
+    });
+});
+
+test.describe("Tamanho de time padrão do grupo", () => {
+    test("input vem pré-preenchido e editável, e o botão já aparece como SALVAR", async ({
+        page,
+    }) => {
+        await loginOwner(page);
+        await openTeamsManageForGroup(page, E2E_TEAMS_DEFAULT_SIZE_GROUP_NAME);
+
+        const teamSizeInput = page.locator("#team_size");
+        await expect(teamSizeInput).toHaveValue("3");
+        await expect(teamSizeInput).not.toHaveAttribute("readonly", "");
+        await expect(page.getByRole("button", { name: "SALVAR" })).toBeVisible();
+        await expect(page.getByRole("button", { name: "EDITAR" })).toHaveCount(0);
+    });
+
+    test("botões +/- ajustam o valor respeitando o mínimo e o máximo", async ({ page }) => {
+        await loginOwner(page);
+        await openTeamsManageForGroup(page, E2E_TEAMS_DEFAULT_SIZE_GROUP_NAME);
+
+        const teamSizeInput = page.locator("#team_size");
+        await expect(teamSizeInput).toHaveValue("3");
+
+        await page.getByRole("button", { name: "Aumentar" }).click();
+        await expect(teamSizeInput).toHaveValue("4");
+
+        await page.getByRole("button", { name: "Diminuir" }).click();
+        await page.getByRole("button", { name: "Diminuir" }).click();
+        await expect(teamSizeInput).toHaveValue("2");
+    });
+
+    test("gerar times usa o valor editado no input", async ({ page }) => {
+        await loginOwner(page);
+        await openTeamsManageForGroup(page, E2E_TEAMS_DEFAULT_SIZE_GROUP_NAME);
+
+        const teamSizeInput = page.locator("#team_size");
+        await teamSizeInput.fill("3");
+        await page.getByRole("button", { name: "SALVAR" }).click();
+        await expect(page.getByText("Times gerados com sucesso.")).toBeVisible();
+
+        const teamA = teamPlayerList(page, "TIME A");
+        const teamB = teamPlayerList(page, "TIME B");
+        const reserves = teamPlayerList(page, "RESERVAS");
+
+        await expect(reserves.locator("button")).toHaveCount(0);
+        const teamACount = await teamA.locator("button").count();
+        const teamBCount = await teamB.locator("button").count();
+        expect(teamACount + teamBCount).toBe(4);
+        expect(teamACount).toBeLessThanOrEqual(3);
+        expect(teamBCount).toBeLessThanOrEqual(3);
     });
 });

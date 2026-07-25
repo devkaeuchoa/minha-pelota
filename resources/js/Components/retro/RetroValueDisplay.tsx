@@ -10,7 +10,7 @@ export function RetroValueDisplay({ label, value }: RetroValueDisplayProps) {
       className="flex flex-col gap-1 w-full min-w-[75px] w-fit"
     >
       <label className="retro-text-shadow text-sm text-[#a0b0ff]">{label}</label>
-      <div className="retro-inset-shadow flex border-2 border-[#4060c0] bg-[#0b1340] p-1">
+      <div className="retro-inset-shadow flex h-9 items-center border-2 border-[#4060c0] bg-[#0b1340] px-2">
         <span className="retro-text-shadow w-full text-xl tracking-widest text-[#ffd700]">
           {value}
         </span>

@@ -32,17 +32,17 @@ async function getInviteTokenFromGroupShow(page: Page, groupName: string): Promi
     await loginOwner(page);
     await openGroupShow(page, groupName);
 
-    // RetroAccordion appends a "+"/"−" toggle glyph to the button's accessible name
-    // (e.g. "CONVITE +"), so it never matches an exact "CONVITE" name.
-    await page.getByRole("button", { name: "CONVITE" }).click();
-
+    // O painel de convite está sempre visível na última linha dos detalhes do
+    // grupo (não fica mais atrás de um accordion "CONVITE").
     const generateBtn = page.getByRole("button", { name: "GERAR LINK DE CONVITE" });
+    const inviteUrlInput = page.locator("#group_invite_url");
+    await expect(generateBtn.or(inviteUrlInput)).toBeVisible();
     if (await generateBtn.isVisible().catch(() => false)) {
         await generateBtn.click();
-        await expect(page.locator("#group_invite_url")).toBeVisible();
+        await expect(inviteUrlInput).toBeVisible();
     }
 
-    const rawUrl = await page.locator("#group_invite_url").inputValue();
+    const rawUrl = await inviteUrlInput.inputValue();
     const pathname = new URL(rawUrl).pathname;
     const segments = pathname.split("/").filter(Boolean);
     const token = segments[segments.length - 1];

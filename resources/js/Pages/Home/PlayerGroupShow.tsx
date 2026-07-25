@@ -1,5 +1,5 @@
 /* global route */
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { GroupRankingEntry, PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import {
@@ -84,6 +84,11 @@ export default function PlayerGroupShow({ group, period, rankings }: PlayerGroup
             value={formatRankingValue(rankings.neymar, t)}
           />
           <div className="flex flex-wrap gap-2">
+            <Link href={route('player.groups.monthly-charges', { group: group.id })}>
+              <RetroButton type="button" variant="neutral" size="sm">
+                {t('monthlyCharges.viewLink')}
+              </RetroButton>
+            </Link>
             <RetroButton type="button" variant="danger" size="sm" onClick={handleLeaveGroup}>
               {t('home.player.leaveGroup')}
             </RetroButton>

@@ -3,9 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { Group, Match, Player, PageProps } from '@/types';
 import { useGroupShowController } from '@/features/groups/useGroupShowController';
 import { GroupDetailsSection } from '@/features/groups/components/GroupDetailsSection';
-import { GroupInviteSection } from '@/features/groups/components/GroupInviteSection';
 import { GroupMatchesQuickActionsSection } from '@/features/groups/components/GroupMatchesQuickActionsSection';
-import { GroupSettingsSection } from '@/features/groups/components/GroupSettingsSection';
 import {
   RetroRosterGrid,
   RetroButton,
@@ -37,14 +35,18 @@ export default function Show({ group, players, matches }: ShowProps) {
 
       <RetroSectionHeader title="DETALHES DO GRUPO" />
       <RetroInfoCard>
-        <GroupDetailsSection group={group} nextMatch={nextMatch} />
+        <GroupDetailsSection
+          group={group}
+          nextMatch={nextMatch}
+          canManageGroup={permissions.can_manage_group}
+          canManageInvites={permissions.can_manage_invites}
+          inviteUrl={invite.inviteUrl}
+          inviteProcessing={invite.processing}
+          onGenerateInvite={invite.onGenerate}
+          deleteProcessing={settings.deleteProcessing}
+          onDeleteGroup={settings.onDeleteGroup}
+        />
         <div className="mt-3 flex flex-col gap-3">
-          <GroupSettingsSection
-            groupId={settings.groupId}
-            deleteProcessing={settings.deleteProcessing}
-            onDeleteGroup={settings.onDeleteGroup}
-            canManageGroup={permissions.can_manage_group}
-          />
           {nextMatch && permissions.can_manage_attendance ? (
             <RetroButton
               variant="neutral"
@@ -59,25 +61,21 @@ export default function Show({ group, players, matches }: ShowProps) {
               VER PRESENÇA DA PRÓXIMA PARTIDA
             </RetroButton>
           ) : null}
-          {nextMatch && permissions.can_manage_attendance ? (
+          {permissions.can_manage_payments ? (
             <RetroButton
               variant="neutral"
               size="sm"
               type="button"
-              onClick={() =>
-                router.visit(
-                  route('groups.matches.teams.manage', { group: group.id, match: nextMatch.id }),
-                )
-              }
+              onClick={() => router.visit(route('groups.payments.calendar', { group: group.id }))}
             >
-              GERAR TIMES DA PRÓXIMA PARTIDA
+              VER PAGAMENTOS DO MÊS
             </RetroButton>
           ) : null}
         </div>
       </RetroInfoCard>
 
       {groupSettings.recurrence !== 'none' && permissions.can_manage_matches && (
-        <RetroAccordion title="GERAR DATAS" defaultOpen={false}>
+        <RetroAccordion title="GERAR DATAS" defaultOpen={true}>
           <GroupMatchesQuickActionsSection
             generateProcessing={settings.generateProcessing}
             onGenerateCurrentMonth={settings.onGenerateCurrentMonth}
@@ -87,27 +85,33 @@ export default function Show({ group, players, matches }: ShowProps) {
         </RetroAccordion>
       )}
 
-      {permissions.can_manage_invites ? (
-        <RetroAccordion title="CONVITE" defaultOpen={false}>
-          <GroupInviteSection
-            inviteUrl={invite.inviteUrl}
-            processing={invite.processing}
-            onGenerateInvite={invite.onGenerate}
-          />
-        </RetroAccordion>
-      ) : null}
-
-      <RetroAccordion title={`JOGADORES (${playersSection.players.length})`} defaultOpen={false}>
-        {permissions.can_manage_players ? (
-          <RetroButton
-            type="button"
-            variant="success"
-            size="md"
-            onClick={() => router.visit(route('groups.players', { group: group.id }))}
-          >
-            GERENCIAR JOGADORES
-          </RetroButton>
-        ) : null}
+      <RetroAccordion title={`JOGADORES (${playersSection.players.length})`} defaultOpen={true}>
+        <div className="mb-3 flex flex-wrap gap-3">
+          {permissions.can_manage_players ? (
+            <RetroButton
+              type="button"
+              variant="success"
+              size="md"
+              onClick={() => router.visit(route('groups.players', { group: group.id }))}
+            >
+              ADICIONAR/REMOVER JOGADORES
+            </RetroButton>
+          ) : null}
+          {nextMatch && permissions.can_manage_attendance ? (
+            <RetroButton
+              variant="neutral"
+              size="md"
+              type="button"
+              onClick={() =>
+                router.visit(
+                  route('groups.matches.teams.manage', { group: group.id, match: nextMatch.id }),
+                )
+              }
+            >
+              SORTEAR TIMES
+            </RetroButton>
+          ) : null}
+        </div>
         <RetroRosterGrid players={playersSection.players} />
       </RetroAccordion>
     </RetroAppShell>

@@ -17,7 +17,7 @@ export function RetroSelect({ label, options, ...props }: RetroSelectProps) {
       <div className="relative">
         <select
           {...props}
-          className="retro-text-shadow retro-drop-shadow w-full cursor-pointer appearance-none border-2 border-[#4060c0] bg-[#1e348c] px-3 py-2 font-retro text-xl text-white outline-none"
+          className="retro-text-shadow retro-drop-shadow h-9 w-full cursor-pointer appearance-none border-2 border-[#4060c0] bg-[#1e348c] px-3 font-retro text-xl text-white outline-none"
         >
           {options.map((opt) => (
             <option key={opt.value} value={opt.value} className="bg-[#1e348c]">

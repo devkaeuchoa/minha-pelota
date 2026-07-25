@@ -18,9 +18,9 @@ const variantStyles: Record<ButtonVariant, string> = {
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-6 py-3 text-xl',
+  sm: 'h-9 px-3 text-sm',
+  md: 'h-9 px-4 text-base',
+  lg: 'h-9 px-6 text-xl',
 };
 
 const disabledStyles =
@@ -34,7 +34,7 @@ export function RetroButton({
   className,
   ...props
 }: RetroButtonProps) {
-  const baseClasses = `retro-text-shadow w-full ${sizeStyles[size]} ${variantStyles[variant]} focus:outline-none ${className}`;
+  const baseClasses = `retro-text-shadow inline-flex w-full items-center justify-center ${sizeStyles[size]} ${variantStyles[variant]} focus:outline-none ${className}`;
   const finalClasses = disabled ? `${baseClasses} ${disabledStyles}` : baseClasses;
 
   return (

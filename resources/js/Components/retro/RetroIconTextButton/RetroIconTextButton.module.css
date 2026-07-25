@@ -1,0 +1,29 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 0.25rem;
+  border-width: 2px;
+  border-style: solid;
+  padding: 0.375rem 0.625rem;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  background: transparent;
+  cursor: pointer;
+  text-shadow: 1px 1px 0 #000000;
+}
+
+.neutral {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.danger {
+  border-color: #ff0055;
+  color: #ff0055;
+}
+
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

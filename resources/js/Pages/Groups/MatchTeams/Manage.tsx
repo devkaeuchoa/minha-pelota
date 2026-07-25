@@ -34,6 +34,15 @@ interface MatchTeamsManageProps extends PageProps {
   };
 }
 
+function TeamFlag({ color }: { color: string }) {
+  return (
+    <div
+      className="h-7 w-10 border-2 border-[#a0b0ff] shadow-[1px_1px_0_#000]"
+      style={{ backgroundColor: color }}
+    />
+  );
+}
+
 function getPhysicalConditionEmoji(condition: PhysicalCondition): string {
   if (condition === PhysicalCondition.Otimo) return '😊';
   if (condition === PhysicalCondition.Regular) return '😐';
@@ -52,6 +61,7 @@ export default function Manage({
 }: MatchTeamsManageProps) {
   const { t } = useLocale();
   const canManageTeams = permissions?.can_manage_teams ?? true;
+  const hasDefaultTeamSize = defaultTeamSize !== null;
   const [teamSizeInput, setTeamSizeInput] = useState(
     match.team_size !== null
       ? String(match.team_size)
@@ -108,6 +118,8 @@ export default function Manage({
     );
   };
 
+  const teamSizeButtonLabel = hasDefaultTeamSize ? 'SALVAR' : 'GERAR TIMES';
+
   return (
     <RetroAppShell activeId="groups">
       <Head title={`Times — ${group.name}`} />
@@ -134,6 +146,7 @@ export default function Manage({
                   min={2}
                   max={50}
                   value={teamSizeInput}
+                  placeholder="0"
                   onChange={(e) => setTeamSizeInput(e.target.value)}
                 />
               </RetroFormField>
@@ -144,14 +157,42 @@ export default function Manage({
                 onClick={handleGenerate}
                 className="sm:w-auto"
               >
-                GERAR TIMES
+                {teamSizeButtonLabel}
               </RetroButton>
             </div>
           ) : null}
 
           <div className="grid gap-4 lg:grid-cols-2">
+            <RetroPlayerList
+              title="CONFIRMADOS"
+              emptyLabel={t('retro.playerList.empty')}
+              players={players.map(toPlayerListItem)}
+              onSelect={(id) => {
+                const player = players.find((p) => p.id === id);
+                if (player) handlePlayerClick(player);
+              }}
+            />
+
+            {reserves.length > 0 ? (
+              <RetroPlayerList
+                title="RESERVAS"
+                emptyLabel={t('retro.playerList.empty')}
+                players={reserves.map(toPlayerListItem)}
+                onSelect={(id) => {
+                  const player = reserves.find((p) => p.id === id);
+                  if (player) handlePlayerClick(player);
+                }}
+              />
+            ) : null}
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <RetroTeamCard teamName="TIME A" playerLabel={String(teamA.length)} />
+              <RetroTeamCard
+                teamName="TIME A"
+                playerLabel={String(teamA.length)}
+                flag={<TeamFlag color="#ff0055" />}
+              />
               <RetroPlayerList
                 title="TIME A"
                 emptyLabel={t('retro.playerList.empty')}
@@ -166,7 +207,11 @@ export default function Manage({
             </div>
 
             <div className="flex flex-col gap-2">
-              <RetroTeamCard teamName="TIME B" playerLabel={String(teamB.length)} />
+              <RetroTeamCard
+                teamName="TIME B"
+                playerLabel={String(teamB.length)}
+                flag={<TeamFlag color="#3b82f6" />}
+              />
               <RetroPlayerList
                 title="TIME B"
                 emptyLabel={t('retro.playerList.empty')}
@@ -180,18 +225,6 @@ export default function Manage({
               />
             </div>
           </div>
-
-          {reserves.length > 0 ? (
-            <RetroPlayerList
-              title="RESERVAS"
-              emptyLabel={t('retro.playerList.empty')}
-              players={reserves.map(toPlayerListItem)}
-              onSelect={(id) => {
-                const player = reserves.find((p) => p.id === id);
-                if (player) handlePlayerClick(player);
-              }}
-            />
-          ) : null}
         </div>
       </RetroInfoCard>
     </RetroAppShell>

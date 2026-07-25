@@ -26,6 +26,7 @@ export { RetroFileInput } from './RetroFileInput';
 export { RetroDatePicker } from './RetroDatePicker';
 export { RetroButton } from './RetroButton';
 export { RetroIconButton } from './RetroIconButton';
+export { RetroIconTextButton } from './RetroIconTextButton/RetroIconTextButton';
 export { RetroMobileNavbar } from './RetroMobileNavbar';
 export { RetroDesktopNavbar } from './RetroDesktopNavbar';
 export { RetroAccordion } from './RetroAccordion';
