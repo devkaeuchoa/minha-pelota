@@ -16,6 +16,19 @@ composer run dev          # Starts all dev services: Laravel, Vite, queue, Pail 
 npm run dev               # Vite + php artisan serve only (lighter alternative)
 ```
 
+### Docker (manual/visual testing via the running container)
+The project also runs in Docker (`minha-pelota-app-1` / `minha-pelota-web-1` at `http://localhost`), backed by a persistent sqlite volume (`storage/dev/database.sqlite`, mounted at `/app/storage/dev`), separate from the local checkout's `database.sqlite`.
+
+The plain `compose.yaml` + `compose.override.yaml` combo runs a **production-built** image (assets baked in at `docker build` time) — it has **no hot reload**. For any manual/visual verification in the browser via this container, always bring it up with the HMR overlay instead:
+```bash
+docker compose -f compose.yaml -f compose.override.yaml -f compose.hmr.yaml up -d
+```
+This mounts `app/`, `routes/`, `config/`, `resources/`, `database/`, `public/` read-only into the `app` container (backend edits apply without rebuild) and runs a real Vite dev server in a separate `vite` service (port 5180) with HMR — no rebuild needed for frontend changes either. `vendor/`, `storage/`, `bootstrap/cache` still come from the image (correct `www-data` ownership preserved). `vite.config.js` reads `VITE_DEV_SERVER_ORIGIN` (set only inside this compose file) to make Vite write a browsable URL to `public/hot` instead of `0.0.0.0`.
+
+Only fall back to a full rebuild (`docker build -t minha-pelota:latest . && docker compose up -d --force-recreate app web`, no HMR overlay) when the image itself changed (Dockerfile, PHP extensions, composer deps) — not for routine PHP/JS edits.
+
+To reset the container's data: `docker compose exec app php artisan migrate:fresh --force`. Factories don't work inside this container (`fakerphp/faker` is a dev dependency, stripped by `composer install --no-dev` in the image) — seed manually via `php artisan tinker` with plain `new Model()` + `->save()`, not `Model::factory()`.
+
 ### Testing
 ```bash
 composer run test                              # All PHPUnit tests (clears config first)
