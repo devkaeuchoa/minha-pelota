@@ -4,6 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettier from 'eslint-plugin-prettier';
+import storybook from 'eslint-plugin-storybook';
 
 export default [
   {
@@ -42,5 +43,5 @@ export default [
       },
     },
   },
+  ...storybook.configs['flat/recommended'],
 ];
-
