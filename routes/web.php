@@ -6,7 +6,8 @@ use App\Http\Controllers\GroupMatchGenerationController;
 use App\Http\Controllers\GroupMatchAttendanceController;
 use App\Http\Controllers\GroupMatchPaymentController;
 use App\Http\Controllers\GroupMatchTeamsController;
-use App\Http\Controllers\GroupSettingsController;
+use App\Http\Controllers\GroupMonthlyChargeController;
+use App\Http\Controllers\GroupPaymentsCalendarController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\PlayerHomeController;
@@ -81,6 +82,8 @@ Route::middleware('auth')->group(function () {
     })->name('admin.home');
     Route::get('/home/player/groups/{group}', [PlayerHomeController::class, 'showGroup'])
         ->name('player.groups.show');
+    Route::get('/home/player/groups/{group}/monthly-charges', [PlayerHomeController::class, 'showMonthlyCharges'])
+        ->name('player.groups.monthly-charges');
     Route::post('/home/player/matches/{match}/presence', [PlayerHomeController::class, 'updatePresence'])
         ->name('player.home.presence.update');
     Route::post('/home/player/groups/{group}/physical-condition', [PlayerHomeController::class, 'updatePhysicalCondition'])
@@ -107,14 +110,12 @@ Route::middleware('auth')->group(function () {
             ->orderByDesc('scheduled_at')
             ->first();
 
+        $paymentsCalendarGroupId = $lastFinishedMatch?->group_id ?? $groups->first()?->id;
+
         return Inertia::render('Groups/Index', [
             'groups' => $groups->values()->all(),
-            'lastFinishedMatchForPayments' => $lastFinishedMatch
-                ? [
-                    'group_id' => $lastFinishedMatch->group_id,
-                    'match_id' => $lastFinishedMatch->id,
-                    'scheduled_at' => $lastFinishedMatch->scheduled_at?->toISOString(),
-                ]
+            'groupForPaymentsCalendar' => $paymentsCalendarGroupId
+                ? ['group_id' => $paymentsCalendarGroupId]
                 : null,
         ]);
     })->name('groups.index');
@@ -196,6 +197,7 @@ Route::middleware('auth')->group(function () {
 
         return Inertia::render('Groups/Edit', [
             'group' => $group,
+            'defaultTeamSize' => $group->default_team_size,
         ]);
     })->name('groups.edit');
 
@@ -262,9 +264,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/groups/{group}/invite', [GroupController::class, 'regenerateInvite'])->name('groups.invite.regenerate');
 
-    Route::get('/groups/{group}/settings', [GroupSettingsController::class, 'edit'])->name('groups.settings.edit');
-    Route::put('/groups/{group}/settings', [GroupSettingsController::class, 'update'])->name('groups.settings.update');
-
     Route::post('/groups/{group}/matches/generate/current-month', [
         GroupMatchGenerationController::class,
         'generateCurrentMonth',
@@ -301,6 +300,13 @@ Route::middleware('auth')->group(function () {
         GroupMatchPaymentController::class,
         'update',
     ])->name('groups.matches.payments.update');
+
+    Route::get('/groups/{group}/payments', [GroupPaymentsCalendarController::class, 'show'])
+        ->name('groups.payments.calendar');
+    Route::post('/groups/{group}/monthly-charges/sync', [GroupMonthlyChargeController::class, 'sync'])
+        ->name('groups.monthly-charges.sync');
+    Route::patch('/groups/{group}/monthly-charges/{player}', [GroupMonthlyChargeController::class, 'update'])
+        ->name('groups.monthly-charges.update');
 
     Route::get('/groups/{group}/matches/{match}/teams', [
         GroupMatchTeamsController::class,

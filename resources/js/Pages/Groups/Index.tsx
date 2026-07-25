@@ -16,14 +16,12 @@ import { resolveGroupPermissions } from '@/utils/groups';
 
 interface IndexProps extends PageProps {
   groups: Group[];
-  lastFinishedMatchForPayments: {
+  groupForPaymentsCalendar: {
     group_id: number;
-    match_id: number;
-    scheduled_at: string;
   } | null;
 }
 
-export default function Index({ groups, lastFinishedMatchForPayments }: IndexProps) {
+export default function Index({ groups, groupForPaymentsCalendar }: IndexProps) {
   const controller = useGroupsIndexController(groups);
   const [showBatchDeleteModal, setShowBatchDeleteModal] = useState(false);
   const canManageGroups = groups.some(
@@ -44,7 +42,7 @@ export default function Index({ groups, lastFinishedMatchForPayments }: IndexPro
             hasSelection={false}
             total={0}
             selectedCount={0}
-            lastFinishedMatchForPayments={lastFinishedMatchForPayments}
+            groupForPaymentsCalendar={groupForPaymentsCalendar}
           />
           <div className="flex flex-col gap-3">
             <p className="retro-text-shadow text-lg text-[#a0b0ff]">
@@ -68,7 +66,7 @@ export default function Index({ groups, lastFinishedMatchForPayments }: IndexPro
             total={controller.groups.length}
             selectedCount={controller.selectedIds.size}
             onBatchDeleteClick={() => setShowBatchDeleteModal(true)}
-            lastFinishedMatchForPayments={lastFinishedMatchForPayments}
+            groupForPaymentsCalendar={groupForPaymentsCalendar}
             canManageGroups={canManageGroups}
             canManagePayments={canManagePayments}
           />

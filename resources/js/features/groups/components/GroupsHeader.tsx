@@ -15,10 +15,8 @@ interface GroupsHeaderProps {
   total: number;
   selectedCount: number;
   onBatchDeleteClick?: () => void;
-  lastFinishedMatchForPayments?: {
+  groupForPaymentsCalendar?: {
     group_id: number;
-    match_id: number;
-    scheduled_at: string;
   } | null;
   canManageGroups?: boolean;
   canManagePayments?: boolean;
@@ -30,7 +28,7 @@ export function GroupsHeader({
   total,
   selectedCount,
   onBatchDeleteClick,
-  lastFinishedMatchForPayments,
+  groupForPaymentsCalendar,
   canManageGroups = true,
   canManagePayments = true,
 }: GroupsHeaderProps) {
@@ -73,16 +71,15 @@ export function GroupsHeader({
 
       <div className="flex flex-wrap items-center justify-end gap-3">
         <div className="flex flex-1 justify-end gap-3">
-          {lastFinishedMatchForPayments && canManagePayments ? (
+          {groupForPaymentsCalendar && canManagePayments ? (
             <Link
-              href={route('groups.matches.payments.manage', {
-                group: lastFinishedMatchForPayments.group_id,
-                match: lastFinishedMatchForPayments.match_id,
+              href={route('groups.payments.calendar', {
+                group: groupForPaymentsCalendar.group_id,
               })}
               className="flex-1"
             >
               <RetroButton size="sm" type="button" variant="neutral">
-                {t('groups.lastMatchPayments')}
+                {t('groups.paymentsCalendar')}
               </RetroButton>
             </Link>
           ) : null}

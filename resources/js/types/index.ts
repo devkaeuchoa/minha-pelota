@@ -74,7 +74,7 @@ export interface Match {
 }
 
 export interface MatchPayment {
-  status: 'paid' | 'unpaid';
+  status: 'paid' | 'unpaid' | 'dispensado';
   paid_amount: number;
   is_monthly_exempt: boolean;
   has_previous_debt: boolean;

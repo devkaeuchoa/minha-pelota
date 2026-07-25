@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\AuthorizesGroupOwnerAdmin;
 use App\Http\Requests\UpdateMatchPaymentRequest;
 use App\Models\Game;
 use App\Models\Group;
-use App\Models\MatchAttendance;
 use App\Models\MatchPayment;
+use App\Models\MonthlyCharge;
 use App\Models\Player;
+use App\Services\Payments\SyncMatchPaymentsAction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,59 +17,45 @@ use Inertia\Response;
 
 class GroupMatchPaymentController extends Controller
 {
-    public function sync(Request $request, Group $group, Game $match): RedirectResponse
+    use AuthorizesGroupOwnerAdmin;
+
+    public function sync(Request $request, Group $group, Game $match, SyncMatchPaymentsAction $action): RedirectResponse
     {
         $this->authorizeOwnerOrAdmin($request, $group);
         abort_unless($match->group_id === $group->id, 404);
 
-        $confirmedPlayerIds = MatchAttendance::query()
-            ->where('match_id', $match->id)
-            ->where('status', 'going')
-            ->whereHas('player.groups', fn($query) => $query->where('groups.id', $group->id))
-            ->pluck('player_id');
-
-        foreach ($confirmedPlayerIds as $playerId) {
-            MatchPayment::query()->firstOrCreate(
-                [
-                    'match_id' => $match->id,
-                    'player_id' => $playerId,
-                ],
-                [
-                    'payment_status' => 'unpaid',
-                    'paid_amount' => 0,
-                    'is_monthly_exempt' => false,
-                ]
-            );
-        }
+        $action->execute($match);
 
         return redirect()
             ->route('groups.matches.payments.manage', [
                 'group' => $group->id,
                 'match' => $match->id,
             ])
-            ->with('status', 'Pagamentos sincronizados com os confirmados.');
+            ->with('status', 'Pagamentos sincronizados.');
     }
 
-    public function manage(Request $request, Group $group, Game $match): Response
+    public function manage(Request $request, Group $group, Game $match, SyncMatchPaymentsAction $action): Response
     {
         $this->authorizeOwnerOrAdmin($request, $group);
         abort_unless($match->group_id === $group->id, 404);
 
-        $confirmedPlayers = $group->players()
-            ->whereHas('matchAttendances', function ($query) use ($match): void {
-                $query->where('match_id', $match->id)->where('status', 'going');
-            })
-            ->orderBy('name')
-            ->get();
+        $action->execute($match);
+
+        $groupPlayers = $group->players()->orderBy('name')->get();
+
+        $confirmedPlayerIds = $match->attendances()
+            ->where('status', 'going')
+            ->pluck('player_id')
+            ->all();
 
         $paymentsByPlayerId = MatchPayment::query()
             ->where('match_id', $match->id)
-            ->whereIn('player_id', $confirmedPlayers->pluck('id'))
+            ->whereIn('player_id', $groupPlayers->pluck('id'))
             ->get()
             ->keyBy('player_id');
 
-        $players = $confirmedPlayers->map(function (Player $player) use ($group, $match, $paymentsByPlayerId): array {
-            /** @var MatchPayment $payment */
+        $players = $groupPlayers->map(function (Player $player) use ($match, $paymentsByPlayerId, $confirmedPlayerIds): array {
+            /** @var MatchPayment|null $payment */
             $payment = $paymentsByPlayerId->get($player->id);
             $previousDebtMatches = MatchPayment::query()
                 ->where('player_id', $player->id)
@@ -84,8 +72,9 @@ class GroupMatchPaymentController extends Controller
                 'id' => $player->id,
                 'name' => $player->name,
                 'nick' => $player->nick,
+                'confirmed' => in_array($player->id, $confirmedPlayerIds, true),
                 'payment' => [
-                    'status' => $payment?->payment_status ?? 'unpaid',
+                    'status' => $payment?->payment_status ?? 'dispensado',
                     'paid_amount' => (float) ($payment?->paid_amount ?? 0),
                     'is_monthly_exempt' => (bool) ($payment?->is_monthly_exempt ?? false),
                     'has_previous_debt' => $previousDebtMatches > 0,
@@ -109,9 +98,10 @@ class GroupMatchPaymentController extends Controller
             ],
             'players' => $players,
             'summary' => [
-                'confirmed_count' => $players->count(),
+                'confirmed_count' => count($confirmedPlayerIds),
                 'paid_count' => $players->where('payment.status', 'paid')->count(),
                 'unpaid_count' => $players->where('payment.status', 'unpaid')->count(),
+                'dispensado_count' => $players->where('payment.status', 'dispensado')->count(),
             ],
             'status' => session('status'),
         ]);
@@ -127,12 +117,6 @@ class GroupMatchPaymentController extends Controller
         abort_unless($match->group_id === $group->id, 404);
         abort_unless($group->players()->where('players.id', $player->id)->exists(), 404);
 
-        $confirmedAttendanceExists = MatchAttendance::query()
-            ->where('match_id', $match->id)
-            ->where('player_id', $player->id)
-            ->where('status', 'going')
-            ->exists();
-        abort_unless($confirmedAttendanceExists, 422, 'Player is not confirmed for this match.');
         if ($match->status !== 'finished') {
             return redirect()
                 ->route('groups.matches.payments.manage', [
@@ -143,7 +127,12 @@ class GroupMatchPaymentController extends Controller
         }
 
         $data = $request->validated();
-        $isMonthlyExempt = (bool) $data['is_monthly_exempt'];
+        $isMonthlyExempt = MonthlyCharge::query()
+            ->where('group_id', $group->id)
+            ->where('player_id', $player->id)
+            ->where('reference_month', $match->scheduled_at->copy()->startOfMonth()->toDateString())
+            ->where('payment_status', 'paid')
+            ->exists();
         $paymentStatus = $isMonthlyExempt ? 'paid' : $data['payment_status'];
         $paidAmount = $isMonthlyExempt ? 0 : (float) $data['paid_amount'];
 
@@ -165,16 +154,5 @@ class GroupMatchPaymentController extends Controller
                 'match' => $match->id,
             ])
             ->with('status', 'Pagamento atualizado com sucesso.');
-    }
-
-    private function authorizeOwnerOrAdmin(Request $request, Group $group): void
-    {
-        $user = $request->user();
-        abort_unless($user !== null, 401);
-
-        $isAdmin = (bool) ($user->is_admin ?? false);
-        $isOwner = $group->owner_player_id === $user->id;
-
-        abort_unless($isAdmin && $isOwner, 403, 'You are not allowed to access this group.');
     }
 }

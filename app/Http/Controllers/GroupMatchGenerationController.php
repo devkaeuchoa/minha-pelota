@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Services\Matches\GenerateGroupMatchesAction;
+use App\Services\Payments\SyncMatchPaymentsAction;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,8 @@ class GroupMatchGenerationController extends Controller
     public function generateCurrentMonth(
         Request $request,
         Group $group,
-        GenerateGroupMatchesAction $action
+        GenerateGroupMatchesAction $action,
+        SyncMatchPaymentsAction $syncPaymentsAction
     ): RedirectResponse {
         $this->authorizeOwner($request, $group);
 
@@ -21,6 +23,7 @@ class GroupMatchGenerationController extends Controller
         $until = $from->endOfMonth();
 
         $created = $action->execute($group, $from, $until);
+        $created->each(fn ($match) => $syncPaymentsAction->execute($match));
 
         return redirect()
             ->to($this->targetUrl($request, $group))
@@ -30,7 +33,8 @@ class GroupMatchGenerationController extends Controller
     public function generateForMonths(
         Request $request,
         Group $group,
-        GenerateGroupMatchesAction $action
+        GenerateGroupMatchesAction $action,
+        SyncMatchPaymentsAction $syncPaymentsAction
     ): RedirectResponse {
         $this->authorizeOwner($request, $group);
 
@@ -42,6 +46,7 @@ class GroupMatchGenerationController extends Controller
         $until = $from->addMonthsNoOverflow($data['months'])->endOfMonth();
 
         $created = $action->execute($group, $from, $until);
+        $created->each(fn ($match) => $syncPaymentsAction->execute($match));
 
         return redirect()
             ->to($this->targetUrl($request, $group))

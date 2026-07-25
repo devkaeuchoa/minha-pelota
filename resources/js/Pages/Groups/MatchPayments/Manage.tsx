@@ -36,12 +36,14 @@ interface MatchPaymentsManageProps extends PageProps {
     id: number;
     name: string;
     nick: string;
+    confirmed: boolean;
     payment: MatchPayment;
   }>;
   summary: {
     confirmed_count: number;
     paid_count: number;
     unpaid_count: number;
+    dispensado_count: number;
   };
   status?: string;
   permissions?: {
@@ -52,13 +54,15 @@ interface MatchPaymentsManageProps extends PageProps {
 type RowState = {
   payment_status: 'paid' | 'unpaid';
   paid_amount: number;
-  is_monthly_exempt: boolean;
 };
 
 type PersistedPlayer = {
   id: number;
-  payment: RowState;
+  payment: MatchPayment;
 };
+
+const toEditableStatus = (status: MatchPayment['status']): 'paid' | 'unpaid' =>
+  status === 'paid' ? 'paid' : 'unpaid';
 
 export default function Manage({
   group,
@@ -76,26 +80,21 @@ export default function Manage({
       players.map((player) => [
         player.id,
         {
-          payment_status: player.payment.status,
+          payment_status: toEditableStatus(player.payment.status),
           paid_amount:
             player.payment.paid_amount > 0
               ? player.payment.paid_amount
               : hasMonthlyFee
                 ? monthlyFee
                 : 0,
-          is_monthly_exempt: player.payment.is_monthly_exempt,
         },
       ]),
     ),
   );
   const [processingPlayerId, setProcessingPlayerId] = useState<number | null>(null);
-  const [persistedStatusByPlayerId, setPersistedStatusByPlayerId] = useState<
-    Record<number, 'paid' | 'unpaid'>
-  >(() =>
-    Object.fromEntries(
-      players.map((player) => [player.id, player.payment.status as 'paid' | 'unpaid']),
-    ),
-  );
+  const [persistedPaymentByPlayerId, setPersistedPaymentByPlayerId] = useState<
+    Record<number, MatchPayment>
+  >(() => Object.fromEntries(players.map((player) => [player.id, player.payment])));
   const canManagePayments = permissions?.can_manage_payments ?? true;
   const [poolTotal, setPoolTotal] = useState<string>('0');
 
@@ -132,11 +131,14 @@ export default function Manage({
 
             setEditingByPlayerId((prev) => ({
               ...prev,
-              [playerId]: persistedPlayer.payment,
+              [playerId]: {
+                payment_status: toEditableStatus(persistedPlayer.payment.status),
+                paid_amount: persistedPlayer.payment.paid_amount,
+              },
             }));
-            setPersistedStatusByPlayerId((prev) => ({
+            setPersistedPaymentByPlayerId((prev) => ({
               ...prev,
-              [playerId]: persistedPlayer.payment.payment_status,
+              [playerId]: persistedPlayer.payment,
             }));
           },
           onFinish: () => setProcessingPlayerId(null),
@@ -161,18 +163,6 @@ export default function Manage({
       [playerId]: {
         ...prev[playerId],
         paid_amount: Number.isFinite(next) && next >= 0 ? next : 0,
-      },
-    }));
-  };
-
-  const setMonthlyExempt = (playerId: number, checked: boolean) => {
-    setEditingByPlayerId((prev) => ({
-      ...prev,
-      [playerId]: {
-        ...prev[playerId],
-        is_monthly_exempt: checked,
-        payment_status: checked ? 'paid' : prev[playerId].payment_status,
-        paid_amount: checked ? 0 : prev[playerId].paid_amount,
       },
     }));
   };
@@ -209,10 +199,14 @@ export default function Manage({
             ) : null}
           </div>
 
-          <div className="flex flex-row gap-3 md:justify-between">
+          <div className="flex flex-row flex-wrap gap-3 md:justify-between">
             <RetroValueDisplay label="CONFIRMADOS" value={summary.confirmed_count.toString()} />
             <RetroValueDisplay label="PAGOS" value={summary.paid_count.toString()} />
             <RetroValueDisplay label="NÃO PAGOS" value={summary.unpaid_count.toString()} />
+            <RetroValueDisplay
+              label={t('payments.dispensadoCount')}
+              value={summary.dispensado_count.toString()}
+            />
           </div>
 
           {!hasMonthlyFee ? (
@@ -255,28 +249,26 @@ export default function Manage({
             <thead>
               <RetroTableHeaderRow>
                 <RetroTableHeaderCell>JOGADOR</RetroTableHeaderCell>
+                <RetroTableHeaderCell>PRESENÇA</RetroTableHeaderCell>
                 <RetroTableHeaderCell>DÍVIDA ANTERIOR</RetroTableHeaderCell>
                 <RetroTableHeaderCell>STATUS</RetroTableHeaderCell>
                 <RetroTableHeaderCell>{t('payments.valueToPayColumn')}</RetroTableHeaderCell>
-                {hasMonthlyFee ? (
-                  <RetroTableHeaderCell>ISENTO MENSALIDADE</RetroTableHeaderCell>
-                ) : null}
                 <RetroTableHeaderCell>AÇÃO</RetroTableHeaderCell>
               </RetroTableHeaderRow>
             </thead>
             <tbody>
               {players.map((player, index) => {
                 const current = editingByPlayerId[player.id];
+                const persistedPayment = persistedPaymentByPlayerId[player.id];
                 const isProcessing = processingPlayerId === player.id;
-                const controlsDisabled = !canManagePayments || isProcessing;
+                const isMonthlyExempt = persistedPayment.is_monthly_exempt;
+                const controlsDisabled = !canManagePayments || isProcessing || isMonthlyExempt;
 
                 return (
                   <RetroTableRow
                     key={player.id}
                     index={index}
-                    className={
-                      persistedStatusByPlayerId[player.id] === 'paid' ? 'bg-[#214f3a]' : undefined
-                    }
+                    className={persistedPayment.status === 'paid' ? 'bg-[#214f3a]' : undefined}
                   >
                     <RetroTableCell>
                       <div className="flex flex-col">
@@ -285,39 +277,44 @@ export default function Manage({
                       </div>
                     </RetroTableCell>
                     <RetroTableCell>
+                      {player.confirmed
+                        ? t('payments.presenceConfirmed')
+                        : t('payments.presenceNotConfirmed')}
+                    </RetroTableCell>
+                    <RetroTableCell>
                       {player.payment.has_previous_debt
                         ? `SIM (${player.payment.previous_debt_matches_count} partida(s))`
                         : 'NÃO'}
                     </RetroTableCell>
                     <RetroTableCell>
-                      <select
-                        value={current.payment_status}
-                        disabled={controlsDisabled || current.is_monthly_exempt}
-                        onChange={(event) =>
-                          setPaymentStatus(player.id, event.target.value as 'paid' | 'unpaid')
-                        }
-                        className="retro-input w-full border-2 border-[#4060c0] bg-[#0b1340] px-2 py-1 text-[#ffd700] outline-none"
-                      >
-                        <option value="unpaid">NÃO PAGO</option>
-                        <option value="paid">PAGO</option>
-                      </select>
+                      {isMonthlyExempt ? (
+                        <span className="text-xs font-bold text-[#ffd700]">
+                          {t('payments.exemptMonthlyBadge')}
+                        </span>
+                      ) : (
+                        <select
+                          value={current.payment_status}
+                          disabled={controlsDisabled}
+                          onChange={(event) =>
+                            setPaymentStatus(player.id, event.target.value as 'paid' | 'unpaid')
+                          }
+                          className="retro-input w-full border-2 border-[#4060c0] bg-[#0b1340] px-2 py-1 text-[#ffd700] outline-none"
+                        >
+                          <option value="unpaid">NÃO PAGO</option>
+                          <option value="paid">PAGO</option>
+                        </select>
+                      )}
+                      {!player.confirmed && !isMonthlyExempt ? (
+                        <div className="mt-1 text-xs text-[#a0b0ff]">
+                          {t('payments.noAttendanceBadge')}
+                        </div>
+                      ) : null}
                     </RetroTableCell>
                     <RetroTableCell>
-                      {formatBrlCurrencyValue(String(current.paid_amount))}
+                      {isMonthlyExempt
+                        ? formatBrlCurrencyValue('0')
+                        : formatBrlCurrencyValue(String(current.paid_amount))}
                     </RetroTableCell>
-                    {hasMonthlyFee ? (
-                      <RetroTableCell>
-                        <label className="flex items-center gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={current.is_monthly_exempt}
-                            disabled={controlsDisabled}
-                            onChange={(event) => setMonthlyExempt(player.id, event.target.checked)}
-                          />
-                          {current.is_monthly_exempt ? 'SIM (MENSALIDADE)' : 'NÃO'}
-                        </label>
-                      </RetroTableCell>
-                    ) : null}
                     <RetroTableCell>
                       <form onSubmit={handleSubmit(player.id)}>
                         <RetroButton

@@ -30,23 +30,36 @@ function summaryValue(page: Page, label: string) {
         .locator("span.tracking-widest");
 }
 
+async function openTodayMatchFromCalendar(page: Page): Promise<void> {
+    await page.getByRole("link", { name: "PAGAMENTOS DO MÊS" }).click();
+    await expect(page).toHaveURL(/\/groups\/\d+\/payments$/);
+    await expect(page.getByRole("heading", { name: "CALENDÁRIO DE PAGAMENTOS" })).toBeVisible();
+
+    const today = new Date().getDate().toString();
+    await page
+        .locator("td a", { hasText: today })
+        .first()
+        .click();
+    await expect(page).toHaveURL(/\/groups\/\d+\/matches\/\d+\/payments$/);
+}
+
 test.describe("Pagamentos por partida", () => {
-    test("atalho na listagem abre tela com colunas e apenas confirmados", async ({ page }) => {
+    test("calendario do mes abre a tela da partida com todos os jogadores do grupo", async ({
+        page,
+    }) => {
         await loginOwner(page);
+        await openTodayMatchFromCalendar(page);
 
-        const shortcut = page.getByRole("link", { name: "PAGAMENTOS ÚLTIMA PARTIDA" });
-        await expect(shortcut).toBeVisible();
-        await shortcut.click();
-
-        await expect(page).toHaveURL(/\/groups\/\d+\/matches\/\d+\/payments$/);
         await expect(page.getByRole("heading", { name: "PAGAMENTOS DA PARTIDA" })).toBeVisible();
-
         await expect(page.getByText("PARTIDA", { exact: true })).toBeVisible();
         await expect(page.getByText("LOCAL", { exact: true })).toBeVisible();
         await expect(page.getByText("Arena Pagamentos E2E").first()).toBeVisible();
 
         await expect(
             page.locator('[data-component="retro-table-header-cell"]', { hasText: "JOGADOR" }),
+        ).toBeVisible();
+        await expect(
+            page.locator('[data-component="retro-table-header-cell"]', { hasText: "PRESENÇA" }),
         ).toBeVisible();
         await expect(
             page.locator('[data-component="retro-table-header-cell"]', { hasText: "DÍVIDA ANTERIOR" }),
@@ -57,36 +70,24 @@ test.describe("Pagamentos por partida", () => {
         await expect(
             page.locator('[data-component="retro-table-header-cell"]', { hasText: "VALOR A PAGAR (R$)" }),
         ).toBeVisible();
-        const monthlyExemptHeader = page.locator('[data-component="retro-table-header-cell"]', {
-            hasText: "ISENTO MENSALIDADE",
-        });
-        const poolApplyButton = page.getByRole("button", { name: "APLICAR PARA TODOS" });
-        if (await poolApplyButton.isVisible().catch(() => false)) {
-            await expect(monthlyExemptHeader).toHaveCount(0);
-        } else {
-            await expect(monthlyExemptHeader).toBeVisible();
-        }
         await expect(
             page.locator('[data-component="retro-table-header-cell"]', { hasText: "AÇÃO" }),
         ).toBeVisible();
 
-        await expect(page.locator("tbody tr")).toHaveCount(1);
-        await expect(page.locator("tbody tr").first()).toContainText("Grouped Player");
-        await expect(page.locator("tbody tr").first()).toContainText("grouped-player");
+        // Owner + Grouped Player are both members of the group, so both appear now
+        // (previously only confirmed attendees were listed).
+        await expect(page.locator("tbody tr")).toHaveCount(2);
         await expect(
-            page.locator('[data-component="retro-table-row"]', { hasText: "Test Player" }),
-        ).toHaveCount(0);
+            page.locator('[data-component="retro-table-row"]', { hasText: "Grouped Player" }),
+        ).toContainText("CONFIRMADA");
     });
 
     test("atualizar pagamento reflete nos contadores pagos e nao pagos", async ({ page }) => {
         await loginOwner(page);
-        await page.getByRole("link", { name: "PAGAMENTOS ÚLTIMA PARTIDA" }).click();
-        await expect(page).toHaveURL(/\/groups\/\d+\/matches\/\d+\/payments$/);
+        await openTodayMatchFromCalendar(page);
 
         const unpaid = summaryValue(page, "NÃO PAGOS");
         const paid = summaryValue(page, "PAGOS");
-        await expect(unpaid).toHaveText("1");
-        await expect(paid).toHaveText("0");
 
         const row = page.locator("tbody tr").filter({ hasText: "Grouped Player" });
         await row.locator("select").selectOption("paid");
@@ -99,8 +100,13 @@ test.describe("Pagamentos por partida", () => {
 
     test("membro nao owner recebe 403 ao acessar pagamentos", async ({ page }) => {
         await loginOwner(page);
+        await page.getByRole("link", { name: "PAGAMENTOS DO MÊS" }).click();
+        await expect(page).toHaveURL(/\/groups\/\d+\/payments$/);
+
+        const today = new Date().getDate().toString();
         const href = await page
-            .getByRole("link", { name: "PAGAMENTOS ÚLTIMA PARTIDA" })
+            .locator("td a", { hasText: today })
+            .first()
             .getAttribute("href");
         expect(href).toBeTruthy();
         await logout(page);

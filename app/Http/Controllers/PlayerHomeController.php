@@ -207,6 +207,42 @@ class PlayerHomeController extends Controller
         ]);
     }
 
+    public function showMonthlyCharges(Request $request, Group $group): Response
+    {
+        $player = $this->resolvePlayerForUserInGroup($request, (int) $group->id);
+        abort_unless($player, 403, 'Não foi possível identificar seu jogador neste grupo.');
+
+        $since = CarbonImmutable::now()->subMonthsNoOverflow(11)->startOfMonth();
+
+        $charges = \App\Models\MonthlyCharge::query()
+            ->where('group_id', $group->id)
+            ->where('player_id', $player->id)
+            ->where('reference_month', '>=', $since->toDateString())
+            ->orderByDesc('reference_month')
+            ->get()
+            ->map(fn (\App\Models\MonthlyCharge $charge) => [
+                'reference_month' => $charge->reference_month->toDateString(),
+                'status' => $charge->payment_status,
+                'amount' => (float) $charge->amount,
+                'paid_amount' => (float) $charge->paid_amount,
+            ])
+            ->values();
+
+        $currentMonth = CarbonImmutable::now()->startOfMonth()->toDateString();
+        $currentCharge = $charges->firstWhere('reference_month', $currentMonth);
+
+        return Inertia::render('Home/PlayerMonthlyCharges', [
+            'group' => [
+                'id' => $group->id,
+                'name' => $group->name,
+                'currency' => $group->currency,
+                'payment_day' => $group->payment_day,
+            ],
+            'currentMonth' => $currentCharge,
+            'history' => $charges,
+        ]);
+    }
+
     public function leaveGroup(Request $request, Group $group): RedirectResponse
     {
         $player = $this->resolvePlayerForUserInGroup($request, (int) $group->id);
