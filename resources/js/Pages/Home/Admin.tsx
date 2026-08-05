@@ -9,7 +9,6 @@ import {
   RetroPixelIcon,
   RetroSectionHeader,
   RetroThumbCard,
-  RetroValueDisplay,
 } from '@/Components/retro';
 import { PageProps } from '@/types';
 import { useLocale } from '@/hooks/useLocale';
@@ -30,6 +29,49 @@ export default function AdminHome({
   nextMatchDate,
 }: AdminHomeProps) {
   const { t } = useLocale();
+  const hasAnyMatches = pastMatchesCount > 0 || upcomingMatchesCount > 0;
+
+  const statCards = [
+    {
+      key: 'groups',
+      title: t('home.admin.ownerGroups'),
+      icon: 'groups' as const,
+      value: ownerGroupsCount,
+      disabled: ownerGroupsCount === 0,
+    },
+    {
+      key: 'played',
+      title: t('home.admin.playedMatches'),
+      icon: 'flag' as const,
+      value: pastMatchesCount,
+      disabled: pastMatchesCount === 0,
+    },
+    {
+      key: 'scheduled',
+      title: t('home.admin.scheduledMatches'),
+      icon: 'calendar' as const,
+      value: upcomingMatchesCount,
+      disabled: upcomingMatchesCount === 0,
+    },
+  ];
+
+  const matchCards = [
+    {
+      key: 'last',
+      title: t('home.admin.lastMatch'),
+      icon: 'arrow-back' as const,
+      value: lastMatchDate ? formatDateTimePtBr(lastMatchDate) : t('home.admin.noPlayedMatches'),
+      disabled: !hasAnyMatches,
+    },
+    {
+      key: 'next',
+      title: t('home.admin.nextMatch'),
+      icon: 'arrow-forward' as const,
+      value: nextMatchDate ? formatDateTimePtBr(nextMatchDate) : t('home.admin.noScheduledMatches'),
+      disabled: !hasAnyMatches,
+    },
+  ];
+
   return (
     <RetroAppShell activeId="home">
       <Head title={t('home.admin.title')} />
@@ -63,50 +105,36 @@ export default function AdminHome({
             </div>
           )}
 
-          <div className="grid gap-3 md:grid-cols-3">
-            <RetroThumbCard>
-              <RetroThumbCard.Title>{t('home.admin.ownerGroups')}</RetroThumbCard.Title>
-              <RetroThumbCard.Thumb>
-                <RetroPixelIcon name="groups" size={28} />
-              </RetroThumbCard.Thumb>
-              <RetroThumbCard.Body>
-                <RetroThumbCard.Counter>{ownerGroupsCount}</RetroThumbCard.Counter>
-              </RetroThumbCard.Body>
-            </RetroThumbCard>
+          <div className="flex flex-wrap justify-center gap-3">
+            {statCards.map((card) => (
+              <div key={card.key} className="w-full sm:w-64">
+                <RetroThumbCard disabled={card.disabled}>
+                  <RetroThumbCard.Title>{card.title}</RetroThumbCard.Title>
+                  <RetroThumbCard.Thumb>
+                    <RetroPixelIcon name={card.icon} size="sm" />
+                  </RetroThumbCard.Thumb>
+                  <RetroThumbCard.Body>
+                    <RetroThumbCard.Counter>{card.value}</RetroThumbCard.Counter>
+                  </RetroThumbCard.Body>
+                </RetroThumbCard>
+              </div>
+            ))}
+          </div>
 
-            <div className="rounded border-2 border-[#4060c0] bg-[#0b1340] p-2">
-              <div className="retro-text-shadow mb-2 text-base text-[#a0b0ff]">
-                {t('home.admin.playedMatches')}
+          <div className="flex flex-wrap justify-center gap-3">
+            {matchCards.map((card) => (
+              <div key={card.key} className="w-full sm:w-64">
+                <RetroThumbCard disabled={card.disabled}>
+                  <RetroThumbCard.Title>{card.title}</RetroThumbCard.Title>
+                  <RetroThumbCard.Thumb>
+                    <RetroPixelIcon name={card.icon} size="sm" />
+                  </RetroThumbCard.Thumb>
+                  <RetroThumbCard.Body>
+                    <RetroThumbCard.Text>{card.value}</RetroThumbCard.Text>
+                  </RetroThumbCard.Body>
+                </RetroThumbCard>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <RetroValueDisplay label={t('common.total')} value={String(pastMatchesCount)} />
-                <RetroValueDisplay
-                  label={t('home.admin.lastMatch')}
-                  value={
-                    lastMatchDate
-                      ? formatDateTimePtBr(lastMatchDate)
-                      : t('home.admin.noPlayedMatches')
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="rounded border-2 border-[#4060c0] bg-[#0b1340] p-2">
-              <div className="retro-text-shadow mb-2 text-base text-[#a0b0ff]">
-                {t('home.admin.scheduledMatches')}
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <RetroValueDisplay label={t('common.total')} value={String(upcomingMatchesCount)} />
-                <RetroValueDisplay
-                  label={t('home.admin.nextMatch')}
-                  value={
-                    nextMatchDate
-                      ? formatDateTimePtBr(nextMatchDate)
-                      : t('home.admin.noScheduledMatches')
-                  }
-                />
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className="rounded border-2 border-[#4060c0] bg-[#1e348c] p-3">

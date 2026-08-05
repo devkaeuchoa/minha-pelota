@@ -17,7 +17,7 @@ export const WithPixelIcon: Story = {
       <>
         <RetroThumbCard.Title>GRUPOS QUE VOCÊ É DONO</RetroThumbCard.Title>
         <RetroThumbCard.Thumb>
-          <RetroPixelIcon name="groups" size={28} />
+          <RetroPixelIcon name="groups" size="sm" />
         </RetroThumbCard.Thumb>
         <RetroThumbCard.Body>
           <RetroValueDisplay label="TOTAL" value="3" />
@@ -37,6 +37,39 @@ export const WithEmoji: Story = {
         </RetroThumbCard.Thumb>
         <RetroThumbCard.Body>
           <RetroValueDisplay label="NOME" value="Jogador" />
+        </RetroThumbCard.Body>
+      </>
+    ),
+  },
+};
+
+export const WithText: Story = {
+  args: {
+    children: (
+      <>
+        <RetroThumbCard.Title>ÚLTIMA PARTIDA</RetroThumbCard.Title>
+        <RetroThumbCard.Thumb>
+          <RetroPixelIcon name="arrow-back" size="sm" />
+        </RetroThumbCard.Thumb>
+        <RetroThumbCard.Body>
+          <RetroThumbCard.Text>12/07/2026 20:00</RetroThumbCard.Text>
+        </RetroThumbCard.Body>
+      </>
+    ),
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+    children: (
+      <>
+        <RetroThumbCard.Title>GRUPOS QUE VOCÊ É DONO</RetroThumbCard.Title>
+        <RetroThumbCard.Thumb>
+          <RetroPixelIcon name="groups" size="sm" />
+        </RetroThumbCard.Thumb>
+        <RetroThumbCard.Body>
+          <RetroThumbCard.Counter>0</RetroThumbCard.Counter>
         </RetroThumbCard.Body>
       </>
     ),

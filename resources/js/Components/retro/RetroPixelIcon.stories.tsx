@@ -14,6 +14,22 @@ type Story = StoryObj<typeof meta>;
 
 export const Groups: Story = {};
 
+export const Flag: Story = {
+  args: { name: 'flag' },
+};
+
+export const Calendar: Story = {
+  args: { name: 'calendar' },
+};
+
+export const ArrowBack: Story = {
+  args: { name: 'arrow-back' },
+};
+
+export const ArrowForward: Story = {
+  args: { name: 'arrow-forward' },
+};
+
 export const Large: Story = {
-  args: { size: 64 },
+  args: { size: 'lg' },
 };

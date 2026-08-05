@@ -1,5 +1,4 @@
 const ptBR = {
-  'common.total': 'TOTAL',
   'common.home': 'HOME',
   'common.groups': 'GRUPOS',
   'common.dates': 'DATAS',
