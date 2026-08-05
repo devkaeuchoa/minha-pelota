@@ -7,6 +7,7 @@ import { slugifyKebab } from '@/utils/slug';
 import { resolveGroupSettings } from '@/utils/groups';
 import { formatBrlCurrencyValue, parseBrlCurrencyInput } from '@/utils/currency';
 import {
+  RetroBreadcrumbs,
   RetroButton,
   RetroFormField,
   RetroLevelSelector,
@@ -88,10 +89,19 @@ export default function Form({ group, submitUrl, method, title, defaultTeamSize 
 
   const activeWeekdayId = data.weekday;
 
+  const breadcrumbItems = group
+    ? [
+        { label: t('common.groups'), href: route('groups.index') },
+        { label: group.name, href: route('groups.show', group) },
+        { label: t('breadcrumbs.edit') },
+      ]
+    : [{ label: t('common.groups'), href: route('groups.index') }, { label: t('groups.newGroup') }];
+
   return (
     <RetroAppShell activeId="groups">
       <Head title={title} />
 
+      <RetroBreadcrumbs items={breadcrumbItems} />
       <RetroSectionHeader title="1. CONFIGURAÇÃO DO GRUPO" />
       <RetroPanel>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

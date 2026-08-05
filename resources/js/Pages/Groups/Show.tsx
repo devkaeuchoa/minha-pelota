@@ -9,10 +9,12 @@ import {
   RetroButton,
   RetroInfoCard,
   RetroAccordion,
+  RetroBreadcrumbs,
   RetroSectionHeader,
 } from '@/Components/retro';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import { resolveGroupPermissions, resolveGroupSettings } from '@/utils/groups';
+import { useLocale } from '@/hooks/useLocale';
 
 interface ShowProps extends PageProps {
   group: Group;
@@ -21,6 +23,7 @@ interface ShowProps extends PageProps {
 }
 
 export default function Show({ group, players, matches }: ShowProps) {
+  const { t } = useLocale();
   const { invite, playersSection, settings } = useGroupShowController(group, players, matches);
   const permissions = resolveGroupPermissions(group, true);
   const groupSettings = resolveGroupSettings(group);
@@ -33,6 +36,9 @@ export default function Show({ group, players, matches }: ShowProps) {
     <RetroAppShell activeId="groups">
       <Head title={group.name} />
 
+      <RetroBreadcrumbs
+        items={[{ label: t('common.groups'), href: route('groups.index') }, { label: group.name }]}
+      />
       <RetroSectionHeader title="DETALHES DO GRUPO" />
       <RetroInfoCard>
         <GroupDetailsSection

@@ -22,7 +22,6 @@ const meta = {
     ],
     activeId: 'home',
     onLogout: fn(),
-    backAriaLabel: 'Voltar',
     openMenuAriaLabel: 'Abrir menu',
     closeMenuAriaLabel: 'Fechar menu',
     modeSelectLabel: 'MODO ADMIN',

@@ -1,7 +1,13 @@
+/* global route */
 import { Head } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
-import { RetroInfoCard, RetroSectionHeader, RetroValueDisplay } from '@/Components/retro';
+import {
+  RetroBreadcrumbs,
+  RetroInfoCard,
+  RetroSectionHeader,
+  RetroValueDisplay,
+} from '@/Components/retro';
 import { useLocale } from '@/hooks/useLocale';
 import { formatBrlCurrencyValue } from '@/utils/currency';
 
@@ -40,6 +46,13 @@ export default function PlayerMonthlyCharges({
   return (
     <RetroAppShell activeId="home">
       <Head title={t('monthlyCharges.title')} />
+      <RetroBreadcrumbs
+        items={[
+          { label: t('common.home'), href: route('player.home') },
+          { label: group.name, href: route('player.groups.show', group.id) },
+          { label: t('breadcrumbs.monthlyCharge') },
+        ]}
+      />
       <RetroSectionHeader title={t('monthlyCharges.title')} />
 
       <RetroInfoCard>

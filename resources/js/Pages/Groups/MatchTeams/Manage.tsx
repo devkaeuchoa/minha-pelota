@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { Group, MatchTeamPlayer, PageProps, PhysicalCondition } from '@/types';
 import {
+  RetroBreadcrumbs,
   RetroButton,
   RetroFormField,
   RetroInfoCard,
@@ -124,6 +125,13 @@ export default function Manage({
     <RetroAppShell activeId="groups">
       <Head title={`Times — ${group.name}`} />
 
+      <RetroBreadcrumbs
+        items={[
+          { label: t('common.groups'), href: route('groups.index') },
+          { label: group.name, href: route('groups.show', group.id) },
+          { label: t('breadcrumbs.teams') },
+        ]}
+      />
       <RetroSectionHeader title="DIVISÃO DE TIMES" />
 
       <RetroInfoCard>

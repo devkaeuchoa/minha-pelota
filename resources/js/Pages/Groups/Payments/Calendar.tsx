@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useMemo } from 'react';
 import { Group, PageProps } from '@/types';
 import {
+  RetroBreadcrumbs,
   RetroButton,
   RetroInfoCard,
   RetroInlineInfo,
@@ -141,6 +142,13 @@ export default function Calendar({
   return (
     <RetroAppShell activeId="groups">
       <Head title={`Pagamentos — ${group.name}`} />
+      <RetroBreadcrumbs
+        items={[
+          { label: t('common.groups'), href: route('groups.index') },
+          { label: group.name, href: route('groups.show', group.id) },
+          { label: t('breadcrumbs.payments') },
+        ]}
+      />
       <RetroSectionHeader title={t('payments.calendar.title')} />
 
       <RetroInfoCard>

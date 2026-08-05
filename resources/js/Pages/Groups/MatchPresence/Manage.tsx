@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { Group, PageProps, PhysicalCondition } from '@/types';
 import {
   RetroPitch,
+  RetroBreadcrumbs,
   RetroButton,
   RetroInfoCard,
   RetroInlineInfo,
@@ -124,6 +125,13 @@ export default function Manage({
     <RetroAppShell activeId="groups">
       <Head title={`Escalação — ${group.name}`} />
 
+      <RetroBreadcrumbs
+        items={[
+          { label: t('common.groups'), href: route('groups.index') },
+          { label: group.name, href: route('groups.show', group.id) },
+          { label: t('breadcrumbs.presence') },
+        ]}
+      />
       <RetroSectionHeader title="VISUALIZAR ESCALAÇÃO" />
 
       <RetroInfoCard>

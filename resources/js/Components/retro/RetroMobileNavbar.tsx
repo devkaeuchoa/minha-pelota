@@ -1,4 +1,3 @@
-/* global window */
 import { useState } from 'react';
 import { RetroIconButton } from '@/Components/retro';
 
@@ -14,7 +13,6 @@ interface RetroMobileNavbarProps {
   items: RetroNavItem[];
   activeId?: string;
   onLogout?: () => void;
-  backAriaLabel: string;
   openMenuAriaLabel: string;
   closeMenuAriaLabel: string;
   modeSelectLabel: string;
@@ -29,7 +27,6 @@ export function RetroMobileNavbar({
   items,
   activeId,
   onLogout,
-  backAriaLabel,
   openMenuAriaLabel,
   closeMenuAriaLabel,
   modeSelectLabel,
@@ -51,18 +48,6 @@ export function RetroMobileNavbar({
     <div data-component="retro-mobile-navbar">
       <header className="retro-bg-metallic retro-border-emboss relative z-20 flex shrink-0 items-center justify-between px-3 py-2 shadow-[0_4px_10px_rgba(0,0,0,0.8)]">
         <div className="flex items-center gap-2">
-          <RetroIconButton
-            aria-label={backAriaLabel}
-            icon={
-              <span className="text-[0.9em] leading-none -ml-[2px] mt-[2px] drop-shadow-[1px_1px_0px_white]">
-                ◀
-              </span>
-            }
-            flat
-            onClick={() => {
-              window.history.back();
-            }}
-          />
           <h1 className="retro-text-shadow-light m-0 text-2xl font-bold leading-none tracking-widest text-red-700 italic">
             {title}
           </h1>

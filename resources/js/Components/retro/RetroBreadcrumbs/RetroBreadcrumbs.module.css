@@ -1,0 +1,56 @@
+.breadcrumbs {
+  display: block;
+  font-size: 1rem;
+}
+
+/* Mobile-first: single-level "back to parent" link, app-nav-bar style. */
+.mobileTrail {
+  display: block;
+}
+
+.desktopTrail {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+@media (min-width: 640px) {
+  .mobileTrail {
+    display: none;
+  }
+
+  .desktopTrail {
+    display: flex;
+  }
+}
+
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.backLink,
+.link {
+  color: #a0b0ff;
+  text-decoration: none;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.backLink:hover,
+.link:hover {
+  color: #ffffff;
+}
+
+.current {
+  color: #ffd700;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+.separator {
+  color: #4060c0;
+}

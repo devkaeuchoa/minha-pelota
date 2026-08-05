@@ -51,7 +51,8 @@ test.describe("Pagamentos por partida", () => {
         await openTodayMatchFromCalendar(page);
 
         await expect(page.getByRole("heading", { name: "PAGAMENTOS DA PARTIDA" })).toBeVisible();
-        await expect(page.getByText("PARTIDA", { exact: true })).toBeVisible();
+        // .last(): "PARTIDA" also appears as a breadcrumb crumb above the page content.
+        await expect(page.getByText("PARTIDA", { exact: true }).last()).toBeVisible();
         await expect(page.getByText("LOCAL", { exact: true })).toBeVisible();
         await expect(page.getByText("Arena Pagamentos E2E").first()).toBeVisible();
 

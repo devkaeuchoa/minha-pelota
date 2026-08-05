@@ -1,6 +1,8 @@
+/* global route */
 import { Head } from '@inertiajs/react';
 import { Group, Player, PageProps } from '@/types';
 import {
+  RetroBreadcrumbs,
   RetroButton,
   RetroPlayerList,
   RetroSearchInput,
@@ -28,6 +30,13 @@ export default function Players({ group, availablePlayers, groupPlayers }: Playe
     <RetroAppShell activeId="groups">
       <Head title={`Jogadores — ${group.name}`} />
 
+      <RetroBreadcrumbs
+        items={[
+          { label: t('common.groups'), href: route('groups.index') },
+          { label: group.name, href: route('groups.show', group) },
+          { label: t('breadcrumbs.players') },
+        ]}
+      />
       <RetroSectionHeader title="3. JOGADORES DO GRUPO" />
 
       <div className="mb-2">

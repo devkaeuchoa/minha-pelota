@@ -3,6 +3,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { GroupRankingEntry, PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
 import {
+  RetroBreadcrumbs,
   RetroButton,
   RetroInfoCard,
   RetroModal,
@@ -55,6 +56,9 @@ export default function PlayerGroupShow({ group, period, rankings }: PlayerGroup
     <RetroAppShell activeId="home">
       <Head title={t('home.playerGroupShow.title', { name: group.name })} />
 
+      <RetroBreadcrumbs
+        items={[{ label: t('common.home'), href: route('player.home') }, { label: group.name }]}
+      />
       <RetroSectionHeader title={t('home.playerGroupShow.header')} />
       <RetroInfoCard>
         <div className="flex flex-col gap-3">

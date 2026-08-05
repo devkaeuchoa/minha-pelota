@@ -47,3 +47,5 @@ export { RetroPhysicalConditionEmoji } from './RetroPhysicalConditionEmoji';
 export { RetroPhysicalConditionScale } from './RetroPhysicalConditionScale';
 export { RetroPixelIcon } from './RetroPixelIcon';
 export { RetroThumbCard } from './RetroThumbCard';
+export { RetroBreadcrumbs } from './RetroBreadcrumbs/RetroBreadcrumbs';
+export type { RetroBreadcrumbItem } from './RetroBreadcrumbs/RetroBreadcrumbs';

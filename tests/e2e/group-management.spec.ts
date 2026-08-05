@@ -57,7 +57,8 @@ test.describe("Gestao de grupos (admin/owner)", () => {
         await page.getByRole("button", { name: "SALVAR" }).click();
 
         await expect(page).toHaveURL(/\/groups\/\d+$/);
-        await expect(page.getByText("Grupo Criado E2E")).toBeVisible();
+        // .last(): the group name also appears as a breadcrumb crumb above the page content.
+        await expect(page.getByText("Grupo Criado E2E").last()).toBeVisible();
         // Validate values rendered on the group details page (not form inputs)
         await expect(page.getByText("DIA:")).toBeVisible();
         await expect(page.getByText(/Sexta-feira/i)).toBeVisible();

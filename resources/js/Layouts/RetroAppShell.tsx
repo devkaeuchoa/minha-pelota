@@ -49,7 +49,6 @@ export function RetroAppShell({
             items={navItems}
             activeId={activeId}
             onLogout={handleLogout}
-            backAriaLabel={t('retro.mobile.backAriaLabel')}
             openMenuAriaLabel={t('retro.mobile.openMenuAriaLabel')}
             closeMenuAriaLabel={t('retro.mobile.closeMenuAriaLabel')}
             modeSelectLabel={t('retro.mobile.modeSelectLabel')}

@@ -2,6 +2,7 @@
 import { Head, router } from '@inertiajs/react';
 import { Group, MatchPayment, PageProps } from '@/types';
 import {
+  RetroBreadcrumbs,
   RetroButton,
   RetroFormField,
   RetroInfoCard,
@@ -186,6 +187,14 @@ export default function Manage({
   return (
     <RetroAppShell activeId="groups">
       <Head title={`Pagamentos — ${group.name}`} />
+      <RetroBreadcrumbs
+        items={[
+          { label: t('common.groups'), href: route('groups.index') },
+          { label: group.name, href: route('groups.show', group.id) },
+          { label: t('breadcrumbs.payments'), href: route('groups.payments.calendar', group.id) },
+          { label: t('breadcrumbs.match') },
+        ]}
+      />
       <RetroSectionHeader title="PAGAMENTOS DA PARTIDA" />
 
       <RetroInfoCard>
