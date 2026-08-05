@@ -6,7 +6,9 @@ import {
   RetroButton,
   RetroInfoCard,
   RetroInlineInfo,
+  RetroPixelIcon,
   RetroSectionHeader,
+  RetroThumbCard,
   RetroValueDisplay,
 } from '@/Components/retro';
 import { PageProps } from '@/types';
@@ -61,29 +63,51 @@ export default function AdminHome({
             </div>
           )}
 
-          <RetroValueDisplay label={t('home.admin.ownerGroups')} value={String(ownerGroupsCount)} />
+          <div className="grid gap-3 md:grid-cols-3">
+            <RetroThumbCard>
+              <RetroThumbCard.Title>{t('home.admin.ownerGroups')}</RetroThumbCard.Title>
+              <RetroThumbCard.Thumb>
+                <RetroPixelIcon name="groups" size={28} />
+              </RetroThumbCard.Thumb>
+              <RetroThumbCard.Body>
+                <RetroThumbCard.Counter>{ownerGroupsCount}</RetroThumbCard.Counter>
+              </RetroThumbCard.Body>
+            </RetroThumbCard>
 
-          <RetroValueDisplay
-            label={t('home.admin.playedMatches')}
-            value={String(pastMatchesCount)}
-          />
-          <RetroValueDisplay
-            label={t('home.admin.lastMatch')}
-            value={
-              lastMatchDate ? formatDateTimePtBr(lastMatchDate) : t('home.admin.noPlayedMatches')
-            }
-          />
+            <div className="rounded border-2 border-[#4060c0] bg-[#0b1340] p-2">
+              <div className="retro-text-shadow mb-2 text-base text-[#a0b0ff]">
+                {t('home.admin.playedMatches')}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <RetroValueDisplay label={t('common.total')} value={String(pastMatchesCount)} />
+                <RetroValueDisplay
+                  label={t('home.admin.lastMatch')}
+                  value={
+                    lastMatchDate
+                      ? formatDateTimePtBr(lastMatchDate)
+                      : t('home.admin.noPlayedMatches')
+                  }
+                />
+              </div>
+            </div>
 
-          <RetroValueDisplay
-            label={t('home.admin.scheduledMatches')}
-            value={String(upcomingMatchesCount)}
-          />
-          <RetroValueDisplay
-            label={t('home.admin.nextMatch')}
-            value={
-              nextMatchDate ? formatDateTimePtBr(nextMatchDate) : t('home.admin.noScheduledMatches')
-            }
-          />
+            <div className="rounded border-2 border-[#4060c0] bg-[#0b1340] p-2">
+              <div className="retro-text-shadow mb-2 text-base text-[#a0b0ff]">
+                {t('home.admin.scheduledMatches')}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <RetroValueDisplay label={t('common.total')} value={String(upcomingMatchesCount)} />
+                <RetroValueDisplay
+                  label={t('home.admin.nextMatch')}
+                  value={
+                    nextMatchDate
+                      ? formatDateTimePtBr(nextMatchDate)
+                      : t('home.admin.noScheduledMatches')
+                  }
+                />
+              </div>
+            </div>
+          </div>
 
           <div className="rounded border-2 border-[#4060c0] bg-[#1e348c] p-3">
             <span className="retro-text-shadow text-base text-[#a0b0ff]">

@@ -45,3 +45,5 @@ export { RetroRosterGrid } from './RetroRosterGrid';
 export { RetroPitch } from './RetroPitch';
 export { RetroPhysicalConditionEmoji } from './RetroPhysicalConditionEmoji';
 export { RetroPhysicalConditionScale } from './RetroPhysicalConditionScale';
+export { RetroPixelIcon } from './RetroPixelIcon';
+export { RetroThumbCard } from './RetroThumbCard';
