@@ -117,8 +117,24 @@ Route::middleware('auth')->group(function () {
             'groupForPaymentsCalendar' => $paymentsCalendarGroupId
                 ? ['group_id' => $paymentsCalendarGroupId]
                 : null,
+            'groupsViewPreference' => $user->groups_view_preference ?? 'table',
         ]);
     })->name('groups.index');
+
+    Route::patch('/groups/view-preference', function (\Illuminate\Http\Request $request) {
+        /** @var \App\Models\Player|null $user */
+        $user = Auth::user();
+        abort_unless($user, 401);
+        abort_unless((bool) ($user->is_admin ?? false), 403);
+
+        $validated = $request->validate([
+            'view' => 'required|string|in:table,list',
+        ]);
+
+        $user->update(['groups_view_preference' => $validated['view']]);
+
+        return back();
+    })->name('groups.view-preference.update');
 
     Route::get('/dates', function (\Illuminate\Http\Request $request) {
         /** @var \App\Models\Player|null $user */

@@ -23,6 +23,7 @@ class Player extends Authenticatable
         'remember_token',
         'physical_condition',
         'rating',
+        'groups_view_preference',
     ];
 
     protected $hidden = [

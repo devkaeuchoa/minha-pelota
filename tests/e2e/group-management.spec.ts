@@ -127,4 +127,31 @@ test.describe("Gestao de grupos (admin/owner)", () => {
         await expect(page.locator("tbody")).not.toContainText("E2E Batch Delete 1");
         await expect(page.locator("tbody")).not.toContainText("E2E Batch Delete 2");
     });
+
+    test("alternar entre tabela e lista no desktop persiste a preferencia", async ({ page }) => {
+        await login(page, OWNER_PHONE);
+
+        await expect(page).toHaveURL(/\/home\/admin$/);
+        await page.getByRole("button", { name: "GRUPOS" }).click();
+        await page.getByRole("button", { name: "VER TODOS" }).click();
+        await expect(page).toHaveURL(/\/groups$/);
+
+        // Default (preferencia nunca definida): tabela.
+        await expect(page.locator("tbody tr").first()).toBeVisible();
+
+        await page.getByRole("button", { name: "LISTA" }).click();
+
+        await expect(page.locator("tbody")).toHaveCount(0);
+        await expect(page.locator('[data-component="groups-list"]').last()).toBeVisible();
+
+        await page.reload();
+
+        // Preferencia persistida no backend: lista continua ativa apos reload.
+        await expect(page.locator("tbody")).toHaveCount(0);
+        await expect(page.locator('[data-component="groups-list"]').last()).toBeVisible();
+
+        // Volta pra tabela, pra nao vazar estado pros demais testes desta suite.
+        await page.getByRole("button", { name: "TABELA" }).click();
+        await expect(page.locator("tbody tr").first()).toBeVisible();
+    });
 });
