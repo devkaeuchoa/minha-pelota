@@ -110,13 +110,21 @@ export default function Calendar({
   const { t } = useLocale();
   const canManagePayments = permissions?.can_manage_payments ?? true;
   const weeks = useMemo(() => buildCalendarWeeks(month, matches), [month, matches]);
+  const [calendarYear, calendarMonthIndex] = useMemo(
+    () => month.split('-').map((part) => Number.parseInt(part, 10)),
+    [month],
+  );
+  const today = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  }, []);
   const monthLabel = useMemo(() => {
-    const [year, monthIndex] = month.split('-').map((part) => Number.parseInt(part, 10));
-    return new Date(year, monthIndex - 1, 1).toLocaleDateString('pt-BR', {
+    return new Date(calendarYear, calendarMonthIndex - 1, 1).toLocaleDateString('pt-BR', {
       month: 'long',
       year: 'numeric',
     });
-  }, [month]);
+  }, [calendarYear, calendarMonthIndex]);
 
   const toggleMonthlyCharge = (playerId: number, nextStatus: 'paid' | 'unpaid') => {
     router.patch(
@@ -185,11 +193,11 @@ export default function Calendar({
           ) : null}
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-center">
+            <table className="w-full table-fixed border-separate border-spacing-1 text-center">
               <thead>
                 <tr>
                   {WEEKDAY_LABELS.map((label) => (
-                    <th key={label} className="p-2 text-xs text-[#a0b0ff]">
+                    <th key={label} className="retro-text-shadow w-[14.28%] p-2 text-lg text-white">
                       {label}
                     </th>
                   ))}
@@ -200,16 +208,28 @@ export default function Calendar({
                   <tr key={weekIndex}>
                     {week.map((cell, cellIndex) => {
                       if (!cell) {
-                        return <td key={cellIndex} className="border border-[#1e348c] p-2" />;
+                        return (
+                          <td key={cellIndex} className="p-0 align-top">
+                            <div className="min-h-[72px] rounded border-2 border-[#1e348c]" />
+                          </td>
+                        );
                       }
 
                       if (!('id' in cell)) {
+                        const cellDate = new Date(calendarYear, calendarMonthIndex - 1, cell.day);
+                        cellDate.setHours(0, 0, 0, 0);
+                        const isPast = cellDate.getTime() < today.getTime();
+                        const isToday = cellDate.getTime() === today.getTime();
+
                         return (
-                          <td
-                            key={cellIndex}
-                            className="border border-[#1e348c] p-2 align-top text-xs text-[#a0b0ff]"
-                          >
-                            {cell.day}
+                          <td key={cellIndex} className="p-0 align-top">
+                            <div
+                              className={`retro-text-shadow min-h-[72px] rounded border-2 p-2 text-lg text-white ${
+                                isToday ? 'border-[#ffd700]' : 'border-[#1e348c]'
+                              } ${isPast ? 'opacity-40 grayscale' : ''}`}
+                            >
+                              {cell.day}
+                            </div>
                           </td>
                         );
                       }
@@ -221,21 +241,43 @@ export default function Calendar({
                         cell.summary.dispensado_count;
                       const allPaid = totalPlayers > 0 && cell.summary.paid_count === totalPlayers;
 
+                      const cellDate = new Date(cell.scheduled_at);
+                      cellDate.setHours(0, 0, 0, 0);
+                      const isPastMatch = cellDate.getTime() < today.getTime();
+                      const isToday = cellDate.getTime() === today.getTime();
+                      const hasPendingPayments = cell.summary.unpaid_count > 0;
+                      const isOverdue = isPastMatch && hasPendingPayments;
+
+                      const bgClass = allPaid
+                        ? 'bg-[#214f3a]'
+                        : isOverdue
+                          ? 'bg-[#5c1f2e]'
+                          : 'bg-[#1e348c]';
+
+                      const borderClass = isToday
+                        ? 'border-[#ffd700]'
+                        : isOverdue
+                          ? 'border-[#ff0055]'
+                          : 'border-transparent';
+
                       return (
-                        <td key={cellIndex} className="border border-[#1e348c] p-1 align-top">
+                        <td key={cellIndex} className="p-0 align-top">
                           <Link
                             href={route('groups.matches.payments.manage', {
                               group: group.id,
                               match: cell.id,
                             })}
-                            className={`retro-text-shadow flex h-full min-h-[64px] flex-col gap-1 rounded p-2 text-xs ${
-                              allPaid ? 'bg-[#214f3a]' : 'bg-[#1e348c]'
-                            }`}
+                            className={`retro-text-shadow flex min-h-[72px] flex-col gap-0.5 rounded border-2 p-2 text-base ${bgClass} ${borderClass}`}
                           >
-                            <span className="text-[#ffd700]">{day}</span>
-                            <span className="text-[#a0b0ff]">
+                            <span className="text-xl leading-tight text-[#ffd700]">{day}</span>
+                            <span className="truncate text-sm leading-tight text-white">
                               {cell.summary.paid_count}/{totalPlayers} PAGOS
                             </span>
+                            {isOverdue ? (
+                              <span className="retro-text-shadow truncate text-sm leading-tight text-[#ff8080]">
+                                {t('payments.calendar.overdue')}
+                              </span>
+                            ) : null}
                           </Link>
                         </td>
                       );

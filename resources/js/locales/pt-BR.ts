@@ -72,6 +72,7 @@ const ptBR = {
   'payments.calendar.noMatches': 'NENHUMA PARTIDA NESTE MÊS.',
   'payments.calendar.previousMonth': '< MÊS ANTERIOR',
   'payments.calendar.nextMonth': 'PRÓXIMO MÊS >',
+  'payments.calendar.overdue': 'PENDENTE',
   'monthlyCharges.title': 'MINHA MENSALIDADE',
   'monthlyCharges.currentMonth': 'MÊS ATUAL',
   'monthlyCharges.history': 'HISTÓRICO',

@@ -56,6 +56,13 @@
     }
 
     /* Retro theme utilities */
+
+    /* Small letter-spacing bump on the pixel font base, across the whole app —
+       keeps the retro look while nudging legibility (VT323 renders quite tight). */
+    .font-retro {
+        letter-spacing: 0.03em;
+    }
+
     .retro-text-shadow {
         text-shadow: 2px 2px 0px #000000;
     }
