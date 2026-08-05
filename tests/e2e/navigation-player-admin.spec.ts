@@ -32,12 +32,6 @@ test.describe("Navegacao jogador vs admin", () => {
         await expect(page.getByRole("heading", { name: "HOME DO JOGADOR" })).toBeVisible();
     });
 
-    test("jogador com is_admin cai na home do admin apos login", async ({ page }) => {
-        await login(page, OWNER_PHONE);
-        await expect(page).toHaveURL(/\/home\/admin$/);
-        await expect(page.getByRole("heading", { name: "HOME DO ADMIN" })).toBeVisible();
-    });
-
     test("admin navega entre home do jogador e grupos com menus distintos", async ({ page }) => {
         await login(page, OWNER_PHONE);
         await expect(page).toHaveURL(/\/home\/admin$/);
@@ -60,9 +54,21 @@ test.describe("Navegacao jogador vs admin", () => {
         await expect(page).toHaveURL(/\/home\/admin$/);
         await expect(page.getByRole("heading", { name: "HOME DO ADMIN" })).toBeVisible();
         await expect(page.getByText("GRUPOS QUE VOCÊ É DONO")).toBeVisible();
+        await expect(page.getByText("PARTIDAS REALIZADAS")).toBeVisible();
+        await expect(page.getByText("PARTIDAS AGENDADAS")).toBeVisible();
         await expect(page.getByText("ÚLTIMA PARTIDA")).toBeVisible();
         await expect(page.getByText("PRÓXIMA PARTIDA")).toBeVisible();
         await expect(page.getByText("QUADRO DE AVISOS")).toBeVisible();
         await expect(page.getByText("BEM-VINDO! AQUI ESTÁ UM RESUMO RÁPIDO DA SUA GESTÃO.")).toBeVisible();
+
+        // Os 5 cards de resumo (grupos, partidas realizadas/agendadas, ultima/proxima partida)
+        // trazem cada um um icone pixelado dentro de um frame circular.
+        await expect(page.locator('[data-component="retro-pixel-icon"]')).toHaveCount(5);
+
+        // Owner tem grupos e partidas passadas/futuras seedadas, entao nenhum card
+        // deve aparecer no estado "disabled" (esvaziado/sem dados).
+        await expect(page.locator('[data-component="retro-thumb-card"][data-disabled]')).toHaveCount(
+            0,
+        );
     });
 });

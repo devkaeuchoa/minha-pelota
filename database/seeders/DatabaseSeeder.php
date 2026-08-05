@@ -67,6 +67,17 @@ class DatabaseSeeder extends Seeder
             'is_admin' => true,
         ]);
 
+        // Admin sem grupos nem partidas, nunca mutado por outras suites — usado só pelo
+        // dashboard E2E (auth-phone.spec.ts) para o estado "primeiro login" (painel de
+        // primeiros passos + cards zerados/desabilitados). Não reaproveitar "Admin No
+        // Groups" acima, pois group-management E2E cria um grupo pra ele.
+        Player::factory()->create([
+            'name' => 'Admin Dashboard Vazio',
+            'nick' => 'admin-dashboard-vazio',
+            'phone' => '11922222222',
+            'is_admin' => true,
+        ]);
+
         // Profile E2E — senha / exclusão (sem grupos para não afetar outras suites)
         Player::factory()->create([
             'name' => 'E2E Profile Password',
