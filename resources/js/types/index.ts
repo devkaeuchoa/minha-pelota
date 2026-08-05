@@ -5,6 +5,7 @@ export interface User {
   phone?: string | null;
   home_route?: string | null;
   can_access_player_admin_area?: boolean;
+  single_owned_group_id?: number | null;
   created_at: string;
   updated_at: string;
 }

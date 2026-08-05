@@ -40,8 +40,24 @@ export function getDefaultNavItemsForUser(user: User | null | undefined): AppNav
     }));
   }
 
-  return PLAYER_ADMIN_NAV_ITEMS.map((item) => ({
-    ...item,
-    href: item.id === 'home' ? homeHref : item.href,
-  }));
+  const singleOwnedGroupId = user?.single_owned_group_id ?? null;
+
+  return PLAYER_ADMIN_NAV_ITEMS.map((item) => {
+    if (item.id !== 'groups' || singleOwnedGroupId === null) {
+      return { ...item, href: item.id === 'home' ? homeHref : item.href };
+    }
+
+    return {
+      ...item,
+      children: item.children?.map((child) =>
+        child.id === 'groups.index'
+          ? {
+              ...child,
+              labelKey: 'groups.viewGroup',
+              href: route('groups.show', { group: singleOwnedGroupId }),
+            }
+          : child,
+      ),
+    };
+  });
 }

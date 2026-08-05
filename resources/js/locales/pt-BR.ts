@@ -46,6 +46,7 @@ const ptBR = {
   'groups.selection': 'SELEÇÃO',
   'groups.selected': 'SELECIONADOS',
   'groups.viewAll': 'VER TODOS',
+  'groups.viewGroup': 'VER GRUPO',
   'groups.removeSelected': 'REMOVER SELECIONADOS',
   'groups.newGroup': 'NOVO GRUPO',
   'groups.paymentsCalendar': 'PAGAMENTOS DO MÊS',
