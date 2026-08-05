@@ -3,16 +3,32 @@ import { PropsWithChildren, useState } from 'react';
 interface RetroAccordionProps extends PropsWithChildren {
   title: string;
   defaultOpen?: boolean;
+  open?: boolean;
+  onToggle?: (open: boolean) => void;
 }
 
-export function RetroAccordion({ title, defaultOpen = true, children }: RetroAccordionProps) {
-  const [open, setOpen] = useState(defaultOpen);
+export function RetroAccordion({
+  title,
+  defaultOpen = true,
+  open: controlledOpen,
+  onToggle,
+  children,
+}: RetroAccordionProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : uncontrolledOpen;
+
+  const toggle = () => {
+    const next = !open;
+    if (!isControlled) setUncontrolledOpen(next);
+    onToggle?.(next);
+  };
 
   return (
     <div data-component="retro-accordion" className="retro-border-panel bg-[#0b1340]">
       <button
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={toggle}
         className="retro-bg-metallic retro-border-emboss flex w-full items-center justify-between px-4 py-1 text-left text-xl text-[#1f2933] text-shadow-retro focus:outline-none"
       >
         <span>{title}</span>

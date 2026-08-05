@@ -1,4 +1,5 @@
 import {
+  RetroAccordion,
   RetroButton,
   RetroModal,
   RetroSelect,
@@ -70,6 +71,7 @@ export function GroupMatchesGenerationSection({
   canManagePayments = true,
 }: GroupMatchesGenerationSectionProps) {
   const presets = [3, 6, 12];
+  const [formOpen, setFormOpen] = useState(false);
   const [pendingGenerate, setPendingGenerate] = useState<PendingGenerate | null>(null);
   const [pendingDeleteMatch, setPendingDeleteMatch] = useState<Match | null>(null);
 
@@ -92,90 +94,8 @@ export function GroupMatchesGenerationSection({
   return (
     <div className="flex flex-col gap-2">
       {canManageMatches ? (
-        <form
-          onSubmit={editingMatchId ? onSaveEditedMatch : onCreateMatch}
-          className="mt-2 flex flex-col gap-2 rounded border-2 border-[#4060c0] bg-[#1e348c] p-3"
-        >
-          <span className="retro-text-shadow text-sm text-[#a0b0ff]">
-            {editingMatchId ? 'EDITAR PARTIDA' : 'NOVA PARTIDA'}
-          </span>
-
-          <div className="grid gap-2 md:grid-cols-2">
-            <div className="flex flex-col gap-1">
-              <label
-                className="retro-text-shadow text-xs text-[#a0b0ff]"
-                htmlFor="match_scheduled_at"
-              >
-                DATA E HORA
-              </label>
-              <input
-                id="match_scheduled_at"
-                type="datetime-local"
-                value={form.values.scheduled_at}
-                onChange={(e) => form.onChange('scheduled_at', e.target.value)}
-                disabled={form.processing}
-                className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
-                required
-              />
-              {form.errors.scheduled_at ? (
-                <span className="text-xs text-red-400">{form.errors.scheduled_at}</span>
-              ) : null}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label
-                className="retro-text-shadow text-xs text-[#a0b0ff]"
-                htmlFor="match_location_name"
-              >
-                LOCAL
-              </label>
-              <input
-                id="match_location_name"
-                type="text"
-                value={form.values.location_name}
-                onChange={(e) => form.onChange('location_name', e.target.value)}
-                disabled={form.processing}
-                className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <RetroSelect
-                id="match_duration_minutes"
-                label="DURAÇÃO"
-                value={form.values.duration_minutes}
-                onChange={(e) => form.onChange('duration_minutes', e.target.value)}
-                disabled={form.processing}
-                options={[
-                  { value: '', label: '—' },
-                  ...getDurationMinutesOptions(form.values.duration_minutes),
-                ]}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <RetroButton type="submit" size="sm" variant="success" disabled={form.processing}>
-              {editingMatchId ? 'SALVAR' : 'CRIAR PARTIDA'}
-            </RetroButton>
-            {editingMatchId ? (
-              <RetroButton
-                type="button"
-                size="sm"
-                variant="neutral"
-                onClick={onCancelEditMatch}
-                disabled={form.processing}
-              >
-                CANCELAR EDIÇÃO
-              </RetroButton>
-            ) : null}
-          </div>
-        </form>
-      ) : null}
-
-      {canManageMatches ? (
         <p className="retro-text-shadow text-sm text-[#a0b0ff]">
-          OU ESCOLHA O PERIODO PARA GERAR AS DATAS DAS PARTIDAS.
+          ESCOLHA O PERIODO PARA GERAR AS DATAS DAS PARTIDAS.
         </p>
       ) : null}
 
@@ -203,6 +123,91 @@ export function GroupMatchesGenerationSection({
             </RetroButton>
           ))}
         </div>
+      ) : null}
+
+      {canManageMatches ? (
+        <RetroAccordion
+          title={editingMatchId ? 'EDITAR PARTIDA' : 'ADICIONAR PARTIDA MANUALMENTE'}
+          defaultOpen={false}
+          open={formOpen}
+          onToggle={setFormOpen}
+        >
+          <form
+            onSubmit={editingMatchId ? onSaveEditedMatch : onCreateMatch}
+            className="flex flex-col gap-2"
+          >
+            <div className="grid gap-2 md:grid-cols-2">
+              <div className="flex flex-col gap-1">
+                <label
+                  className="retro-text-shadow text-xs text-[#a0b0ff]"
+                  htmlFor="match_scheduled_at"
+                >
+                  DATA E HORA
+                </label>
+                <input
+                  id="match_scheduled_at"
+                  type="datetime-local"
+                  value={form.values.scheduled_at}
+                  onChange={(e) => form.onChange('scheduled_at', e.target.value)}
+                  disabled={form.processing}
+                  className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
+                  required
+                />
+                {form.errors.scheduled_at ? (
+                  <span className="text-xs text-red-400">{form.errors.scheduled_at}</span>
+                ) : null}
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label
+                  className="retro-text-shadow text-xs text-[#a0b0ff]"
+                  htmlFor="match_location_name"
+                >
+                  LOCAL
+                </label>
+                <input
+                  id="match_location_name"
+                  type="text"
+                  value={form.values.location_name}
+                  onChange={(e) => form.onChange('location_name', e.target.value)}
+                  disabled={form.processing}
+                  className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <RetroSelect
+                  id="match_duration_minutes"
+                  label="DURAÇÃO"
+                  value={form.values.duration_minutes}
+                  onChange={(e) => form.onChange('duration_minutes', e.target.value)}
+                  disabled={form.processing}
+                  options={[
+                    { value: '', label: '—' },
+                    ...getDurationMinutesOptions(form.values.duration_minutes),
+                  ]}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <RetroButton type="submit" size="sm" variant="success" disabled={form.processing}>
+                {editingMatchId ? 'SALVAR' : 'CRIAR PARTIDA'}
+              </RetroButton>
+              {editingMatchId ? (
+                <RetroButton
+                  type="button"
+                  size="sm"
+                  variant="neutral"
+                  onClick={onCancelEditMatch}
+                  disabled={form.processing}
+                >
+                  CANCELAR EDIÇÃO
+                </RetroButton>
+              ) : null}
+            </div>
+          </form>
+        </RetroAccordion>
       ) : null}
 
       <div className="mt-2">
@@ -251,7 +256,10 @@ export function GroupMatchesGenerationSection({
                             type="button"
                             size="sm"
                             variant="neutral"
-                            onClick={() => onStartEditMatch(match)}
+                            onClick={() => {
+                              onStartEditMatch(match);
+                              setFormOpen(true);
+                            }}
                           >
                             EDITAR
                           </RetroButton>
