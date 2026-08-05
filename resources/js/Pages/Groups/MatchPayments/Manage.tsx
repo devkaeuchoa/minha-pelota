@@ -8,6 +8,7 @@ import {
   RetroInfoCard,
   RetroInlineInfo,
   RetroSectionHeader,
+  RetroSelect,
   RetroTable,
   RetroTableCell,
   RetroTableHeaderCell,
@@ -301,17 +302,17 @@ export default function Manage({
                           {t('payments.exemptMonthlyBadge')}
                         </span>
                       ) : (
-                        <select
+                        <RetroSelect
                           value={current.payment_status}
                           disabled={controlsDisabled}
                           onChange={(event) =>
                             setPaymentStatus(player.id, event.target.value as 'paid' | 'unpaid')
                           }
-                          className="retro-input w-full border-2 border-[#4060c0] bg-[#0b1340] px-2 py-1 text-[#ffd700] outline-none"
-                        >
-                          <option value="unpaid">NÃO PAGO</option>
-                          <option value="paid">PAGO</option>
-                        </select>
+                          options={[
+                            { value: 'unpaid', label: 'NÃO PAGO' },
+                            { value: 'paid', label: 'PAGO' },
+                          ]}
+                        />
                       )}
                       {!player.confirmed && !isMonthlyExempt ? (
                         <div className="mt-1 text-xs text-[#a0b0ff]">

@@ -2,7 +2,7 @@
 import { Head, router } from '@inertiajs/react';
 import { Group, Match, PageProps } from '@/types';
 import { RetroAppShell } from '@/Layouts/RetroAppShell';
-import { RetroInfoCard, RetroSectionHeader } from '@/Components/retro';
+import { RetroInfoCard, RetroSectionHeader, RetroSelect } from '@/Components/retro';
 import { GroupMatchesGenerationSection } from '@/features/groups/components/GroupMatchesGenerationSection';
 import { useGroupMatchesController } from '@/features/groups/useGroupMatchesController';
 import { resolveGroupPermissions } from '@/utils/groups';
@@ -36,14 +36,9 @@ export default function Dates({ groups, selectedGroupId, selectedGroup, matches 
 
       <RetroInfoCard>
         <div className="flex flex-col gap-3">
-          <label
-            htmlFor="dates_group_selector"
-            className="retro-text-shadow text-sm text-[#a0b0ff]"
-          >
-            GRUPO
-          </label>
-          <select
+          <RetroSelect
             id="dates_group_selector"
+            label="GRUPO"
             value={selectedGroupId ?? ''}
             onChange={(e) => {
               const nextGroupId = Number(e.target.value);
@@ -52,14 +47,8 @@ export default function Dates({ groups, selectedGroupId, selectedGroup, matches 
                 preserveScroll: true,
               });
             }}
-            className="retro-input w-full border-2 border-[#4060c0] bg-[#0b1340] px-3 py-2 text-[#ffd700] outline-none"
-          >
-            {groups.map((group) => (
-              <option key={group.id} value={group.id}>
-                {group.name}
-              </option>
-            ))}
-          </select>
+            options={groups.map((group) => ({ value: String(group.id), label: group.name }))}
+          />
 
           {selectedGroup ? (
             <GroupMatchesGenerationSection

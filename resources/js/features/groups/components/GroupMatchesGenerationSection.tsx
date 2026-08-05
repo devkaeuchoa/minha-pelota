@@ -1,6 +1,7 @@
 import {
   RetroButton,
   RetroModal,
+  RetroSelect,
   RetroTable,
   RetroTableCell,
   RetroTableHeaderCell,
@@ -139,26 +140,17 @@ export function GroupMatchesGenerationSection({
             </div>
 
             <div className="flex flex-col gap-1">
-              <label
-                className="retro-text-shadow text-xs text-[#a0b0ff]"
-                htmlFor="match_duration_minutes"
-              >
-                DURAÇÃO
-              </label>
-              <select
+              <RetroSelect
                 id="match_duration_minutes"
+                label="DURAÇÃO"
                 value={form.values.duration_minutes}
                 onChange={(e) => form.onChange('duration_minutes', e.target.value)}
                 disabled={form.processing}
-                className="retro-input border-2 border-[#4060c0] bg-[#0b1340] px-2 py-2 text-[#ffd700] outline-none"
-              >
-                <option value="">—</option>
-                {getDurationMinutesOptions(form.values.duration_minutes).map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                options={[
+                  { value: '', label: '—' },
+                  ...getDurationMinutesOptions(form.values.duration_minutes),
+                ]}
+              />
             </div>
           </div>
 
