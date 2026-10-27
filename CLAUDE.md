@@ -1,3 +1,7 @@
+> **PROJETO PARADO (stale)**, arquivado em 2026-10-27 em `~/Work/stale/`.
+> Última atividade: 2026-08-05 na main, sem pendências. As dependências instaladas foram removidas (node_modules, vendor e os browsers do Playwright em .playwright).
+> Para retomar: `composer install`, `npm install` e `npm run e2e:install`.
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
